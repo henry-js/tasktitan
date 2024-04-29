@@ -7,6 +7,7 @@ using TaskTitan.Cli.Commands;
 using TaskTitan.Lib;
 using TaskTitan.Lib.Services;
 using Spectre.Console.Cli;
+using TaskTitan.Data;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -17,6 +18,11 @@ builder.Configuration.AddJsonFile("appsettings.json", false);
 //Disable logging
 builder.Logging.ClearProviders();
 
+
+string connectionString = builder.Configuration
+    .GetConnectionString("TaskTitanDb") ?? string.Empty;
+builder.Services.RegisterDb(connectionString);
+
 // Bind configuration section to object
 builder.Services.AddOptions<NestedSettings>()
     .Bind(builder.Configuration.GetSection(NestedSettings.Key));
@@ -26,7 +32,6 @@ builder.Services.AddCommand<HelloCommand>("hello", cmd =>
 {
     cmd.WithDescription("A command that says hello");
 });
-
 
 // Add another command and its dependent service
 
