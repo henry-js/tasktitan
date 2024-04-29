@@ -19,8 +19,6 @@ public class TaskTitanDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasDefaultSchema("Tasks");
-
         modelBuilder.Entity<Task>()
         .Property(task => task.Id)
         .HasConversion(id => id.Value.ToString(), value => new TaskId(value));
