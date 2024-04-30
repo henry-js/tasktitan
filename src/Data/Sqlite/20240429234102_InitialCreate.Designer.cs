@@ -21,7 +21,7 @@ namespace Data.Sqlite
                 .HasDefaultSchema("Tasks")
                 .HasAnnotation("ProductVersion", "8.0.4");
 
-            modelBuilder.Entity("TaskTitan.Domain.Task", b =>
+            modelBuilder.Entity("TaskTitan.Core.Task", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");

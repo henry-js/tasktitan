@@ -1,7 +1,7 @@
 using shortid;
 using shortid.Configuration;
 
-namespace TaskTitan.Domain;
+namespace TaskTitan.Core;
 
 public readonly record struct TaskId(string Value)
 {

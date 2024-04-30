@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-using TaskTitan.Domain;
+using TaskTitan.Core;
 
-using Task = TaskTitan.Domain.Task;
+using Task = TaskTitan.Core.Task;
 
 namespace TaskTitan.Data;
 

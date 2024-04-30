@@ -1,6 +1,6 @@
 using shortid;
 
-namespace TaskTitan.Domain;
+namespace TaskTitan.Core;
 
 public class Task
 {
@@ -12,7 +12,6 @@ public class Task
 
     public TaskId Id { get; private set; } = TaskId.Empty;
     public string Description { get; private set; } = string.Empty;
-
 
     public static Task CreateNew(string description)
     {
