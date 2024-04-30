@@ -11,12 +11,12 @@ public class Task
     }
 
     public TaskId Id { get; private set; } = TaskId.Empty;
-    public string Description { get; private set; }
+    public string Description { get; private set; } = string.Empty;
 
 
-    public Task CreateNew(string description)
+    public static Task CreateNew(string description)
     {
-        Task task = new Task()
+        Task task = new()
         {
             Id = TaskId.NewTaskId(),
             Description = description,

@@ -27,6 +27,14 @@ public class TaskTitanDbContext : DbContext
         modelBuilder.Entity<Task>().HasKey(t => t.Id);
 
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Task>().HasData(
+            [
+                Task.CreateNew("Basic task"),
+                Task.CreateNew("Wash the dog"),
+                Task.CreateNew("Feed the cats"),
+            ]
+        );
     }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
