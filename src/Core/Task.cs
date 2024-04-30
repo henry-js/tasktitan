@@ -1,5 +1,3 @@
-using shortid;
-
 namespace TaskTitan.Core;
 
 public class Task
@@ -12,6 +10,7 @@ public class Task
 
     public TaskId Id { get; private set; } = TaskId.Empty;
     public string Description { get; private set; } = string.Empty;
+    public DateTime CreatedAt { get; private set; }
 
     public static Task CreateNew(string description)
     {
@@ -19,6 +18,7 @@ public class Task
         {
             Id = TaskId.NewTaskId(),
             Description = description,
+            CreatedAt = DateTime.UtcNow,
         };
 
         return task;
