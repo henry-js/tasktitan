@@ -30,7 +30,7 @@ partial class Build : NukeBuild
     AbsolutePath ProjectDirectory => SourceDirectory / "Cli";
     AbsolutePath ArtifactsDirectory => RootDirectory / ".artifacts";
     AbsolutePath PublishDirectory => RootDirectory / "publish";
-    AbsolutePath InstallDirectory => RootDirectory / "install";
+    AbsolutePath ReleaseDirectory => RootDirectory / "release";
     AbsolutePath PackDirectory => RootDirectory / "packages";
     AbsolutePath SourceDirectory => RootDirectory / "src";
     AbsolutePath TestDirectory => RootDirectory / "tests";
@@ -98,6 +98,6 @@ partial class Build : NukeBuild
         .DependsOn(Publish)
         .Executes(() =>
         {
-            Vpk.Invoke($"pack --packId tasktitan --packVersion 0.0.1 --packDir {PublishDirectory} --mainExe task.exe --packTitle tasktitan --outputDir {InstallDirectory}");
+            Vpk.Invoke($"pack --packId tasktitan --packVersion 0.0.1 --packDir {PublishDirectory} --mainExe task.exe --packTitle tasktitan --outputDir {ReleaseDirectory}");
         });
 }
