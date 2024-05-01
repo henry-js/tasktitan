@@ -15,4 +15,8 @@
     <PackageReference Include="Nuke.Common" Version="8.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageDownload Include="vpk" Version="[0.0.462-gf8acc97]" />
+  </ItemGroup>
+
 </Project>

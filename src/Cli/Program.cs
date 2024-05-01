@@ -8,19 +8,25 @@ using TaskTitan.Lib;
 using TaskTitan.Lib.Services;
 using Spectre.Console.Cli;
 using TaskTitan.Data;
+using Velopack;
+using TaskTitan.Cli;
+
+VelopackApp.Build().Run();
 
 var builder = Host.CreateApplicationBuilder(args);
 
 // Only use configuration in appsettings.json
 builder.Configuration.Sources.Clear();
-builder.Configuration.AddJsonFile("appsettings.json", false);
+builder.Configuration.AddJsonFile(Path.Combine(Constants.ConfigurationDirectory, "appsettings.json"), false);
 
 //Disable logging
 builder.Logging.ClearProviders();
 
 
-string connectionString = builder.Configuration
+string fileName = builder.Configuration
     .GetConnectionString("TaskTitanDb") ?? string.Empty;
+
+string connectionString = Path.Combine(Constants.ConfigurationDirectory, fileName);
 builder.Services.RegisterDb(connectionString);
 
 // Bind configuration section to object

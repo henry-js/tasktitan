@@ -20,9 +20,8 @@ using Serilog;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.ReportGenerator.ReportGeneratorTasks;
 
-class Build : NukeBuild
+partial class Build : NukeBuild
 {
-
     public static int Main() => Execute<Build>(x => x.Compile);
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
@@ -31,6 +30,7 @@ class Build : NukeBuild
     AbsolutePath ProjectDirectory => SourceDirectory / "Cli";
     AbsolutePath ArtifactsDirectory => RootDirectory / ".artifacts";
     AbsolutePath PublishDirectory => RootDirectory / "publish";
+    AbsolutePath InstallDirectory => RootDirectory / "install";
     AbsolutePath PackDirectory => RootDirectory / "packages";
     AbsolutePath SourceDirectory => RootDirectory / "src";
     AbsolutePath TestDirectory => RootDirectory / "tests";
@@ -74,4 +74,30 @@ class Build : NukeBuild
             );
         });
 
+    Target Publish => _ => _
+        // .After(Test)
+        .DependsOn(Compile)
+        // .Triggers(Pack)
+        // .Produces(PackDirectory)
+        .Executes(() =>
+        {
+            PublishDirectory.CreateOrCleanDirectory();
+
+            DotNetPublish(_ => _
+                .EnableNoLogo()
+                .EnableNoBuild()
+                .EnableNoRestore()
+                .SetProject(ProjectDirectory)
+                .SetOutput(PublishDirectory)
+                .SetConfiguration(Configuration)
+            );
+
+            // PublishDirectory.ZipTo(PackDirectory / $"{Solution.Name}.zip", fileMode: FileMode.Create);
+        });
+    Target Pack => _ => _
+        .DependsOn(Publish)
+        .Executes(() =>
+        {
+            Vpk.Invoke($"pack --packId tasktitan --packVersion 0.0.1 --packDir {PublishDirectory} --mainExe task.exe --packTitle tasktitan --outputDir {InstallDirectory}");
+        });
 }
