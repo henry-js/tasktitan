@@ -1,16 +1,22 @@
 ﻿using Community.Extensions.Spectre.Cli.Hosting;
+
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+
+using Serilog;
+
+using Spectre.Console.Cli;
+
+using TaskTitan.Cli;
 using TaskTitan.Cli.Commands;
+using TaskTitan.Data;
 using TaskTitan.Lib;
 using TaskTitan.Lib.Services;
-using Spectre.Console.Cli;
-using TaskTitan.Data;
+
 using Velopack;
-using TaskTitan.Cli;
-using Serilog;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.File("logs/setup.log", rollingInterval: RollingInterval.Day)
@@ -18,25 +24,19 @@ Log.Logger = new LoggerConfiguration()
 
 try
 {
-
     VelopackApp.Build().Run();
 
     var builder = Host.CreateApplicationBuilder(args);
 
     // Only use configuration in appsettings.json
 
-    
     builder.Configuration.Sources.Clear();
-    builder.Configuration.AddJsonFile(Path.Combine(Constants.ConfigurationDirectory, "appsettings.json"), false);
+    builder.Configuration.AddJsonFile(Constants.AppSettingsPath, false);
 
     //Disable logging
     builder.Logging.ClearProviders();
 
-    string fileName = builder.Configuration
-        .GetConnectionString("TaskTitanDb") ?? string.Empty;
-
-    string connectionString = Path.Combine(Constants.ConfigurationDirectory, fileName);
-    builder.Services.RegisterDb(connectionString);
+    builder.Services.RegisterDb(Constants.DbConnectionString);
 
     // Bind configuration section to object
     builder.Services.AddOptions<NestedSettings>()
@@ -56,17 +56,20 @@ try
     //
     // The standard call save for the commands will be pre-added & configured
     //
-    builder.UseSpectreConsole<HelloCommand>(config =>
+    builder.UseSpectreConsole<HelloCommand>(configureCommandApp =>
     {
         // All commands above are passed to config.AddCommand() by this point
-
-        config.SetApplicationName("hello");
-        config.UseBasicExceptionHandler();
+        configureCommandApp.SetApplicationName("hello");
+        configureCommandApp.UseBasicExceptionHandler();
     });
 
     var app = builder.Build();
+    await using (var scope = app.Services.CreateAsyncScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<TaskTitanDbContext>();
+        await db.Database.MigrateAsync();
+    }
     await app.RunAsync();
-
 }
 catch (Exception ex)
 {

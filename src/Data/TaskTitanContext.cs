@@ -38,6 +38,6 @@ public class TaskTitanDbContext : DbContext
     }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        Database.EnsureCreated();
+        // Database.EnsureCreated();
     }
 }
