@@ -44,4 +44,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(ProjectDir).tasktitan\**" CopyToOutputDirectory="PreserveNewest" LinkBase=".tasktitan\"/>
+  </ItemGroup>
 </Project>
