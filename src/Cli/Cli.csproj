@@ -4,6 +4,7 @@
     <ProjectReference Include="..\Lib\Lib.csproj" />
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Data\Data.csproj" />
+    <ProjectReference Include="..\DotConfig\DotConfig.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -46,6 +47,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="$(ProjectDir).tasktitan\**" CopyToOutputDirectory="PreserveNewest" LinkBase=".tasktitan\"/>
+    <None Include="$(ProjectDir).tasktitan\**" CopyToOutputDirectory="PreserveNewest" LinkBase=".tasktitan\" />
   </ItemGroup>
 </Project>
