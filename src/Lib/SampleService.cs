@@ -14,4 +14,15 @@ public class SampleService : ISampleService
 
         return true;
     }
+
+    public interface ITaskRepository
+    {
+        public void Add(Task task);
+        public void Update(Task task);
+        public IEnumerable<Task> Get();
+        public Task Get(string id);
+        public Task Delete(Task task);
+
+
+    }
 }
