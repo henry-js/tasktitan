@@ -1,22 +1,17 @@
 ﻿using Community.Extensions.Spectre.Cli.Hosting;
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 using Serilog;
-using Serilog.Events;
 
-using Spectre.Console;
 using Spectre.Console.Cli;
 
 using TaskTitan.Cli;
-using TaskTitan.Cli.Commands;
 using TaskTitan.Cli.Commands.TaskCommands;
 using TaskTitan.Data;
-using TaskTitan.Lib;
 using TaskTitan.Lib.Services;
 
 using Velopack;
@@ -46,24 +41,14 @@ try
 
     var builder = Host.CreateApplicationBuilder(args);
 
-    // Only use configuration in appsettings.json
-    // builder.Configuration.Sources.Clear();
-    // builder.Configuration.AddJsonFile("appsettings.json", false);
-
     // Bind configuration section to object
     // builder.Services.AddOptions<NestedSettings>()
     //     .Bind(builder.Configuration.GetSection(NestedSettings.Key));
 
     //Disable logging
     builder.Logging.ClearProviders();
-    builder.Services.AddSerilog((serv, lc) => lc
-        .ReadFrom.Configuration(builder.Configuration)
-    // .WriteTo.File(
-    //     path: "logs/test-file-.log",
-    //     rollingInterval: RollingInterval.Day,
-    //     restrictedToMinimumLevel: LogEventLevel.Information
-    // )
-    // .WriteTo.Console(LogEventLevel.Information)
+    builder.Services.AddSerilog((_, lc) =>
+        lc.ReadFrom.Configuration(builder.Configuration)
     );
 
 #if DEBUG
@@ -91,6 +76,8 @@ try
     });
 
     var app = builder.Build();
+
+    // Ensure db exists
     await using (var scope = app.Services.CreateAsyncScope())
     {
         var db = scope.ServiceProvider.GetRequiredService<TaskTitanDbContext>();

@@ -10,8 +10,6 @@
                 "${workspaceFolder}/TaskTitan.sln",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign",
-                "-o",
-                "debug\\app"
             ],
             "problemMatcher": "$msCompile"
         },

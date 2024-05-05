@@ -11,7 +11,7 @@ internal class AddCommand(IAnsiConsole console, ILogger logger) : AsyncCommand<T
 
     public override Task<int> ExecuteAsync(CommandContext context, TaskSettings settings)
     {
-        _logger.Information("Hello from add command");
+        _logger.Information("Hello from: {Command}", typeof(AddCommand));
         _console.WriteLine("Hello from task add");
         return Task.FromResult(0);
     }
