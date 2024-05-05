@@ -176,6 +176,9 @@ csharp_preserve_single_line_statements = true
 # MA0004: Use Task.ConfigureAwait
 dotnet_diagnostic.MA0004.severity = none
 
+# IDE1006: Naming Styles
+dotnet_diagnostic.IDE1006.severity = silent
+
 [*.{cs,vb}]
 
 # Naming rules
@@ -205,7 +208,7 @@ dotnet_naming_rule.events_should_be_pascalcase.symbols = events
 dotnet_naming_rule.events_should_be_pascalcase.style = pascalcase
 
 dotnet_naming_rule.local_variables_should_be_camelcase.severity = suggestion
-dotnet_naming_rule.local_variables_should_be_camelcase.symbols = local_variables
+dotnet_naming_rule.local_variables_should_be_camelcase.symbols = local_variablesW
 dotnet_naming_rule.local_variables_should_be_camelcase.style = camelcase
 
 dotnet_naming_rule.local_constants_should_be_camelcase.severity = suggestion

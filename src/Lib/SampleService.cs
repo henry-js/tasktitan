@@ -1,6 +1,6 @@
 namespace TaskTitan.Lib.Services;
 
-public class SampleService : ISampleService
+public partial class SampleService : ISampleService
 {
     private readonly string _message;
 
