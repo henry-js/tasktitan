@@ -1,6 +1,7 @@
 ﻿using Community.Extensions.Spectre.Cli.Hosting;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -46,8 +47,9 @@ try
     var builder = Host.CreateApplicationBuilder(args);
 
     // Only use configuration in appsettings.json
-    builder.Configuration.Sources.Clear();
-    // builder.Configuration.AddJsonFile(Constants.AppSettingsPath, false);
+    // builder.Configuration.Sources.Clear();
+    // builder.Configuration.AddJsonFile("appsettings.json", false);
+
     // Bind configuration section to object
     // builder.Services.AddOptions<NestedSettings>()
     //     .Bind(builder.Configuration.GetSection(NestedSettings.Key));
@@ -55,12 +57,13 @@ try
     //Disable logging
     builder.Logging.ClearProviders();
     builder.Services.AddSerilog((serv, lc) => lc
-        .WriteTo.File(
-            "logs/test-file-.log",
-            rollingInterval: RollingInterval.Day,
-            restrictedToMinimumLevel: LogEventLevel.Information
-        )
-        .WriteTo.Console(LogEventLevel.Information)
+        .ReadFrom.Configuration(builder.Configuration)
+    // .WriteTo.File(
+    //     path: "logs/test-file-.log",
+    //     rollingInterval: RollingInterval.Day,
+    //     restrictedToMinimumLevel: LogEventLevel.Information
+    // )
+    // .WriteTo.Console(LogEventLevel.Information)
     );
 
 #if DEBUG
@@ -104,5 +107,5 @@ finally
     await Log.CloseAndFlushAsync();
 }
 
-AnsiConsole.WriteLine("Press any key to exit.");
-Console.ReadKey(intercept: false);
+// AnsiConsole.WriteLine("Press any key to exit.");
+// Console.ReadKey(intercept: false);
