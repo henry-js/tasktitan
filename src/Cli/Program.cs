@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 using Serilog;
+using Serilog.Events;
 
 using Spectre.Console;
 using Spectre.Console.Cli;
@@ -53,6 +54,14 @@ try
 
     //Disable logging
     builder.Logging.ClearProviders();
+    builder.Services.AddSerilog((serv, lc) => lc
+        .WriteTo.File(
+            "logs/test-file-.log",
+            rollingInterval: RollingInterval.Day,
+            restrictedToMinimumLevel: LogEventLevel.Information
+        )
+        .WriteTo.Console(LogEventLevel.Information)
+    );
 
 #if DEBUG
     var path = Path.Combine(Directory.GetCurrentDirectory(), ".tasktitan", "tasks.db");
