@@ -19,7 +19,7 @@ using Velopack;
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
     .WriteTo.File("logs/setup-.log", rollingInterval: RollingInterval.Day)
-    .CreateLogger();
+    .CreateBootstrapLogger();
 
 try
 {
@@ -44,11 +44,16 @@ try
     // Bind configuration section to object
     // builder.Services.AddOptions<NestedSettings>()
     //     .Bind(builder.Configuration.GetSection(NestedSettings.Key));
-
     //Disable logging
     builder.Logging.ClearProviders();
-    builder.Services.AddSerilog((_, lc) =>
-        lc.ReadFrom.Configuration(builder.Configuration)
+    // builder.Services.AddSerilog((_, lc) =>
+    //     lc.ReadFrom.Configuration(builder.Configuration)
+    // );
+    builder.Services.AddLogging(lbuilder =>
+        lbuilder.AddSerilog(
+            new LoggerConfiguration()
+                .ReadFrom.Configuration(builder.Configuration)
+                .CreateLogger())
     );
 
 #if DEBUG
