@@ -1,11 +1,7 @@
-
 using Microsoft.Extensions.Logging;
 
-using Spectre.Console;
-using Spectre.Console.Cli;
-
 namespace TaskTitan.Cli.Commands.TaskCommands;
-internal class AddCommand(IAnsiConsole console, ILogger<AddCommand> logger) : AsyncCommand<TaskSettings>
+internal sealed class AddCommand(IAnsiConsole console, ILogger<AddCommand> logger) : AsyncCommand<TaskSettings>
 {
     private readonly IAnsiConsole _console = console;
     private readonly ILogger _logger = logger;

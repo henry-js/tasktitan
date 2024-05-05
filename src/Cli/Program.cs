@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 
 using Serilog;
 
+using Spectre.Console;
 using Spectre.Console.Cli;
 
 using TaskTitan.Cli;
@@ -30,9 +31,10 @@ try
         {
             throw new Exception(".tasktitan directory not found in source directory");
         }
-        if (!Directory.Exists(ConfigHelper.UserProfileDirectoryDataFolder))
+        if (!Directory.Exists(ConfigHelper.UserProfileDirectoryDataFolder) || !File.Exists(ConfigHelper.UserProfileDbPath))
         {
             Directory.CreateDirectory(ConfigHelper.UserProfileDirectoryDataFolder);
+            Directory.Move(ConfigHelper.SourceDirectoryDataFolder, ConfigHelper.UserProfileDirectory);
         }
     })
     .Run();
@@ -65,6 +67,7 @@ try
 
     // Add a command and optionally configure it.
     builder.Services.AddScoped<AddCommand>();
+    builder.Services.AddScoped<ListCommand>();
     builder.Services.AddScoped<ISampleService, SampleService>(s => new SampleService("Other Service"));
 
     builder.UseSpectreConsole(config =>
@@ -75,6 +78,9 @@ try
         config.AddCommand<AddCommand>("add")
             .WithDescription("Add a task to the list");
 
+        config.AddCommand<ListCommand>("list")
+            .WithDescription("List tasks in default collection");
+
 #if DEBUG
         config.UseBasicExceptionHandler();
 #endif
@@ -83,11 +89,11 @@ try
     var app = builder.Build();
 
     // Ensure db exists
-    await using (var scope = app.Services.CreateAsyncScope())
-    {
-        var db = scope.ServiceProvider.GetRequiredService<TaskTitanDbContext>();
-        await db.Database.MigrateAsync();
-    }
+    // await using (var scope = app.Services.CreateAsyncScope())
+    // {
+    //     var db = scope.ServiceProvider.GetRequiredService<TaskTitanDbContext>();
+    //     await db.Database.MigrateAsync();
+    // }
     await app.RunAsync();
 }
 catch (Exception ex)
@@ -99,5 +105,5 @@ finally
     await Log.CloseAndFlushAsync();
 }
 
-// AnsiConsole.WriteLine("Press any key to exit.");
-// Console.ReadKey(intercept: false);
+AnsiConsole.WriteLine("Press any key to exit.");
+System.Console.ReadKey(intercept: false);

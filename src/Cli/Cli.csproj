@@ -51,4 +51,10 @@
   <ItemGroup>
     <None Include="$(ProjectDir).tasktitan\**" CopyToOutputDirectory="PreserveNewest" LinkBase=".tasktitan\" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Spectre.Console" />
+    <Using Include="Spectre.Console.Cli" />
+    <Using Include="Spectre.Console.AnsiConsole" Alias="Console" />
+  </ItemGroup>
 </Project>
