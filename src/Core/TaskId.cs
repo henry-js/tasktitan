@@ -3,11 +3,11 @@ using shortid.Configuration;
 
 namespace TaskTitan.Core;
 
-public readonly record struct MyTaskId(string Value)
+public readonly record struct TTaskId(string Value)
 {
     private static readonly GenerationOptions Options = new(useNumbers: true, useSpecialCharacters: false, length: 8);
 
-    public static MyTaskId Empty => new(string.Empty);
+    public static TTaskId Empty => new(string.Empty);
 
-    public static MyTaskId NewTaskId() => new(ShortId.Generate(Options));
+    public static TTaskId NewTaskId() => new(ShortId.Generate(Options));
 }

@@ -1,8 +1,7 @@
 using Microsoft.Extensions.Logging;
-
 using TaskTitan.Data;
-
-using static TaskTitan.Core.MyTask;
+using System.Threading.Tasks;
+using TaskTitan.Core;
 
 namespace TaskTitan.Cli.Commands.TaskCommands;
 
@@ -10,10 +9,12 @@ internal sealed class ListCommand(IAnsiConsole console, TaskTitanDbContext dbCon
 {
     private readonly IAnsiConsole console = console;
     private readonly TaskTitanDbContext dbContext = dbContext;
+    private readonly ILogger<ListCommand> logger = logger;
 
     public override Task<int> ExecuteAsync(CommandContext context, TaskSettings settings)
     {
-        var tasks = dbContext.Tasks.Where(t => t.State != TaskState.Done);
+        logger.LogDebug("Fetching tasks");
+        // var tasks = dbContext.Tasks.Where(t => t.State != TTaskState.Done);
         console.ListTasks(dbContext.Tasks.ToList());
         return Task.FromResult(0);
     }

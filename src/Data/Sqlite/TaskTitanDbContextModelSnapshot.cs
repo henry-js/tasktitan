@@ -17,7 +17,7 @@ namespace Data.Sqlite
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.4");
 
-            modelBuilder.Entity("TaskTitan.Core.Task", b =>
+            modelBuilder.Entity("TaskTitan.Core.TTask", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -29,29 +29,13 @@ namespace Data.Sqlite
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.ToTable("tasks", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "BqlWvjNY",
-                            CreatedAt = new DateTime(2024, 5, 5, 21, 36, 42, 619, DateTimeKind.Utc).AddTicks(5544),
-                            Description = "Basic task"
-                        },
-                        new
-                        {
-                            Id = "sCBNmoJr",
-                            CreatedAt = new DateTime(2024, 5, 5, 21, 36, 42, 619, DateTimeKind.Utc).AddTicks(5550),
-                            Description = "Wash the dog"
-                        },
-                        new
-                        {
-                            Id = "qGjh4lHm",
-                            CreatedAt = new DateTime(2024, 5, 5, 21, 36, 42, 619, DateTimeKind.Utc).AddTicks(5555),
-                            Description = "Feed the cats"
-                        });
                 });
 #pragma warning restore 612, 618
         }

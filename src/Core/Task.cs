@@ -1,33 +1,33 @@
 namespace TaskTitan.Core;
 
-public class MyTask
+public class TTask
 {
-    private MyTask() { }
-    public MyTask(string description)
+    private TTask() { }
+    public TTask(string description)
     {
         Description = description;
     }
 
-    public MyTaskId Id { get; private set; } = MyTaskId.Empty;
+    public TTaskId Id { get; private set; } = TTaskId.Empty;
     public string Description { get; private set; } = string.Empty;
     public DateTime CreatedAt { get; private set; }
-    public TaskState State { get; private set; }
+    public TTaskState State { get; private set; }
 
-    public static MyTask CreateNew(string description)
+    public static TTask CreateNew(string description)
     {
-        MyTask task = new()
+        TTask task = new()
         {
-            Id = MyTaskId.NewTaskId(),
+            Id = TTaskId.NewTaskId(),
             Description = description,
             CreatedAt = DateTime.UtcNow,
-            State = TaskState.Pending
+            State = TTaskState.Pending
         };
 
         return task;
     }
+}
 
-    public enum TaskState
-    {
-        Pending, Started, Done
-    }
+public enum TTaskState
+{
+    Pending, Started, Done
 }

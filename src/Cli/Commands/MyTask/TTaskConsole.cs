@@ -1,12 +1,12 @@
 namespace TaskTitan.Cli.Commands.TaskCommands;
 
-internal static class MyTaskConsole
+internal static class TTaskConsole
 {
-    internal static void ListTasks(this IAnsiConsole console, List<Core.MyTask> tasks)
+    internal static void ListTasks(this IAnsiConsole console, List<Core.TTask> tasks)
     {
         var table = new Table()
         .Border(TableBorder.Horizontal)
-        .AddColumns(nameof(Core.MyTask.Id), nameof(Core.MyTask.Description));
+        .AddColumns(nameof(Core.TTask.Id), nameof(Core.TTask.Description));
 
         foreach (var task in tasks)
         {

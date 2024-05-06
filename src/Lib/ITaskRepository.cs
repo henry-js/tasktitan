@@ -4,9 +4,9 @@ namespace TaskTitan.Lib;
 
 public interface ITaskRepository
 {
-    public void Add(MyTask task);
-    public void Update(MyTask task);
-    public IEnumerable<MyTask> Get();
-    public MyTask Get(string id);
-    public MyTask Delete(MyTask task);
+    public void Add(TTask task);
+    public void Update(TTask task);
+    public IEnumerable<TTask> Get();
+    public TTask Get(string id);
+    public TTask Delete(TTask task);
 }

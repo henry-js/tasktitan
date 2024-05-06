@@ -48,9 +48,6 @@ try
     //     .Bind(builder.Configuration.GetSection(NestedSettings.Key));
     //Disable logging
     builder.Logging.ClearProviders();
-    // builder.Services.AddSerilog((_, lc) =>
-    //     lc.ReadFrom.Configuration(builder.Configuration)
-    // );
     builder.Services.AddLogging(lbuilder =>
         lbuilder.AddSerilog(
             new LoggerConfiguration()

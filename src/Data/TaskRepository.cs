@@ -4,27 +4,27 @@ namespace TaskTitan.Data;
 
 public class TaskRepository : ITaskRepository
 {
-    public void Add(Core.MyTask task)
+    public void Add(Core.TTask task)
     {
         throw new NotImplementedException();
     }
 
-    public Core.MyTask Delete(Core.MyTask task)
+    public Core.TTask Delete(Core.TTask task)
     {
         throw new NotImplementedException();
     }
 
-    public IEnumerable<Core.MyTask> Get()
+    public IEnumerable<Core.TTask> Get()
     {
         throw new NotImplementedException();
     }
 
-    public Core.MyTask Get(string id)
+    public Core.TTask Get(string id)
     {
         throw new NotImplementedException();
     }
 
-    public void Update(Core.MyTask task)
+    public void Update(Core.TTask task)
     {
         throw new NotImplementedException();
     }

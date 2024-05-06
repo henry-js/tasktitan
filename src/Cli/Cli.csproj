@@ -57,7 +57,6 @@
     <Using Include="Spectre.Console.Cli" />
     <Using Include="Spectre.Console.AnsiConsole" Alias="Console" />
     <Using Include="System.Collections.Generic" />
-    <Using Include="System" />
-    <Using Include="System.IO" />
+    <Using Remove="System.Threading.Tasks" />
   </ItemGroup>
 </Project>
