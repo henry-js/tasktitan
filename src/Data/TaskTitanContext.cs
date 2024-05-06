@@ -2,7 +2,7 @@
 
 using TaskTitan.Core;
 
-using Task = TaskTitan.Core.Task;
+using MyTask = TaskTitan.Core.MyTask;
 
 namespace TaskTitan.Data;
 
@@ -13,26 +13,26 @@ public class TaskTitanDbContext : DbContext
     {
     }
 
-    public DbSet<Task> Tasks => base.Set<Task>();
+    public DbSet<MyTask> Tasks => base.Set<MyTask>();
 
     public void Commit() => this.SaveChanges();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Task>()
+        modelBuilder.Entity<MyTask>()
         .Property(task => task.Id)
-        .HasConversion(id => id.Value.ToString(), value => new TaskId(value));
+        .HasConversion(id => id.Value.ToString(), value => new MyTaskId(value));
 
-        modelBuilder.Entity<Task>().ToTable("tasks");
-        modelBuilder.Entity<Task>().HasKey(t => t.Id);
+        modelBuilder.Entity<MyTask>().ToTable("tasks");
+        modelBuilder.Entity<MyTask>().HasKey(t => t.Id);
 
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<Task>().HasData(
+        modelBuilder.Entity<MyTask>().HasData(
             [
-                Task.CreateNew("Basic task"),
-                Task.CreateNew("Wash the dog"),
-                Task.CreateNew("Feed the cats"),
+                MyTask.CreateNew("Basic task"),
+                MyTask.CreateNew("Wash the dog"),
+                MyTask.CreateNew("Feed the cats"),
             ]
         );
     }

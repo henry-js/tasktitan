@@ -105,5 +105,6 @@ finally
     await Log.CloseAndFlushAsync();
 }
 
+AnsiConsole.WriteLine();
 AnsiConsole.WriteLine("Press any key to exit.");
 System.Console.ReadKey(intercept: false);
