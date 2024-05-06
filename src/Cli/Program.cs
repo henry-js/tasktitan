@@ -65,7 +65,7 @@ try
     // Add a command and optionally configure it.
     builder.Services.AddScoped<AddCommand>();
     builder.Services.AddScoped<ListCommand>();
-    builder.Services.AddScoped<ISampleService, SampleService>(s => new SampleService("Other Service"));
+    builder.Services.AddScoped<ITtaskService, TaskService>();
 
     builder.UseSpectreConsole(config =>
     {

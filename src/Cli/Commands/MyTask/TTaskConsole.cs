@@ -1,5 +1,7 @@
 using System.Globalization;
 
+using Humanizer;
+
 using TaskTitan.Core;
 
 namespace TaskTitan.Cli.Commands.TaskCommands;
@@ -32,5 +34,7 @@ internal static class TTaskConsole
         }
 
         console.Write(table);
+        string taskSummary = "task".ToQuantity(tasks.Count);
+        console.Write($"{taskSummary}.");
     }
 }
