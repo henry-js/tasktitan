@@ -32,13 +32,21 @@ public class TaskTitanDbContext : DbContext
 
         base.OnModelCreating(modelBuilder);
 
-        // modelBuilder.Entity<MyTask>().HasData(
-        //     [
-        //         MyTask.CreateNew("Basic task"),
-        //         MyTask.CreateNew("Wash the dog"),
-        //         MyTask.CreateNew("Feed the cats"),
-        //     ]
-        // );
+        var startedTask = TTask.CreateNew("Started task");
+        startedTask.Start();
+        var completedTask = TTask.CreateNew("Completed task");
+        completedTask.Complete();
+
+        modelBuilder.Entity<TTask>().HasData(
+            [
+                TTask.CreateNew("Basic task"),
+                TTask.CreateNew("Wash the dog"),
+                TTask.CreateNew("Feed the cats"),
+                startedTask,
+                completedTask,
+            ]
+        );
+
     }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

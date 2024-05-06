@@ -25,6 +25,16 @@ public class TTask
 
         return task;
     }
+
+    public void Start()
+    {
+        State = TTaskState.Started;
+    }
+
+    public void Complete()
+    {
+        State = TTaskState.Done;
+    }
 }
 
 public enum TTaskState

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskTitan.Data;
 
@@ -10,9 +11,11 @@ using TaskTitan.Data;
 namespace Data.Sqlite
 {
     [DbContext(typeof(TaskTitanDbContext))]
-    partial class TaskTitanDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240506083653_AddSeedTasksWithStates")]
+    partial class AddSeedTasksWithStates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.4");
@@ -40,36 +43,36 @@ namespace Data.Sqlite
                     b.HasData(
                         new
                         {
-                            Id = "JCcDM2ey",
-                            CreatedAt = new DateTime(2024, 5, 6, 8, 41, 6, 745, DateTimeKind.Utc).AddTicks(3578),
+                            Id = "TbNdVCnL",
+                            CreatedAt = new DateTime(2024, 5, 6, 8, 36, 53, 13, DateTimeKind.Utc).AddTicks(3721),
                             Description = "Basic task",
                             State = "Pending"
                         },
                         new
                         {
-                            Id = "95mI7PF4",
-                            CreatedAt = new DateTime(2024, 5, 6, 8, 41, 6, 745, DateTimeKind.Utc).AddTicks(3591),
+                            Id = "YHwj0rTr",
+                            CreatedAt = new DateTime(2024, 5, 6, 8, 36, 53, 13, DateTimeKind.Utc).AddTicks(3729),
                             Description = "Wash the dog",
                             State = "Pending"
                         },
                         new
                         {
-                            Id = "UFBzhVvq",
-                            CreatedAt = new DateTime(2024, 5, 6, 8, 41, 6, 745, DateTimeKind.Utc).AddTicks(3604),
+                            Id = "WDvXCLgN",
+                            CreatedAt = new DateTime(2024, 5, 6, 8, 36, 53, 13, DateTimeKind.Utc).AddTicks(3737),
                             Description = "Feed the cats",
                             State = "Pending"
                         },
                         new
                         {
-                            Id = "LUUrYVj3",
-                            CreatedAt = new DateTime(2024, 5, 6, 8, 41, 6, 745, DateTimeKind.Utc).AddTicks(3500),
+                            Id = "L2GxtC0R",
+                            CreatedAt = new DateTime(2024, 5, 6, 8, 36, 53, 13, DateTimeKind.Utc).AddTicks(3676),
                             Description = "Started task",
                             State = "Started"
                         },
                         new
                         {
-                            Id = "sF13aU2U",
-                            CreatedAt = new DateTime(2024, 5, 6, 8, 41, 6, 745, DateTimeKind.Utc).AddTicks(3516),
+                            Id = "aI50VPJR",
+                            CreatedAt = new DateTime(2024, 5, 6, 8, 36, 53, 13, DateTimeKind.Utc).AddTicks(3690),
                             Description = "Completed task",
                             State = "Done"
                         });

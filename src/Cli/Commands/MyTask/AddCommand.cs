@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Logging;
 
-using TTask = TaskTitan.Core.TTask;
 using TaskTitan.Data;
 using System.Threading.Tasks;
+using TaskTitan.Core;
 
 namespace TaskTitan.Cli.Commands.TaskCommands;
 internal sealed class AddCommand(IAnsiConsole console, TaskTitanDbContext dbContext, ILogger<AddCommand> logger) : AsyncCommand<AddCommand.Settings>
