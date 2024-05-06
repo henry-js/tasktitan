@@ -25,6 +25,11 @@ public class TaskRepository : ITaskRepository
         throw new NotImplementedException();
     }
 
+    public IEnumerable<TTask> GetAll()
+    {
+        throw new NotImplementedException();
+    }
+
     public void Update(TTask task)
     {
         throw new NotImplementedException();

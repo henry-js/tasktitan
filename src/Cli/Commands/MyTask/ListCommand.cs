@@ -14,8 +14,8 @@ internal sealed class ListCommand(IAnsiConsole console, TaskTitanDbContext dbCon
     public override Task<int> ExecuteAsync(CommandContext context, TaskSettings settings)
     {
         logger.LogDebug("Fetching tasks");
-        var tasks = dbContext.Tasks.Where(t => t.State != TTaskState.Done);
-        console.ListTasks(dbContext.Tasks.ToList());
+        var pending = dbContext.PendingTasks.ToList();
+        console.ListPendingTasks(pending);
         return Task.FromResult(0);
     }
 }

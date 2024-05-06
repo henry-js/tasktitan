@@ -9,4 +9,5 @@ public interface ITaskRepository
     public IEnumerable<TTask> Get();
     public TTask Get(string id);
     public TTask Delete(TTask task);
+    IEnumerable<TTask> GetAll();
 }

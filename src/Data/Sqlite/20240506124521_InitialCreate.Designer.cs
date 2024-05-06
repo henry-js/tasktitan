@@ -11,7 +11,7 @@ using TaskTitan.Data;
 namespace Data.Sqlite
 {
     [DbContext(typeof(TaskTitanDbContext))]
-    [Migration("20240506082618_InitialCreate")]
+    [Migration("20240506124521_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

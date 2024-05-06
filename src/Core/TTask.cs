@@ -2,7 +2,7 @@ namespace TaskTitan.Core;
 
 public class TTask
 {
-    private TTask() { }
+    protected TTask() { }
     public TTask(string description)
     {
         Description = description;
@@ -26,18 +26,15 @@ public class TTask
         return task;
     }
 
-    public void Start()
+    public TTask Start()
     {
         State = TTaskState.Started;
+        return this;
     }
 
-    public void Complete()
+    public TTask Complete()
     {
         State = TTaskState.Done;
+        return this;
     }
-}
-
-public enum TTaskState
-{
-    Pending, Started, Done
 }
