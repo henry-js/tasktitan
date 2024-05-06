@@ -1,15 +1,18 @@
 using TaskTitan.Core;
+using TaskTitan.Data;
 
 namespace TaskTitan.Lib.Services;
 
-public class TaskService(ITaskRepository repository) : ITtaskService
+public class TaskService(TaskTitanDbContext dbcontext) : ITtaskService
 {
-    private readonly ITaskRepository _repository = repository;
+    private readonly TaskTitanDbContext _dbcontext = dbcontext;
 
-    public int AddTask(TTask task)
+    public int Add(TTask task)
     {
-        _repository.Add(task);
-        return _repository.GetAll().Count();
+        _dbcontext.Tasks.Add(task);
+        _dbcontext.SaveChanges();
+
+        return _dbcontext.PendingTasks.Count();
     }
 
 }
