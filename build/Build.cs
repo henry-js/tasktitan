@@ -31,7 +31,6 @@ partial class Build : NukeBuild
     AbsolutePath ArtifactsDirectory => RootDirectory / ".artifacts";
     AbsolutePath PublishDirectory => RootDirectory / "publish";
     AbsolutePath ReleaseDirectory => RootDirectory / "release";
-    AbsolutePath PackDirectory => RootDirectory / "packages";
     AbsolutePath SourceDirectory => RootDirectory / "src";
     AbsolutePath TestDirectory => RootDirectory / "tests";
     IEnumerable<string> Projects => Solution.AllProjects.Select(x => x.Name);
@@ -75,25 +74,26 @@ partial class Build : NukeBuild
         });
 
     Target Publish => _ => _
-        // .After(Test)
-        .DependsOn(Compile)
-        // .Triggers(Pack)
-        // .Produces(PackDirectory)
-        .Executes(() =>
-        {
-            PublishDirectory.CreateOrCleanDirectory();
+                // .After(Test)
+                .DependsOn(Compile)
+                .Requires(() => Configuration == "Release")
+                // .Triggers(Pack)
+                // .Produces(PackDirectory)
+                .Executes(() =>
+                {
+                    PublishDirectory.CreateOrCleanDirectory();
 
-            DotNetPublish(_ => _
-                .EnableNoLogo()
-                .EnableNoBuild()
-                .EnableNoRestore()
-                .SetProject(ProjectDirectory)
-                .SetOutput(PublishDirectory)
-                .SetConfiguration(Configuration)
-            );
+                    DotNetPublish(_ => _
+                        .EnableNoLogo()
+                        .EnableNoBuild()
+                        .EnableNoRestore()
+                        .SetProject(ProjectDirectory)
+                        .SetOutput(PublishDirectory)
+                        .SetConfiguration(Configuration)
+                    );
 
-            // PublishDirectory.ZipTo(PackDirectory / $"{Solution.Name}.zip", fileMode: FileMode.Create);
-        });
+                    // PublishDirectory.ZipTo(PackDirectory / $"{Solution.Name}.zip", fileMode: FileMode.Create);
+                });
     Target Pack => _ => _
         .DependsOn(Publish)
         .Executes(() =>

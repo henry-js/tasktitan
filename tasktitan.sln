@@ -3,7 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_build", "build\_build.csproj", "{16D6231A-513A-490D-975E-35ECA0E17C41}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{19B6F068-AEA1-4652-9EB7-52AAB7D6FACE}"
 EndProject
@@ -21,6 +20,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cli.Tests", "tests\Cli.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lib.Tests", "tests\Lib.Tests\Lib.Tests.csproj", "{3A942E08-F222-422B-8D69-45F5314EAF89}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{8A41AA67-BD10-4850-B51E-94A02BD0D46C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,10 +31,8 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{16D6231A-513A-490D-975E-35ECA0E17C41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{16D6231A-513A-490D-975E-35ECA0E17C41}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{16D6231A-513A-490D-975E-35ECA0E17C41}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{16D6231A-513A-490D-975E-35ECA0E17C41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A41AA67-BD10-4850-B51E-94A02BD0D46C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A41AA67-BD10-4850-B51E-94A02BD0D46C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D617861C-AA60-4236-99E9-6F991AF96491}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D617861C-AA60-4236-99E9-6F991AF96491}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D617861C-AA60-4236-99E9-6F991AF96491}.Release|Any CPU.ActiveCfg = Release|Any CPU
