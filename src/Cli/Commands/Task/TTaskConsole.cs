@@ -4,7 +4,7 @@ using Humanizer;
 
 using TaskTitan.Core;
 
-namespace TaskTitan.Cli.Commands.TaskCommands;
+namespace TaskTitan.Cli.TaskCommands;
 
 internal static class TTaskConsole
 {

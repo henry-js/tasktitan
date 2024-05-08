@@ -1,11 +1,6 @@
-using Microsoft.Extensions.Logging;
-
-using TaskTitan.Data;
 using System.Threading.Tasks;
-using TaskTitan.Core;
-using TaskTitan.Lib.Services;
 
-namespace TaskTitan.Cli.Commands.TaskCommands;
+namespace TaskTitan.Cli.TaskCommands;
 internal sealed class AddCommand(IAnsiConsole console, ITtaskService service, ILogger<AddCommand> logger) : AsyncCommand<AddCommand.Settings>
 {
     private readonly IAnsiConsole console = console;

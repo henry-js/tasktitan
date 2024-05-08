@@ -1,9 +1,6 @@
-using Microsoft.Extensions.Logging;
-using TaskTitan.Data;
 using System.Threading.Tasks;
-using TaskTitan.Core;
 
-namespace TaskTitan.Cli.Commands.TaskCommands;
+namespace TaskTitan.Cli.TaskCommands;
 
 internal sealed class ListCommand(IAnsiConsole console, TaskTitanDbContext dbContext, ILogger<ListCommand> logger) : AsyncCommand<TaskSettings>
 {

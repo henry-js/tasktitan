@@ -1,19 +1,12 @@
 ﻿using Community.Extensions.Spectre.Cli.Hosting;
 
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 using Serilog;
 
-using Spectre.Console;
-using Spectre.Console.Cli;
-
-using TaskTitan.Cli;
-using TaskTitan.Cli.Commands.TaskCommands;
-using TaskTitan.Data;
-using TaskTitan.Lib.Services;
+using TaskTitan.Cli.TaskCommands;
 
 using Velopack;
 
@@ -27,14 +20,13 @@ try
     VelopackApp.Build()
     .WithFirstRun(v =>
     {
-        if (!Directory.Exists(ConfigHelper.SourceDirectoryDataFolder))
+        Log.Information("First run of tasktitan");
+        Log.Information("Moving .db file");
+        Directory.CreateDirectory(ConfigHelper.UserProfileDirectoryDataFolder);
+        if (File.Exists(ConfigHelper.SourceDbPath))
         {
-            throw new Exception(".tasktitan directory not found in source directory");
-        }
-        if (!Directory.Exists(ConfigHelper.UserProfileDirectoryDataFolder) || !File.Exists(ConfigHelper.UserProfileDbPath))
-        {
-            Directory.CreateDirectory(ConfigHelper.UserProfileDirectoryDataFolder);
-            Directory.Move(ConfigHelper.SourceDirectoryDataFolder, ConfigHelper.UserProfileDirectory);
+            File.Move(ConfigHelper.SourceDbPath, ConfigHelper.UserProfileDbPath);
+            Log.Information("Moved .db file to %userprofile%");
         }
     })
     .Run();
@@ -102,6 +94,6 @@ finally
     await Log.CloseAndFlushAsync();
 }
 
-AnsiConsole.WriteLine();
-AnsiConsole.WriteLine("Press any key to exit.");
-System.Console.ReadKey(intercept: false);
+// AnsiConsole.WriteLine();
+// AnsiConsole.WriteLine("Press any key to exit.");
+// System.Console.ReadKey(intercept: false);
