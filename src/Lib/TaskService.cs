@@ -15,4 +15,8 @@ public class TaskService(TaskTitanDbContext dbcontext) : ITtaskService
         return _dbcontext.PendingTasks.Count();
     }
 
+    public TTask? Get(int rowId)
+    {
+        return _dbcontext.PendingTasks.FirstOrDefault(t => t.RowId == rowId);
+    }
 }
