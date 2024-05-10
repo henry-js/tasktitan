@@ -36,7 +36,7 @@ public class TaskService(TaskTitanDbContext dbcontext) : ITtaskService
         if (task == null) return new TTaskResult(false, task, "Could not find task");
         var due = Parse(dueDate);
         if (due == null) return new TTaskResult(false, task, "Could not parse due date option");
-        task.DueDate = due;
+        task.DueDate = DateOnly.FromDateTime(due.Value);
         _dbcontext.Update(task);
         _dbcontext.Commit();
         return new TTaskResult(task != null, task);

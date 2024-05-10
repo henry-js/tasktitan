@@ -15,7 +15,7 @@
                 // "add",
                 // "hello",
                 "modify",
-                "1"
+                "6"
             ],
             "cwd": "${workspaceFolder}/src/Cli",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
