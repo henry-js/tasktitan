@@ -9,7 +9,10 @@ public interface ITtaskService
     TTaskResult Update(int rowId, string? dueDate);
 }
 
-public record TTaskResult(bool Success, TTask? task, string? Messaqge = null)
-{
-
-}
+public record TTaskResult(bool Success, TTask? task, string? Messaqge = null);
+// {
+//     public static TTaskResult Fail(params string[] errorMessages)
+// {
+//     return new TTaskResult(false,);
+//     }
+// }

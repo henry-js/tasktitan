@@ -1,4 +1,4 @@
-﻿using Community.Extensions.Spectre.Cli.Hosting;
+using Community.Extensions.Spectre.Cli.Hosting;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -57,6 +57,7 @@ try
     // Add a command and optionally configure it.
     builder.Services.AddScoped<AddCommand>();
     builder.Services.AddScoped<ListCommand>();
+    builder.Services.AddScoped<ModifyCommand>();
     builder.Services.AddScoped<ITtaskService, TaskService>();
 
     builder.UseSpectreConsole(config =>
@@ -70,6 +71,9 @@ try
         config.AddCommand<ListCommand>("list")
             .WithDescription("List tasks in default collection");
 
+        config.AddCommand<ModifyCommand>("modify")
+            .WithDescription("Modify an existing task");
+        config.PropagateExceptions();
 #if DEBUG
         config.UseBasicExceptionHandler();
 #endif

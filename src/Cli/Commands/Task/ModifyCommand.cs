@@ -17,7 +17,7 @@ internal sealed class ModifyCommand(IAnsiConsole console, ITtaskService service,
             return Task.FromResult(-1);
         }
 
-        TTaskResult updateTaskResult = service.Update(settings.rowId, settings.dueDate);
+        TTaskResult updateTaskResult = service.Update(settings.rowId, settings.due);
 
         return Task.FromResult(0);
     }
@@ -27,6 +27,15 @@ internal sealed class ModifyCommand(IAnsiConsole console, ITtaskService service,
         [CommandArgument(0, "<id>")]
         public int rowId { get; set; }
 
-        public string? dueDate { get; set; }
+        [CommandArgument(1, "[due]")]
+        public string? due { get; set; }
+
+        public override ValidationResult Validate()
+        {
+            if (rowId < 1) return ValidationResult.Error("rowId cannot be less than 0");
+            return due is not null && !due.StartsWith("due:", StringComparison.OrdinalIgnoreCase)
+                ? ValidationResult.Error("due argument correct format: 'due:day'")
+                : ValidationResult.Success();
+        }
     }
 }
