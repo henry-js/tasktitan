@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Threading.Tasks;
 
 namespace TaskTitan.Cli.TaskCommands;
@@ -12,8 +13,8 @@ internal sealed class ModifyCommand(IAnsiConsole console, ITtaskService service,
 
         if (task == null)
         {
-            logger.LogInformation("Not found");
-            console.MarkupLine("[red]Not found.[/]");
+            logger.LogInformation("Task {rowId} not found", settings.rowId);
+            console.MarkupLineInterpolated(CultureInfo.CurrentCulture, $"Task {settings.rowId} not found");
             return Task.FromResult(-1);
         }
 
