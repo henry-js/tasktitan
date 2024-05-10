@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 
 using TaskTitan.Cli.TaskCommands;
+using TaskTitan.Lib;
 
 using Velopack;
 
@@ -59,6 +60,8 @@ try
     builder.Services.AddScoped<ListCommand>();
     builder.Services.AddScoped<ModifyCommand>();
     builder.Services.AddScoped<ITtaskService, TaskService>();
+    builder.Services.AddSingleton(TimeProvider.System);
+    builder.Services.AddSingleton<DueDateHelper>();
 
     builder.UseSpectreConsole(config =>
     {
@@ -98,6 +101,6 @@ finally
     await Log.CloseAndFlushAsync();
 }
 
-// AnsiConsole.WriteLine();
-// AnsiConsole.WriteLine("Press any key to exit.");
-// System.Console.ReadKey(intercept: false);
+AnsiConsole.WriteLine();
+AnsiConsole.WriteLine("Press any key to exit.");
+System.Console.ReadKey(intercept: false);

@@ -5,14 +5,6 @@ namespace TaskTitan.Lib.Services;
 public interface ITtaskService
 {
     int Add(TTask task);
-    TTask? Get(int rowId);
-    TTaskResult Update(int rowId, string? dueDate);
+    PendingTTask? Get(int rowId);
+    TTaskResult UpdateDueDate(PendingTTask task, string dueDate);
 }
-
-public record TTaskResult(bool Success, TTask? task, string? Messaqge = null);
-// {
-//     public static TTaskResult Fail(params string[] errorMessages)
-// {
-//     return new TTaskResult(false,);
-//     }
-// }

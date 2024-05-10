@@ -27,6 +27,7 @@ public class DueDateHelper(TimeProvider _timeProvider)
             "tomorrow" => Tomorrow(),
             "yesterday" => Yesterday(),
             string day when IsDayOfWeek(day) => NextDayOfWeek(day),
+            "eoy" => EndOfYear(),
             _ => null,
         };
     }
@@ -47,13 +48,13 @@ public class DueDateHelper(TimeProvider _timeProvider)
         return _daysOfWeek.Single(d => d.ToString().Equals(day, StringComparison.InvariantCultureIgnoreCase));
     }
 
-    private DateOnly? Yesterday() => DateOnly.FromDateTime(Now.Date.AddDays(-1));
-    private DateOnly? Tomorrow() => DateOnly.FromDateTime(Now.Date.AddDays(1));
-    private DateOnly? Today() => DateOnly.FromDateTime(Now.Date);
+    private DateOnly Yesterday() => DateOnly.FromDateTime(Now.Date.AddDays(-1));
+    private DateOnly Tomorrow() => DateOnly.FromDateTime(Now.Date.AddDays(1));
+    private DateOnly Today() => DateOnly.FromDateTime(Now.Date);
 
     private bool IsDayOfWeek(string input) =>
         _daysOfWeek.Any(day => string.Equals(day.ToString(), input, StringComparison.InvariantCultureIgnoreCase));
 
-    private DateOnly? EndOfMonth() =>
-        new DateOnly(Now.Year, Now.Month, DateTime.DaysInMonth(Now.Year, Now.Month));
+    private DateOnly EndOfMonth() => new(Now.Year, Now.Month, DateTime.DaysInMonth(Now.Year, Now.Month));
+    private DateOnly EndOfYear() => new(Now.Year, 12, 31);
 }

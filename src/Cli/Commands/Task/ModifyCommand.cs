@@ -8,18 +8,20 @@ internal sealed class ModifyCommand(IAnsiConsole console, ITtaskService service,
 {
     public override Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
+        TTaskResult? updateResult = default;
         logger.LogInformation("Querying task with rowId: {rowId}", settings.rowId);
         var task = service.Get(settings.rowId);
 
         if (task == null)
         {
-            logger.LogInformation("Task {rowId} not found", settings.rowId);
             console.MarkupLineInterpolated(CultureInfo.CurrentCulture, $"Task {settings.rowId} not found");
             return Task.FromResult(-1);
         }
-
-        TTaskResult updateTaskResult = service.Update(settings.rowId, settings.due);
-
+        if (settings.due != null)
+        {
+            updateResult = service.UpdateDueDate(task, settings.due.Split(':')[^1]);
+        }
+        console.WriteLine(updateResult?.Success == true ? "Update successful" : "Update failed");
         return Task.FromResult(0);
     }
 

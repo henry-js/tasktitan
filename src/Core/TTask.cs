@@ -38,4 +38,16 @@ public class TTask
         State = TTaskState.Done;
         return this;
     }
+
+    public static TTask FromPending(PendingTTask pendingTask)
+    {
+        return new()
+        {
+            Id = pendingTask.Id,
+            Description = pendingTask.Description,
+            CreatedAt = pendingTask.CreatedAt,
+            State = pendingTask.State,
+            DueDate = pendingTask.DueDate,
+        };
+    }
 }

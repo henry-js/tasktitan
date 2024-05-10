@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 
 namespace TaskTitan.Cli.TaskCommands;
+
 internal sealed class AddCommand(IAnsiConsole console, ITtaskService service, ILogger<AddCommand> logger) : AsyncCommand<AddCommand.Settings>
 {
     private readonly IAnsiConsole console = console;
