@@ -1,8 +1,8 @@
-using Community.Extensions.Spectre.Cli.Hosting;
+﻿using Community.Extensions.Spectre.Cli.Hosting;
 
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 using Serilog;
 
@@ -82,11 +82,11 @@ try
     var app = builder.Build();
 
     // Ensure db exists
-    // await using (var scope = app.Services.CreateAsyncScope())
-    // {
-    //     var db = scope.ServiceProvider.GetRequiredService<TaskTitanDbContext>();
-    //     await db.Database.MigrateAsync();
-    // }
+    await using (var scope = app.Services.CreateAsyncScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<TaskTitanDbContext>();
+        await db.Database.MigrateAsync();
+    }
     await app.RunAsync();
 }
 catch (Exception ex)
