@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageDownload Include="minver-cli" Version="[5.0.0]" />
     <PackageDownload Include="vpk" Version="[0.0.462-gf8acc97]" />
   </ItemGroup>
 

@@ -75,6 +75,7 @@
               "Clean",
               "Compile",
               "Pack",
+              "PrintVersion",
               "Publish",
               "Restore"
             ]
@@ -93,6 +94,7 @@
               "Clean",
               "Compile",
               "Pack",
+              "PrintVersion",
               "Publish",
               "Restore"
             ]

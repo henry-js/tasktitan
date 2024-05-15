@@ -27,6 +27,7 @@ partial class Build : NukeBuild
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
     [Solution(GenerateProjects = true)] readonly Solution Solution;
+    [MinVer] readonly MinVer MinVer;
     AbsolutePath ProjectDirectory => SourceDirectory / "Cli";
     AbsolutePath ArtifactsDirectory => RootDirectory / ".artifacts";
     AbsolutePath PublishDirectory => RootDirectory / "publish";
@@ -34,6 +35,17 @@ partial class Build : NukeBuild
     AbsolutePath SourceDirectory => RootDirectory / "src";
     AbsolutePath TestDirectory => RootDirectory / "tests";
     IEnumerable<string> Projects => Solution.AllProjects.Select(x => x.Name);
+
+    Target PrintVersion => _ => _
+        .TriggeredBy(Compile)
+        .Executes(() =>
+        {
+            MinVerTasks.MinVer(_ => _
+                .SetMinimumMajorMinor("1.0")
+                .SetDefaultPreReleasePhase("preview.0")
+            );
+            Log.Information(MinVer.Version);
+        });
 
     Target Clean => _ => _
         .Before(Restore)
@@ -49,7 +61,6 @@ partial class Build : NukeBuild
                                .DeleteDirectories();
             }
         });
-
 
     Target Restore => _ => _
     .After(Clean)
