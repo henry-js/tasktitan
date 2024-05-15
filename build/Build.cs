@@ -27,24 +27,25 @@ partial class Build : NukeBuild
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
     [Solution(GenerateProjects = true)] readonly Solution Solution;
-    [MinVer] readonly MinVer MinVer;
+    [MinVer] MinVer MinVer;
     AbsolutePath ProjectDirectory => SourceDirectory / "Cli";
     AbsolutePath ArtifactsDirectory => RootDirectory / ".artifacts";
     AbsolutePath PublishDirectory => RootDirectory / "publish";
     AbsolutePath ReleaseDirectory => RootDirectory / "release";
     AbsolutePath SourceDirectory => RootDirectory / "src";
-    AbsolutePath TestDirectory => RootDirectory / "tests";
+    AbsolutePath TestResultsDirectory => RootDirectory / "testresults";
     IEnumerable<string> Projects => Solution.AllProjects.Select(x => x.Name);
 
     Target PrintVersion => _ => _
         .TriggeredBy(Compile)
         .Executes(() =>
         {
-            MinVerTasks.MinVer(_ => _
-                .SetMinimumMajorMinor("1.0")
-                .SetDefaultPreReleasePhase("preview.0")
-            );
+            MinVer = MinVerTasks.MinVer(_ => _
+                // .SetMinimumMajorMinor("1.0")
+                .SetDefaultPreReleasePhase("preview")
+            ).Result;
             Log.Information(MinVer.Version);
+            Log.Information(MinVer.MinVerPreRelease);
         });
 
     Target Clean => _ => _
@@ -82,6 +83,35 @@ partial class Build : NukeBuild
                 .SetProjectFile(Solution.Directory)
                 .SetConfiguration(Configuration)
             );
+        });
+    Target Test => _ => _
+        .DependsOn(Compile)
+        .Executes(() =>
+        {
+            // Log.Information("Building version {Value}", MinVer.Version);
+            DotNetTest(_ => _
+                .EnableNoLogo()
+                .EnableNoBuild()
+                .EnableNoRestore()
+                .SetConfiguration(Configuration)
+                .SetResultsDirectory(TestResultsDirectory)
+                .SetDataCollector("XPlat Code Coverage")
+                .SetProjectFile(Solution.Directory)
+                .SetRunSetting(
+                    "DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.ExcludeByAttribute",
+                     "Obsolete,GeneratedCodeAttribute,CompilerGeneratedAttribute")
+            );
+            var coverageReports = TestResultsDirectory.GetFiles("coverage.cobertura.xml", 2)
+                .Select(x => x.ToString());
+
+            if (coverageReports is not null)
+            {
+                ReportGenerator(_ => _
+                    .AddReports(coverageReports)
+                    .SetTargetDirectory(RootDirectory / "coveragereport")
+                );
+            }
+            TestResultsDirectory.DeleteDirectory();
         });
 
     Target Publish => _ => _
