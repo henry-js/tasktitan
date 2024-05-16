@@ -27,13 +27,28 @@ partial class Build : NukeBuild
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
     [Solution(GenerateProjects = true)] readonly Solution Solution;
+    [MinVer] MinVer MinVer;
     AbsolutePath ProjectDirectory => SourceDirectory / "Cli";
     AbsolutePath ArtifactsDirectory => RootDirectory / ".artifacts";
     AbsolutePath PublishDirectory => RootDirectory / "publish";
     AbsolutePath ReleaseDirectory => RootDirectory / "release";
     AbsolutePath SourceDirectory => RootDirectory / "src";
-    AbsolutePath TestDirectory => RootDirectory / "tests";
+    AbsolutePath TestResultsDirectory => RootDirectory / "testresults";
     IEnumerable<string> Projects => Solution.AllProjects.Select(x => x.Name);
+
+    Target PrintVersion => _ => _
+        .Before(Publish)
+        .Executes(() =>
+        {
+            MinVer = MinVerTasks.MinVer(_ => _
+                // .SetMinimumMajorMinor("1.0")
+                .SetDefaultPreReleasePhase("preview")
+                .SetTagPrefix("v")
+            ).Result;
+            Log.Information("MinVer.Version: {0}", MinVer.Version);
+            Log.Information("MinVer.MinverVersion: {0}", MinVer.MinVerVersion);
+            Log.Information("Configuration is {0}", Configuration);
+        });
 
     Target Clean => _ => _
         .Before(Restore)
@@ -49,7 +64,6 @@ partial class Build : NukeBuild
                                .DeleteDirectories();
             }
         });
-
 
     Target Restore => _ => _
     .After(Clean)
@@ -72,13 +86,39 @@ partial class Build : NukeBuild
                 .SetConfiguration(Configuration)
             );
         });
+    Target Test => _ => _
+        .DependsOn(Compile)
+        .Executes(() =>
+        {
+            // Log.Information("Building version {Value}", MinVer.Version);
+            DotNetTest(_ => _
+                .EnableNoLogo()
+                .EnableNoBuild()
+                .EnableNoRestore()
+                .SetConfiguration(Configuration)
+                .SetResultsDirectory(TestResultsDirectory)
+                .SetDataCollector("XPlat Code Coverage")
+                .SetProjectFile(Solution.Directory)
+                .SetRunSetting(
+                    "DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.ExcludeByAttribute",
+                     "Obsolete,GeneratedCodeAttribute,CompilerGeneratedAttribute")
+            );
+            var coverageReports = TestResultsDirectory.GetFiles("coverage.cobertura.xml", 2)
+                .Select(x => x.ToString());
+
+            if (coverageReports is not null)
+            {
+                ReportGenerator(_ => _
+                    .AddReports(coverageReports)
+                    .SetTargetDirectory(RootDirectory / "coveragereport")
+                );
+            }
+            TestResultsDirectory.DeleteDirectory();
+        });
 
     Target Publish => _ => _
-                // .After(Test)
                 .DependsOn(Compile)
                 .Requires(() => Configuration == "Release")
-                // .Triggers(Pack)
-                // .Produces(PackDirectory)
                 .Executes(() =>
                 {
                     PublishDirectory.CreateOrCleanDirectory();
@@ -91,13 +131,8 @@ partial class Build : NukeBuild
                         .SetOutput(PublishDirectory)
                         .SetConfiguration(Configuration)
                     );
+                    Vpk.Invoke($"pack --packId tasktitan --packVersion {MinVer.Version} --packDir {PublishDirectory} --mainExe task.exe --packTitle tasktitan --outputDir {ReleaseDirectory}");
 
                     // PublishDirectory.ZipTo(PackDirectory / $"{Solution.Name}.zip", fileMode: FileMode.Create);
                 });
-    Target Pack => _ => _
-        .DependsOn(Publish)
-        .Executes(() =>
-        {
-            Vpk.Invoke($"pack --packId tasktitan --packVersion 0.0.1 --packDir {PublishDirectory} --mainExe task.exe --packTitle tasktitan --outputDir {ReleaseDirectory}");
-        });
 }

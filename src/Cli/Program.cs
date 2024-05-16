@@ -1,12 +1,13 @@
 ﻿using Community.Extensions.Spectre.Cli.Hosting;
 
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 using Serilog;
 
 using TaskTitan.Cli.TaskCommands;
+using TaskTitan.Lib;
 
 using Velopack;
 
@@ -57,7 +58,10 @@ try
     // Add a command and optionally configure it.
     builder.Services.AddScoped<AddCommand>();
     builder.Services.AddScoped<ListCommand>();
+    builder.Services.AddScoped<ModifyCommand>();
     builder.Services.AddScoped<ITtaskService, TaskService>();
+    builder.Services.AddSingleton(TimeProvider.System);
+    builder.Services.AddSingleton<DueDateHelper>();
 
     builder.UseSpectreConsole(config =>
     {
@@ -70,6 +74,9 @@ try
         config.AddCommand<ListCommand>("list")
             .WithDescription("List tasks in default collection");
 
+        config.AddCommand<ModifyCommand>("modify")
+            .WithDescription("Modify an existing task");
+        config.PropagateExceptions();
 #if DEBUG
         config.UseBasicExceptionHandler();
 #endif
@@ -78,11 +85,11 @@ try
     var app = builder.Build();
 
     // Ensure db exists
-    // await using (var scope = app.Services.CreateAsyncScope())
-    // {
-    //     var db = scope.ServiceProvider.GetRequiredService<TaskTitanDbContext>();
-    //     await db.Database.MigrateAsync();
-    // }
+    await using (var scope = app.Services.CreateAsyncScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<TaskTitanDbContext>();
+        await db.Database.MigrateAsync();
+    }
     await app.RunAsync();
 }
 catch (Exception ex)
@@ -94,6 +101,6 @@ finally
     await Log.CloseAndFlushAsync();
 }
 
-// AnsiConsole.WriteLine();
-// AnsiConsole.WriteLine("Press any key to exit.");
-// System.Console.ReadKey(intercept: false);
+AnsiConsole.WriteLine();
+AnsiConsole.WriteLine("Press any key to exit.");
+System.Console.ReadKey(intercept: false);
