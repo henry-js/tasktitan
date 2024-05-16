@@ -37,15 +37,17 @@ partial class Build : NukeBuild
     IEnumerable<string> Projects => Solution.AllProjects.Select(x => x.Name);
 
     Target PrintVersion => _ => _
-        .TriggeredBy(Compile)
+        .Before(Publish)
         .Executes(() =>
         {
             MinVer = MinVerTasks.MinVer(_ => _
                 // .SetMinimumMajorMinor("1.0")
                 .SetDefaultPreReleasePhase("preview")
+                .SetTagPrefix("v")
             ).Result;
-            Log.Information(MinVer.Version);
-            Log.Information(MinVer.MinVerPreRelease);
+            Log.Information("MinVer.Version: {0}", MinVer.Version);
+            Log.Information("MinVer.MinverVersion: {0}", MinVer.MinVerVersion);
+            Log.Information("Configuration is {0}", Configuration);
         });
 
     Target Clean => _ => _
@@ -115,11 +117,8 @@ partial class Build : NukeBuild
         });
 
     Target Publish => _ => _
-                // .After(Test)
                 .DependsOn(Compile)
                 .Requires(() => Configuration == "Release")
-                // .Triggers(Pack)
-                // .Produces(PackDirectory)
                 .Executes(() =>
                 {
                     PublishDirectory.CreateOrCleanDirectory();
@@ -132,13 +131,8 @@ partial class Build : NukeBuild
                         .SetOutput(PublishDirectory)
                         .SetConfiguration(Configuration)
                     );
+                    Vpk.Invoke($"pack --packId tasktitan --packVersion {MinVer.Version} --packDir {PublishDirectory} --mainExe task.exe --packTitle tasktitan --outputDir {ReleaseDirectory}");
 
                     // PublishDirectory.ZipTo(PackDirectory / $"{Solution.Name}.zip", fileMode: FileMode.Create);
                 });
-    Target Pack => _ => _
-        .DependsOn(Publish)
-        .Executes(() =>
-        {
-            Vpk.Invoke($"pack --packId tasktitan --packVersion 0.0.1 --packDir {PublishDirectory} --mainExe task.exe --packTitle tasktitan --outputDir {ReleaseDirectory}");
-        });
 }
