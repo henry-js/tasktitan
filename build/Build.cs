@@ -35,9 +35,12 @@ partial class Build : NukeBuild
     AbsolutePath SourceDirectory => RootDirectory / "src";
     AbsolutePath TestResultsDirectory => RootDirectory / "testresults";
     IEnumerable<string> Projects => Solution.AllProjects.Select(x => x.Name);
+    string Framework => "net8.0";
+    string Runtime => "win-x64";
 
     Target PrintVersion => _ => _
         .Before(Publish)
+        .DependentFor(Release)
         .Executes(() =>
         {
             MinVer = MinVerTasks.MinVer(_ => _
@@ -72,6 +75,7 @@ partial class Build : NukeBuild
         .Executes(() =>
         {
             DotNetRestore(_ => _
+                .SetRuntime(Runtime)
                 .SetForce(true)
                 .SetProjectFile(Solution.Directory));
         });
@@ -84,8 +88,11 @@ partial class Build : NukeBuild
             DotNetBuild(_ => _
                 .EnableNoLogo()
                 .EnableNoRestore()
-                .SetProjectFile(Solution.Directory)
+                .SetRuntime(Runtime)
+                .SetFramework(Framework)
+                .SetProjectFile(ProjectDirectory)
                 .SetConfiguration(Configuration)
+            // .SetOutputDirectory(ArtifactsDirectory / "net8.0" / "win-x64")
             );
         });
     Target Test => _ => _
@@ -119,22 +126,30 @@ partial class Build : NukeBuild
         });
 
     Target Publish => _ => _
-                .DependsOn(PrintVersion, Compile)
-                .Requires(() => Configuration == "Release")
-                .Executes(() =>
-                {
-                    PublishDirectory.CreateOrCleanDirectory();
+        .DependsOn(PrintVersion, Compile)
+        .Requires(() => Configuration == "Release")
+        .Executes(() =>
+        {
+            PublishDirectory.CreateOrCleanDirectory();
 
-                    DotNetPublish(_ => _
-                        .EnableNoLogo()
-                        .EnableNoBuild()
-                        .EnableNoRestore()
-                        .SetProject(ProjectDirectory)
-                        .SetOutput(PublishDirectory)
-                        .SetConfiguration(Configuration)
-                    );
-                    Vpk.Invoke($"pack --packId tasktitan --packVersion {MinVer.Version} --packDir {PublishDirectory} --mainExe task.exe --packTitle tasktitan --outputDir {ReleaseDirectory}");
+            DotNetPublish(_ => _
+                .EnableNoLogo()
+                // .EnableNoBuild()
+                .SetRuntime(Runtime)
+                .SetFramework(Framework)
+                .SetProject(ProjectDirectory)
+                .SetOutput(PublishDirectory / Framework / Runtime)
+                .SetConfiguration(Configuration)
+                .SetPublishSingleFile(true)
+            );
+        });
 
-                    // PublishDirectory.ZipTo(PackDirectory / $"{Solution.Name}.zip", fileMode: FileMode.Create);
-                });
+    Target Release => _ => _
+        .TriggeredBy(Publish)
+        .Requires(() => Configuration == "Release")
+        .Executes(() =>
+        {
+            Vpk.Invoke($"pack --packId tasktitan --packVersion {MinVer.Version} --packDir {PublishDirectory / Framework / Runtime} --mainExe task.exe --packTitle tasktitan --outputDir {ReleaseDirectory / Runtime}");
+        });
+
 }
