@@ -4,7 +4,7 @@ namespace TaskTitan.Cli;
 
 public static class ConfigHelper
 {
-    public static string SourceDirectory => Path.GetDirectoryName(typeof(ConfigHelper).Assembly.Location)!;
+    public static string SourceDirectory => Path.GetDirectoryName(AppContext.BaseDirectory)!;
     public static string SourceDirectoryDataFolder => Path.Combine(SourceDirectory, ".tasktitan");
     public static string SourceDbPath => Path.Combine(SourceDirectoryDataFolder, DbName);
     public static string UserProfileDirectory => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);

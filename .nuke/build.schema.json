@@ -76,6 +76,7 @@
               "Compile",
               "PrintVersion",
               "Publish",
+              "Release",
               "Restore",
               "Test"
             ]
@@ -95,6 +96,7 @@
               "Compile",
               "PrintVersion",
               "Publish",
+              "Release",
               "Restore",
               "Test"
             ]
