@@ -16,21 +16,22 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.File("logs/setup-.log", rollingInterval: RollingInterval.Day)
     .CreateBootstrapLogger();
 
+VelopackApp.Build()
+.WithFirstRun(v =>
+{
+    Log.Information("First run of tasktitan");
+    Log.Information("Moving .db file");
+    Directory.CreateDirectory(ConfigHelper.UserProfileDirectoryDataFolder);
+    if (File.Exists(ConfigHelper.SourceDbPath))
+    {
+        File.Move(ConfigHelper.SourceDbPath, ConfigHelper.UserProfileDbPath);
+        Log.Information("Moved .db file to %userprofile%");
+    }
+})
+.Run();
+
 try
 {
-    VelopackApp.Build()
-    .WithFirstRun(v =>
-    {
-        Log.Information("First run of tasktitan");
-        Log.Information("Moving .db file");
-        Directory.CreateDirectory(ConfigHelper.UserProfileDirectoryDataFolder);
-        if (File.Exists(ConfigHelper.SourceDbPath))
-        {
-            File.Move(ConfigHelper.SourceDbPath, ConfigHelper.UserProfileDbPath);
-            Log.Information("Moved .db file to %userprofile%");
-        }
-    })
-    .Run();
 
     var configDir = ConfigHelper.FindTaskTitanDataFolder();
 

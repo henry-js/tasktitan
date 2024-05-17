@@ -150,7 +150,11 @@ partial class Build : NukeBuild
         .Produces(ReleaseDirectory / Runtime / "*.exe")
         .Executes(() =>
         {
-            Vpk.Invoke($"pack --packId tasktitan --packVersion {MinVer.Version} --packDir {PublishDirectory / Framework / Runtime} --mainExe task.exe --packTitle tasktitan --outputDir {ReleaseDirectory / Runtime}");
+            var packDir = PublishDirectory / Framework / Runtime;
+            var outputDir = ReleaseDirectory / Runtime;
+            Log.Information("Velopack --packDir: {0}", packDir);
+            Log.Information("Velopack --outputDir: {0}", outputDir);
+            Vpk.Invoke($"pack --packId tasktitan --packVersion {MinVer.Version} --packDir {packDir} --mainExe task.exe --packTitle tasktitan --outputDir {outputDir}");
         });
 
 }
