@@ -96,14 +96,14 @@ partial class Build : NukeBuild
             );
         });
     Target Test => _ => _
-        .DependsOn(Compile)
+        .DependsOn()
         .Executes(() =>
         {
             // Log.Information("Building version {Value}", MinVer.Version);
             DotNetTest(_ => _
                 .EnableNoLogo()
-                .EnableNoBuild()
-                .EnableNoRestore()
+                .SetFramework(Framework)
+                .SetRuntime("linux-x64")
                 .SetConfiguration(Configuration)
                 .SetResultsDirectory(TestResultsDirectory)
                 .SetDataCollector("XPlat Code Coverage")

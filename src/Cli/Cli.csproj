@@ -35,7 +35,7 @@
     <Nullable>enable</Nullable>
     <DebugType>embedded</DebugType>
     <TargetFrameworks>net8.0</TargetFrameworks>
-    <RuntimeIndentifiers>win-x64</RuntimeIndentifiers>
+    <RuntimeIndentifiers>win-x64;linux-x64</RuntimeIndentifiers>
   </PropertyGroup>
 
   <ItemGroup>
