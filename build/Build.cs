@@ -147,6 +147,7 @@ partial class Build : NukeBuild
     Target Release => _ => _
         .TriggeredBy(Publish)
         .Requires(() => Configuration == "Release")
+        .Produces(ReleaseDirectory / Runtime / "*.exe")
         .Executes(() =>
         {
             Vpk.Invoke($"pack --packId tasktitan --packVersion {MinVer.Version} --packDir {PublishDirectory / Framework / Runtime} --mainExe task.exe --packTitle tasktitan --outputDir {ReleaseDirectory / Runtime}");

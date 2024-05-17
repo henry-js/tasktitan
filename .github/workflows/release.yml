@@ -22,9 +22,9 @@ on:
       - 'v*.*'
 
 jobs:
-  windows-latest:
-    name: windows-latest
-    runs-on: windows-latest
+  ubuntu-latest:
+    name: ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
@@ -38,3 +38,8 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj', '**/Directory.Packages.props') }}
       - name: 'Run: Publish'
         run: ./build.cmd Publish
+      - name: 'Publish: win-x64'
+        uses: actions/upload-artifact@v3
+        with:
+          name: win-x64
+          path: release/win-x64
