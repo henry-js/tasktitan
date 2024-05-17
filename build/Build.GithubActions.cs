@@ -17,7 +17,7 @@ using Nuke.Common.CI.GitHubActions;
 [GitHubActions(
     "release",
     GitHubActionsImage.UbuntuLatest,
-    OnPushBranches = ["main"],
+    // OnPushBranches = ["main"],
     InvokedTargets = [nameof(Publish)],
     AutoGenerate = true,
     FetchDepth = 0, OnPushTags = ["v*.*"]
