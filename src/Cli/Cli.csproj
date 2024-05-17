@@ -25,7 +25,7 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageReference Include="Spectre.Console" Version="0.49" />
-    <PackageReference Include="Velopack" Version="0.0.359" />
+    <PackageReference Include="Velopack" Version="0.0.462-gf8acc97" />
   </ItemGroup>
 
   <PropertyGroup>
