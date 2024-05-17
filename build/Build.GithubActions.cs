@@ -4,6 +4,7 @@ using Nuke.Common.CI.GitHubActions;
     "continuous",
     GitHubActionsImage.UbuntuLatest,
     OnPushBranchesIgnore = ["main"],
+    OnPullRequestExcludePaths = ["feat/*", "build", "build/*", "bug/*"],
     InvokedTargets = [nameof(Compile)],
     AutoGenerate = true,
     FetchDepth = 0)]

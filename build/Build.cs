@@ -63,6 +63,8 @@ partial class Build : NukeBuild
                 SourceDirectory.GlobDirectories("**/{obj,bin}")
                                .DeleteDirectories();
             }
+            PublishDirectory.DeleteDirectory();
+            ReleaseDirectory.DeleteDirectory();
         });
 
     Target Restore => _ => _
@@ -117,7 +119,7 @@ partial class Build : NukeBuild
         });
 
     Target Publish => _ => _
-                .DependsOn(Compile)
+                .DependsOn(PrintVersion, Compile)
                 .Requires(() => Configuration == "Release")
                 .Executes(() =>
                 {
