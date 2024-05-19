@@ -103,7 +103,7 @@ partial class Build : NukeBuild
             DotNetTest(_ => _
                 .EnableNoLogo()
                 .SetFramework(Framework)
-                .SetRuntime("linux-x64")
+                .SetRuntime(Runtime)
                 .SetConfiguration(Configuration)
                 .SetResultsDirectory(TestResultsDirectory)
                 .SetDataCollector("XPlat Code Coverage")

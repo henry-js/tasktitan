@@ -29,7 +29,7 @@ namespace Data.Sqlite
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("DueDate")
+                    b.Property<DateOnly?>("DueDate")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("State")

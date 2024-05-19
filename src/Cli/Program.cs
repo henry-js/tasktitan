@@ -48,12 +48,7 @@ try
                 .CreateLogger())
     );
 
-#if DEBUG
-    var path = Path.Combine(Directory.GetCurrentDirectory(), ".tasktitan", "tasks.db");
-    builder.Services.RegisterDb($"Data Source={path}", Log.Logger);
-#else
     builder.Services.RegisterDb($"Data Source={ConfigHelper.UserProfileDbPath}", Log.Logger);
-#endif
 
     // Add a command and optionally configure it.
     builder.Services.AddScoped<AddCommand>();
@@ -84,8 +79,7 @@ try
 
     var app = builder.Build();
 
-    await ConfigHelper.FirstRun(app);
-
+    await ConfigHelper.FirstRun();
 
     await app.RunAsync();
 }
