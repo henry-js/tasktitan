@@ -31,6 +31,7 @@ public static class ConfigHelper
 
     internal static async Task FirstRun()
     {
+        Directory.CreateDirectory(UserProfileDirectoryDataFolder);
         if (File.Exists(UserProfileDbPath)) return;
 
         var path = new TextPath(UserProfileDbPath.Replace(UserProfileDirectory, @"~\"));
