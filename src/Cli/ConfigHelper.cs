@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -10,13 +11,10 @@ namespace TaskTitan.Cli;
 
 public static class ConfigHelper
 {
-    private static string SourceDirectory => Path.GetDirectoryName(AppContext.BaseDirectory)!;
-    private static string SourceDirectoryDataFolder => Path.Combine(SourceDirectory, ".tasktitan");
-    private static string SourceDbPath => Path.Combine(SourceDirectoryDataFolder, DbName);
+    private static string DbName => "tasks.db";
     private static string UserProfileDirectory => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
     private static string UserProfileDirectoryDataFolder => Path.Combine(UserProfileDirectory, ".tasktitan");
-    private static string UserProfileDbPath => Path.Combine(UserProfileDirectoryDataFolder, DbName);
-    private static string DbName => "tasks.db";
+    public static string UserProfileDbPath => Path.Combine(UserProfileDirectoryDataFolder, DbName);
 
     // public static string FindTaskTitanDataFolder()
     // {
@@ -31,7 +29,7 @@ public static class ConfigHelper
     //     else throw new Exception("Could not find .tasktitan data folder");
     // }
 
-    internal static async Task FirstRun(Microsoft.Extensions.Hosting.IHost app)
+    internal static async Task FirstRun()
     {
         if (File.Exists(UserProfileDbPath)) return;
 
@@ -42,11 +40,7 @@ public static class ConfigHelper
 
         if (!AnsiConsole.Confirm("Would you like a new database created, so tasktitan can proceed?")) return;
 
-        // Ensure db exists
-        await using var scope = app.Services.CreateAsyncScope();
-        var db = scope.ServiceProvider.GetRequiredService<TaskTitanDbContext>();
-        await db.Database.EnsureCreatedAsync();
-        await db.Database.MigrateAsync();
-        //     throw new TaskTitanDatabaseNotFoundException($"Expected to find default {DbName} in source directory");
+        var dbbundle = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tasksdb_migrations.exe");
+        Process.Start(dbbundle);
     }
 }

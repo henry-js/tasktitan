@@ -8,6 +8,7 @@ namespace TaskTitan.Data;
 
 public class TaskTitanDbContext : DbContext
 {
+    // public const string MigrationExe = "tasksdb_migrations.exe";
     public TaskTitanDbContext(DbContextOptions<TaskTitanDbContext> options)
     : base(options)
     {

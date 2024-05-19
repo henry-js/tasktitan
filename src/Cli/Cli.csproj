@@ -44,16 +44,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="*.db">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="$(ProjectDir).tasktitan\**" CopyToOutputDirectory="PreserveNewest" LinkBase=".tasktitan\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Using Include="Microsoft.Extensions.Logging" />
     <Using Include="Spectre.Console" />
     <Using Include="Spectre.Console.Cli" />
