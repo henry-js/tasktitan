@@ -2,7 +2,7 @@ using Nuke.Common.CI.GitHubActions;
 
 [GitHubActions(
     "continuous",
-    GitHubActionsImage.UbuntuLatest,
+    GitHubActionsImage.WindowsLatest,
     OnPushBranchesIgnore = ["main"],
     OnPullRequestExcludePaths = ["feat/*", "build", "build/*", "bug/*"],
     InvokedTargets = [nameof(Compile)],
@@ -10,14 +10,14 @@ using Nuke.Common.CI.GitHubActions;
     FetchDepth = 0)]
 [GitHubActions(
     "test",
-    GitHubActionsImage.UbuntuLatest,
+    GitHubActionsImage.WindowsLatest,
     On = [GitHubActionsTrigger.PullRequest],
     InvokedTargets = [nameof(Test)],
     AutoGenerate = true,
     FetchDepth = 0)]
 [GitHubActions(
     "release",
-    GitHubActionsImage.UbuntuLatest,
+    GitHubActionsImage.WindowsLatest,
     // OnPushBranches = ["main"],
     InvokedTargets = [nameof(Publish)],
     AutoGenerate = true,
