@@ -19,21 +19,20 @@ Log.Logger = new LoggerConfiguration()
 VelopackApp.Build()
 .WithFirstRun(v =>
 {
-    Log.Information("First run of tasktitan");
-    Log.Information("Moving .db file");
-    Directory.CreateDirectory(ConfigHelper.UserProfileDirectoryDataFolder);
-    if (File.Exists(ConfigHelper.SourceDbPath))
-    {
-        File.Move(ConfigHelper.SourceDbPath, ConfigHelper.UserProfileDbPath);
-        Log.Information("Moved .db file to %userprofile%");
-    }
+    // Log.Information("First run of tasktitan");
+    // Log.Information("Moving .db file");
+    // Directory.CreateDirectory(ConfigHelper.UserProfileDirectoryDataFolder);
+    // if (File.Exists(ConfigHelper.SourceDbPath))
+    // {
+    //     File.Move(ConfigHelper.SourceDbPath, ConfigHelper.UserProfileDbPath);
+    //     Log.Information("Moved .db file to %userprofile%");
+    // }
 })
 .Run();
 
 try
 {
-
-    var configDir = ConfigHelper.FindTaskTitanDataFolder();
+    // var configDir = ConfigHelper.FindTaskTitanDataFolder();
 
     var builder = Host.CreateApplicationBuilder(args);
 
@@ -49,12 +48,7 @@ try
                 .CreateLogger())
     );
 
-#if DEBUG
-    var path = Path.Combine(Directory.GetCurrentDirectory(), ".tasktitan", "tasks.db");
-    builder.Services.RegisterDb($"Data Source={path}", Log.Logger);
-#else
     builder.Services.RegisterDb($"Data Source={ConfigHelper.UserProfileDbPath}", Log.Logger);
-#endif
 
     // Add a command and optionally configure it.
     builder.Services.AddScoped<AddCommand>();
@@ -85,12 +79,8 @@ try
 
     var app = builder.Build();
 
-    // Ensure db exists
-    await using (var scope = app.Services.CreateAsyncScope())
-    {
-        var db = scope.ServiceProvider.GetRequiredService<TaskTitanDbContext>();
-        await db.Database.MigrateAsync();
-    }
+    await ConfigHelper.FirstRun();
+
     await app.RunAsync();
 }
 catch (Exception ex)
