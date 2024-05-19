@@ -14,9 +14,9 @@
             "args": [
                 // "add",
                 // "hello",
-                "modify",
-                "1",
-                "due:eom"
+                "add",
+                "hello there",
+                "schdeuled:3-before"
             ],
             "cwd": "${workspaceFolder}/src/Cli",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
