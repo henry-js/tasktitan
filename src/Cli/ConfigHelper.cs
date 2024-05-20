@@ -1,11 +1,4 @@
 using System.Diagnostics;
-using System.Reflection;
-using System.Threading.Tasks;
-
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-
-using Spectre.Console.Cli.Help;
 
 namespace TaskTitan.Cli;
 
@@ -29,7 +22,7 @@ public static class ConfigHelper
     //     else throw new Exception("Could not find .tasktitan data folder");
     // }
 
-    internal static async Task FirstRun()
+    internal static void FirstRun()
     {
         Directory.CreateDirectory(UserProfileDirectoryDataFolder);
         if (File.Exists(UserProfileDbPath)) return;

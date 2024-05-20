@@ -22,7 +22,7 @@ public class DueDateHelperTests
     public void GivenAStringDateShouldReturnAValidDateOnly(string input)
     {
         FakeTimeProvider fake = new();
-        var sut = new DateParser(fake);
+        var sut = new StringDateParser(fake);
         var success = sut.IsExactDate(input, out DateOnly? date);
 
         success.Should().BeTrue();
@@ -45,7 +45,7 @@ public class DueDateHelperTests
         // Arrange
         var today = new DateTime(2024, 06, 06);
         _timeProvider.SetUtcNow(new DateTimeOffset(today));
-        var sut = new DateParser(_timeProvider);
+        var sut = new StringDateParser(_timeProvider);
         var exact = DateTime.ParseExact(expected, "yyyy-MM-dd", provider);
 
         // Act
@@ -69,7 +69,7 @@ public class DueDateHelperTests
         // Arrange
         var today = new DateTime(2024, 06, 06);
         _timeProvider.SetUtcNow(new DateTimeOffset(today));
-        var sut = new DateParser(_timeProvider);
+        var sut = new StringDateParser(_timeProvider);
         var exact = DateTime.ParseExact(expected, "yyyy-MM-dd", provider);
 
         // Act

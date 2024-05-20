@@ -16,6 +16,13 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="TaskTitan.Core" />
+    <Using Include="TaskTitan.Data" />
+    <Using Include="Microsoft.EntityFrameworkCore" />
+    <Using Include="Microsoft.EntityFrameworkCore.Infrastructure" />
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFrameworks>net8.0</TargetFrameworks>
     <RuntimeIndentifiers>win-x64</RuntimeIndentifiers>

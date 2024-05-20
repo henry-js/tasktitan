@@ -1,8 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-using TaskTitan.Core;
-
-using TTask = TaskTitan.Core.TTask;
+﻿using TTask = TaskTitan.Core.TTask;
 
 namespace TaskTitan.Data;
 

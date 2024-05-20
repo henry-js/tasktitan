@@ -1,10 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-
-using TaskTitan.Core;
-using TaskTitan.Data;
-using TaskTitan.Lib.Dates;
-
 namespace TaskTitan.Lib.Services;
 
 public class TaskService(TaskTitanDbContext dbcontext, ILogger<TaskService> logger) : ITtaskService
