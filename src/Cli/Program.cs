@@ -8,6 +8,7 @@ using Serilog;
 
 using TaskTitan.Cli.TaskCommands;
 using TaskTitan.Lib;
+using TaskTitan.Lib.Dates;
 
 using Velopack;
 
@@ -56,7 +57,7 @@ try
     builder.Services.AddScoped<ModifyCommand>();
     builder.Services.AddScoped<ITtaskService, TaskService>();
     builder.Services.AddSingleton(TimeProvider.System);
-    builder.Services.AddSingleton<DueDateHelper>();
+    // builder.Services.AddSingleton<DueDateHelper>();
 
     builder.UseSpectreConsole(config =>
     {
@@ -79,7 +80,7 @@ try
 
     var app = builder.Build();
 
-    await ConfigHelper.FirstRun();
+    // await ConfigHelper.FirstRun();
 
     await app.RunAsync();
 }

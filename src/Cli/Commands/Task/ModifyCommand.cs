@@ -19,7 +19,7 @@ internal sealed class ModifyCommand(IAnsiConsole console, ITtaskService service,
         }
         if (settings.due != null)
         {
-            updateResult = service.UpdateDueDate(task, settings.due.Split(':')[^1]);
+            updateResult = service.Update(task);
         }
         console.WriteLine(updateResult?.Success == true ? "Update successful" : "Update failed");
         return Task.FromResult(0);
