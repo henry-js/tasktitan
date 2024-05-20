@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace TaskTitan.Lib.Dates;
 
 public class StringDateParser(TimeProvider _timeProvider)
@@ -37,7 +39,6 @@ public class StringDateParser(TimeProvider _timeProvider)
                 "tomorrow" => DateOnly.FromDateTime(Now.Date.AddDays(1)),
                 "yesterday" => DateOnly.FromDateTime(Now.Date.AddDays(-1)),
                 "eoy" => new(Now.Year, 12, 31),
-                string day when IsDayOfWeek(day) => NextDayOfWeek(day),
                 _ => null,
             };
         }
@@ -47,8 +48,7 @@ public class StringDateParser(TimeProvider _timeProvider)
     {
         var isStringDate = DateOnly.TryParseExact(strValue, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedDate);
 
-        if (isStringDate) exactDate = parsedDate;
-        else exactDate = null;
+        exactDate = isStringDate ? parsedDate : null;
         return exactDate is not null;
     }
 
