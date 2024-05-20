@@ -5,10 +5,8 @@ namespace TaskTitan.Cli;
 public static class ConfigHelper
 {
     private static string DbName => "tasks.db";
-    private static string DbName => "tasks.db";
     private static string UserProfileDirectory => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
     private static string UserProfileDirectoryDataFolder => Path.Combine(UserProfileDirectory, ".tasktitan");
-    public static string UserProfileDbPath => Path.Combine(UserProfileDirectoryDataFolder, DbName);
     public static string UserProfileDbPath => Path.Combine(UserProfileDirectoryDataFolder, DbName);
 
     // public static string FindTaskTitanDataFolder()
@@ -37,8 +35,6 @@ public static class ConfigHelper
 
         if (!AnsiConsole.Confirm("Would you like a new database created, so tasktitan can proceed?")) return;
 
-        var dbbundle = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tasksdb_migrations.exe");
-        Process.Start(dbbundle);
         var dbbundle = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tasksdb_migrations.exe");
         Process.Start(dbbundle);
     }

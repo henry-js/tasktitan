@@ -28,7 +28,8 @@ internal static class TTaskConsole
 
         foreach (var task in tasks)
         {
-            table.AddRow(task.RowId.ToString(CultureInfo.CurrentCulture), task.Description, task.DueDate?.ToString(CultureInfo.InvariantCulture) ?? "");
+            var humanizedDate = task.DueDate?.Humanize() ?? "";
+            table.AddRow(task.RowId.ToString(CultureInfo.CurrentCulture), task.Description, humanizedDate);
         }
 
         console.Write(table);

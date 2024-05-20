@@ -49,24 +49,7 @@ public class TaskService(TaskTitanDbContext dbcontext, ILogger<TaskService> logg
     public TTaskResult Update(TTask pendingTask)
     {
         List<string> errors = [];
-        // if (dueString != string.Empty)
-        // {
-        //     var due = _dateHelper.DateStringToDate(dueString);
-        //     if (due is null)
-        //     {
-        //         _logger.LogWarning("Could not parse received dueDate: {dueDate}", dueString);
-        //         errors.Add("Could not parse due date");
-        //     }
-        //     else
-        //     {
-        //         pendingTask.DueDate = due;
-        //     }
-        // }
-        // else
-        // {
-        //     _logger.LogInformation("Removing due date");
-        //     pendingTask.DueDate = null;
-        // }
+
         _logger.LogInformation("Updating task {rowId}", pendingTask.RowId);
         try
         {

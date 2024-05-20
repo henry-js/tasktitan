@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 
 using TaskTitan.Cli.TaskCommands;
+using TaskTitan.Lib.Dates;
 
 using Velopack;
 
@@ -45,6 +46,7 @@ try
     builder.Services.AddScoped<ListCommand>();
     builder.Services.AddScoped<ModifyCommand>();
     builder.Services.AddScoped<ITtaskService, TaskService>();
+    builder.Services.AddScoped<IDateTimeConverter, DateOnlyConverter>();
     builder.Services.AddSingleton(TimeProvider.System);
     // builder.Services.AddSingleton<DueDateHelper>();
 
@@ -82,6 +84,6 @@ finally
     await Log.CloseAndFlushAsync();
 }
 
-// Console.WriteLine();
-// Console.WriteLine("Press any key to exit.");
-// System.Console.ReadKey(intercept: false);
+Console.WriteLine();
+Console.WriteLine("Press any key to exit.");
+System.Console.ReadKey(intercept: false);

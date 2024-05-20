@@ -22,10 +22,9 @@ public class DueDateHelperTests
     public void GivenAStringDateShouldReturnAValidDateOnly(string input)
     {
         FakeTimeProvider fake = new();
-        var sut = new StringDateParser(fake);
-        var success = sut.IsExactDate(input, out DateOnly? date);
+        var sut = new DateOnlyConverter(fake);
+        var date = sut.ConvertFrom(input);
 
-        success.Should().BeTrue();
         date.Should().NotBeNull("the default format for date strings is 'yyyy-MM-dd'");
         var dateParts = input.Split("-").Select(s => Convert.ToInt32(s)).ToList();
         dateParts[0].Should().Be(date?.Year);
@@ -45,14 +44,13 @@ public class DueDateHelperTests
         // Arrange
         var today = new DateTime(2024, 06, 06);
         _timeProvider.SetUtcNow(new DateTimeOffset(today));
-        var sut = new StringDateParser(_timeProvider);
+        var sut = new DateOnlyConverter(_timeProvider);
         var exact = DateTime.ParseExact(expected, "yyyy-MM-dd", provider);
 
         // Act
-        var success = sut.IsRelative(synonym, out DateOnly? date);
+        var date = sut.ConvertFrom(synonym);
 
         // Assert
-        success.Should().BeTrue();
         date.Should().Be(DateOnly.FromDateTime(exact), "a synoymn should correctly convert to a date");
     }
 
@@ -69,14 +67,13 @@ public class DueDateHelperTests
         // Arrange
         var today = new DateTime(2024, 06, 06);
         _timeProvider.SetUtcNow(new DateTimeOffset(today));
-        var sut = new StringDateParser(_timeProvider);
+        var sut = new DateOnlyConverter(_timeProvider);
         var exact = DateTime.ParseExact(expected, "yyyy-MM-dd", provider);
 
         // Act
-        var success = sut.IsNextDate(dayOfWeek, out DateOnly? date);
+        var date = sut.ConvertFrom(dayOfWeek);
 
         // Assert
-        success.Should().BeTrue();
         date.Should().Be(DateOnly.FromDateTime(exact), "a synoymn should correctly convert to a date");
 
     }

@@ -1,5 +1,3 @@
-
-
 namespace TaskTitan.Lib.Services;
 
 public record TTaskResult(bool IsSuccess, TTask? task, string? Messaqge = null)

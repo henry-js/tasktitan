@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Dynamic;
+using System.Text.Json;
 
 namespace TaskTitan.Core;
 
@@ -19,7 +19,7 @@ public class TTask
     public DateTime CreatedAt { get; private set; }
     public TTaskState State { get; private set; }
     public DateOnly? DueDate { get; set; }
-    public TTaskMetadata? Metadata { get; set; }
+    public TTaskMetadata Metadata { get; set; } = new();
 
     public static TTask CreateNew(string description, TTaskMetadata? metadata = null)
     {
@@ -29,11 +29,15 @@ public class TTask
             Description = description,
             CreatedAt = DateTime.UtcNow,
             State = TTaskState.Pending,
-            Metadata = metadata,
         };
 
         return task;
     }
+
+    // public static TTask Update(string scheduled = null)
+    // {
+
+    // }
 
     public TTask Start()
     {
@@ -63,5 +67,11 @@ public class TTask
     {
         this.RowId = index;
         return this;
+    }
+
+    public override string ToString()
+    {
+        var json = JsonSerializer.Serialize(this, new JsonSerializerOptions() { WriteIndented = true });
+        return json;
     }
 }

@@ -1,8 +1,6 @@
-using System.Linq;
-
 namespace TaskTitan.Lib.Dates;
 
-public class StringDateParser(TimeProvider _timeProvider)
+public class DateOnlyConverter(TimeProvider _timeProvider) : IDateTimeConverter
 {
     public DateTimeOffset Now { get; } = _timeProvider.GetLocalNow();
     private readonly DayOfWeek[] _daysOfWeek = Enum.GetValues<DayOfWeek>();
@@ -43,8 +41,7 @@ public class StringDateParser(TimeProvider _timeProvider)
             };
         }
     }
-
-    public bool IsExactDate(string strValue, out DateOnly? exactDate)
+    private bool IsExactDate(string strValue, out DateOnly? exactDate)
     {
         var isStringDate = DateOnly.TryParseExact(strValue, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedDate);
 
@@ -52,7 +49,7 @@ public class StringDateParser(TimeProvider _timeProvider)
         return exactDate is not null;
     }
 
-    public bool IsNextDate(string strValue, out DateOnly? nextDate)
+    private bool IsNextDate(string strValue, out DateOnly? nextDate)
     {
         nextDate = strValue switch
         {
@@ -62,4 +59,18 @@ public class StringDateParser(TimeProvider _timeProvider)
         return nextDate != null;
     }
 
+    public DateOnly? ConvertFrom(string value)
+    {
+        if (value == string.Empty) return null;
+
+        if (IsExactDate(value, out DateOnly? date)) return date;
+        if (IsNextDate(value, out date)) return date;
+        if (IsRelative(value, out date)) return date;
+        return null;
+    }
+}
+
+public interface IDateTimeConverter
+{
+    public DateOnly? ConvertFrom(string value);
 }

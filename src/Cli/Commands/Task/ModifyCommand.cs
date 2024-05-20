@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
 
@@ -6,44 +7,80 @@ using TaskTitan.Lib.Dates;
 
 namespace TaskTitan.Cli.TaskCommands;
 
-internal sealed class ModifyCommand(IAnsiConsole console, ITtaskService service, ILogger<ModifyCommand> logger)
+internal sealed class ModifyCommand(IAnsiConsole console, IDateTimeConverter dateConverter, ITtaskService service, ILogger<ModifyCommand> logger)
 : AsyncCommand<ModifyCommand.Settings>
 {
     public override Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
         logger.LogInformation("Querying task with rowId: {rowId}", settings.rowId);
         var task = service.Get(settings.rowId, false);
-
+        Debug.WriteLine(task);
+        // ParsedInput input = ParseInput(settings);
         if (task == null)
         {
             console.MarkupLineInterpolated(CultureInfo.CurrentCulture, $"Task {settings.rowId} not found");
             return Task.FromResult(-1);
         }
-        if (settings.Due != null)
+        if (settings.due != null)
         {
-            task.DueDate = settings.Due;
-            var updateResult = service.Update(task);
-            console.WriteLine(updateResult.IsSuccess ? "Update successful" : $"Update failed: {updateResult.Messaqge}");
+            task.DueDate = dateConverter.ConvertFrom(settings.due);
         }
+        if (settings.wait != null)
+        {
+            task.Metadata.Wait = dateConverter.ConvertFrom(settings.wait);
+        }
+        var updateResult = service.Update(task);
+        Debug.WriteLine(task);
+
+        console.WriteLine(updateResult.IsSuccess ? "Update successful" : $"Update failed: {updateResult.Messaqge}");
         return Task.FromResult(0);
     }
 
     internal sealed class Settings : CommandSettings
     {
-        [CommandArgument(0, "<id>")]
+        [CommandArgument(0, "[id]")]
         public int rowId { get; set; }
 
-        [TypeConverter(typeof(DueDateConverter))]
-        [CommandArgument(1, "[due]")]
-        public DateOnly? Due { get; set; } = DateOnly.MinValue;
+        [CommandOption("-d|--due")]
+        public string? due { get; set; }
+        [CommandOption("-s|--scheduled")]
+        public string? scheduled { get; set; }
+        [CommandOption("-w|--wait")]
+        public string? wait { get; internal set; }
+        [CommandOption("-u|--until")]
+        public string? until { get; internal set; }
 
         public override ValidationResult Validate()
         {
             if (rowId < 1) return ValidationResult.Error("rowId cannot be less than 0");
+
+            // return IsInvalid(due, nameof(due))
+            //         ? ValidationResult.Error("due argument correct format: 'due:day'")
+            //     : IsInvalid(scheduled, nameof(scheduled))
+            //         ? ValidationResult.Error("scheduled argument correct format: 'scheduled:day'")
+            //     : IsInvalid(wait, nameof(wait))
+            //         ? ValidationResult.Error("wait argument correct format: 'wait:day'")
+            //     : IsInvalid(until, nameof(until))
+            //         ? ValidationResult.Error("until argument correct format: 'until:day'")
+            //     :
             return ValidationResult.Success();
-            // return due is not null && !due.StartsWith("due:", StringComparison.OrdinalIgnoreCase)
-            //     ? ValidationResult.Error("due argument correct format: 'due:day'")
-            //     : ValidationResult.Success();
+
+            // static bool IsInvalid(string? value, string argname)
+            // {
+            //     return value is not null && !value.StartsWith($"{argname}:", StringComparison.OrdinalIgnoreCase);
+            // }
         }
     }
+}
+
+internal class ParsedInput
+{
+    public bool UpdateDue { get; internal set; }
+    public DateValueOptions Due { get; internal set; }
+}
+
+public class DateValueOptions
+{
+    public bool Update { get; set; }
+    public DateOnly? Value { get; set; }
 }

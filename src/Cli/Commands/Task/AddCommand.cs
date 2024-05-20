@@ -25,9 +25,8 @@ internal sealed class AddCommand(IAnsiConsole console, ITtaskService service, IL
         [CommandArgument(0, "<description>")]
         public string Description { get; set; } = string.Empty;
 
-        [TypeConverter(typeof(DueDateConverter))]
         [CommandArgument(1, "[due]")]
-        public DateOnly? Due { get; set; } = DateOnly.MinValue;
+        public string? Due { get; set; }
 
 
         [CommandArgument(2, "[scheduled]")]
