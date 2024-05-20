@@ -2,8 +2,6 @@ using System.Globalization;
 
 using Humanizer;
 
-using TaskTitan.Core;
-
 namespace TaskTitan.Cli.TaskCommands;
 
 internal static class TTaskConsole
@@ -22,11 +20,11 @@ internal static class TTaskConsole
         console.Write(table);
     }
 
-    internal static void ListPendingTasks(this IAnsiConsole console, List<PendingTTask> tasks)
+    internal static void ListPendingTasks(this IAnsiConsole console, List<TTask> tasks)
     {
         var table = new Table()
             .Border(TableBorder.Horizontal)
-            .AddColumns("Id", nameof(PendingTTask.Description));
+            .AddColumns("Id", nameof(TTask.Description));
 
         foreach (var task in tasks)
         {

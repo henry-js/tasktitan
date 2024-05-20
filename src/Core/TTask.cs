@@ -1,3 +1,6 @@
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Dynamic;
+
 namespace TaskTitan.Core;
 
 public class TTask
@@ -9,19 +12,24 @@ public class TTask
     }
 
     public TTaskId Id { get; private set; } = TTaskId.Empty;
+
+    [NotMapped]
+    public int RowId { get; private set; }
     public string Description { get; private set; } = string.Empty;
     public DateTime CreatedAt { get; private set; }
     public TTaskState State { get; private set; }
     public DateOnly? DueDate { get; set; }
+    public TTaskMetadata? Metadata { get; set; }
 
-    public static TTask CreateNew(string description)
+    public static TTask CreateNew(string description, TTaskMetadata? metadata = null)
     {
         TTask task = new()
         {
             Id = TTaskId.NewTaskId(),
             Description = description,
             CreatedAt = DateTime.UtcNow,
-            State = TTaskState.Pending
+            State = TTaskState.Pending,
+            Metadata = metadata,
         };
 
         return task;
@@ -39,7 +47,7 @@ public class TTask
         return this;
     }
 
-    public static TTask FromPending(PendingTTask pendingTask)
+    public static TTask FromPending(TTask pendingTask)
     {
         return new()
         {
@@ -51,4 +59,9 @@ public class TTask
         };
     }
 
+    public TTask WithIndex(int index)
+    {
+        this.RowId = index;
+        return this;
+    }
 }

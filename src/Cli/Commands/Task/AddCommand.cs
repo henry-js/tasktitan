@@ -42,11 +42,8 @@ internal sealed class AddCommand(IAnsiConsole console, ITtaskService service, IL
             {
                 return ValidationResult.Error("Incorrect syntax for scheduled.");
             }
-            else
-            {
-                Scheduled = "Hello i have been edited";
-            }
 
+            Scheduled = "Hello i have been edited";
             return base.Validate();
         }
     }

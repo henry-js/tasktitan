@@ -14,8 +14,8 @@
             "args": [
                 // "add",
                 // "hello",
-                "add",
-                "hello there",
+                "list",
+                // "hello there",
                 // "due:eom"
             ],
             "cwd": "${workspaceFolder}/src/Cli",

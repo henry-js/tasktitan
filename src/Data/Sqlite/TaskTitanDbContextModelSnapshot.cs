@@ -32,6 +32,9 @@ namespace Data.Sqlite
                     b.Property<DateOnly?>("DueDate")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("RowId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("State")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -41,16 +44,39 @@ namespace Data.Sqlite
                     b.ToTable("tasks", (string)null);
                 });
 
-            modelBuilder.Entity("TaskTitan.Core.PendingTTask", b =>
+            modelBuilder.Entity("TaskTitan.Core.TTask", b =>
                 {
-                    b.HasBaseType("TaskTitan.Core.TTask");
+                    b.OwnsOne("TaskTitan.Core.TTaskMetadata", "Metadata", b1 =>
+                        {
+                            b1.Property<string>("TTaskId")
+                                .HasColumnType("TEXT");
 
-                    b.Property<int>("RowId")
-                        .HasColumnType("INTEGER");
+                            b1.Property<bool>("Blocked")
+                                .HasColumnType("INTEGER");
 
-                    b.ToTable((string)null);
+                            b1.Property<int>("Priority")
+                                .HasColumnType("INTEGER");
 
-                    b.ToView("pending_tasks", (string)null);
+                            b1.Property<DateOnly?>("Scheduled")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<DateOnly?>("Until")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<DateOnly?>("Wait")
+                                .HasColumnType("TEXT");
+
+                            b1.HasKey("TTaskId");
+
+                            b1.ToTable("tasks");
+
+                            b1.ToJson("Metadata");
+
+                            b1.WithOwner()
+                                .HasForeignKey("TTaskId");
+                        });
+
+                    b.Navigation("Metadata");
                 });
 #pragma warning restore 612, 618
         }

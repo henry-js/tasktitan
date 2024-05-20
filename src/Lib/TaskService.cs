@@ -10,12 +10,15 @@ public class TaskService(TaskTitanDbContext dbcontext, ILogger<TaskService> logg
         _dbcontext.Tasks.Add(task);
         _dbcontext.SaveChanges();
 
-        return _dbcontext.PendingTasks.AsNoTracking().Count();
+        return _dbcontext.Tasks.AsNoTracking().Count();
     }
 
-    public PendingTTask? Get(int rowId)
+    public TTask? Get(int rowId)
     {
-        var task = _dbcontext.PendingTasks.AsNoTracking().FirstOrDefault(t => t.RowId == rowId);
+        int index = 0;
+        var task = _dbcontext.Tasks.AsNoTracking().Select(t => t.WithIndex(index + 1))
+
+        .FirstOrDefault(t => t.RowId == rowId);
         if (task == null)
         {
             _logger.LogInformation("Task not found"); _logger.LogInformation("Task {rowId} not found", rowId);
@@ -23,7 +26,7 @@ public class TaskService(TaskTitanDbContext dbcontext, ILogger<TaskService> logg
         return task;
     }
 
-    public TTaskResult Update(PendingTTask pendingTask)
+    public TTaskResult Update(TTask pendingTask)
     {
         List<string> errors = [];
         // if (dueString != string.Empty)
