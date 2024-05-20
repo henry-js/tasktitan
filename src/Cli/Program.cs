@@ -82,6 +82,6 @@ finally
     await Log.CloseAndFlushAsync();
 }
 
-Console.WriteLine();
-Console.WriteLine("Press any key to exit.");
-System.Console.ReadKey(intercept: false);
+// Console.WriteLine();
+// Console.WriteLine("Press any key to exit.");
+// System.Console.ReadKey(intercept: false);

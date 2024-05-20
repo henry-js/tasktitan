@@ -24,11 +24,11 @@ internal static class TTaskConsole
     {
         var table = new Table()
             .Border(TableBorder.Horizontal)
-            .AddColumns("Id", nameof(TTask.Description));
+            .AddColumns("Id", nameof(TTask.Description), nameof(TTask.DueDate));
 
         foreach (var task in tasks)
         {
-            table.AddRow(task.RowId.ToString(CultureInfo.CurrentCulture), task.Description);
+            table.AddRow(task.RowId.ToString(CultureInfo.CurrentCulture), task.Description, task.DueDate?.ToString(CultureInfo.InvariantCulture) ?? "");
         }
 
         console.Write(table);

@@ -13,17 +13,37 @@ public class TaskService(TaskTitanDbContext dbcontext, ILogger<TaskService> logg
         return _dbcontext.Tasks.AsNoTracking().Count();
     }
 
-    public TTask? Get(int rowId)
+    public void Delete(int rowId)
     {
-        int index = 0;
-        var task = _dbcontext.Tasks.AsNoTracking().Select(t => t.WithIndex(index + 1))
+        _logger.LogInformation("deleting Task {rowid}", rowId);
+        var tasks = GetTasks();
+        var task = tasks.SingleOrDefault(t => t.RowId == rowId);
 
+        if (task is null)
+        {
+            _logger.LogInformation("Task not found");
+            return;
+        }
+
+        _dbcontext.Tasks.Remove(task);
+        _logger.LogInformation("Task deleted");
+    }
+
+    public TTask? Get(int rowId, bool asreadonly = true)
+    {
+        var task = GetTasks(asreadonly)
         .FirstOrDefault(t => t.RowId == rowId);
         if (task == null)
         {
-            _logger.LogInformation("Task not found"); _logger.LogInformation("Task {rowId} not found", rowId);
+            _logger.LogInformation("Task {rowId} not found", rowId);
         }
         return task;
+    }
+
+    public IEnumerable<TTask> GetTasks(bool asreadonly = true)
+    {
+        int index = 1;
+        return _dbcontext.Tasks.AsNoTracking().AsEnumerable().Select(t => t.WithIndex(index++));
     }
 
     public TTaskResult Update(TTask pendingTask)
@@ -47,10 +67,17 @@ public class TaskService(TaskTitanDbContext dbcontext, ILogger<TaskService> logg
         //     _logger.LogInformation("Removing due date");
         //     pendingTask.DueDate = null;
         // }
-        var task = TTask.FromPending(pendingTask);
         _logger.LogInformation("Updating task {rowId}", pendingTask.RowId);
-        _dbcontext.Tasks.Update(task);
-        _dbcontext.Commit();
-        return new TTaskResult(task != null, task);
+        try
+        {
+            _dbcontext.Tasks.Update(pendingTask);
+            _dbcontext.Commit();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return TTaskResult.Fail(ex.Message);
+        }
+        return TTaskResult.Success();
     }
 }
