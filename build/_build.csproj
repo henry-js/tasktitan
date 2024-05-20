@@ -8,6 +8,7 @@
     <NukeRootDirectory>..</NukeRootDirectory>
     <NukeScriptDirectory>..</NukeScriptDirectory>
     <NukeTelemetryVersion>1</NukeTelemetryVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -21,4 +22,16 @@
     <PackageDownload Include="vpk" Version="[0.0.462-gf8acc97]" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="Nuke.Common"/>
+    <Using Include="Nuke.Common.IO"/>
+    <Using Include="Nuke.Common.ProjectModel"/>
+    <Using Include="Nuke.Common.Tools.Coverlet"/>
+    <Using Include="Nuke.Common.Tools.DotNet"/>
+    <Using Include="Nuke.Common.Tools.MinVer"/>
+    <Using Include="Nuke.Common.Tools.ReportGenerator"/>
+    <Using Include="Serilog" />
+    <Using Include="Nuke.Common.Tools.DotNet.DotNetTasks" Static="True" />
+    <Using Include="Nuke.Common.Tools.ReportGenerator.ReportGeneratorTasks" Static="True" />
+  </ItemGroup>
 </Project>
