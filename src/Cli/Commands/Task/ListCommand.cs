@@ -10,9 +10,22 @@ internal sealed class ListCommand(IAnsiConsole console, ITtaskService service, I
 
     public override Task<int> ExecuteAsync(CommandContext context, TaskSettings settings)
     {
-        logger.LogDebug("Fetching tasks");
-        var pending = service.GetTasks().ToList();
-        console.ListPendingTasks(pending);
-        return Task.FromResult(0);
+        if (settings.taskNum is null)
+        {
+            logger.LogDebug("Fetching all pending tasks");
+            var pending = service.GetTasks().ToList();
+            console.ListTasks(pending);
+            return Task.FromResult(0);
+        }
+        logger.LogDebug("Fetching task {taskNum}", settings.taskNum);
+        var task = service.Get(settings.taskNum.Value);
+        if (task is not null)
+        {
+            console.DisplayTask(task);
+            return Task.FromResult(0);
+        }
+
+        Console.WriteLine($"Task with taskNum {settings.taskNum} could not be found");
+        return Task.FromResult(-1);
     }
 }

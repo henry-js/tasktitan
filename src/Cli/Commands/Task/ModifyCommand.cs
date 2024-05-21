@@ -43,7 +43,7 @@ internal sealed class ModifyCommand(IAnsiConsole console, IDateTimeConverter dat
 
         [CommandOption("-d|--due")]
         public string? due { get; set; }
-        [CommandOption("-s|--scheduled")]
+        [CommandOption("-s|--sched|--scheduled")]
         public string? scheduled { get; set; }
         [CommandOption("-w|--wait")]
         public string? wait { get; internal set; }

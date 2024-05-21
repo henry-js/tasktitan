@@ -7,8 +7,16 @@ public class TaskService(TaskTitanDbContext dbcontext, ILogger<TaskService> logg
 
     public int Add(TTask task)
     {
-        _dbcontext.Tasks.Add(task);
-        _dbcontext.SaveChanges();
+        try
+        {
+            _dbcontext.Tasks.Add(task);
+            _dbcontext.SaveChanges();
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError("Save failed: {exception}", ex.Message);
+            return -1;
+        }
 
         return _dbcontext.Tasks.AsNoTracking().Count();
     }
@@ -21,7 +29,7 @@ public class TaskService(TaskTitanDbContext dbcontext, ILogger<TaskService> logg
 
         if (task is null)
         {
-            _logger.LogInformation("Task not found");
+            _logger.LogWarning("Task not found");
             return;
         }
 
