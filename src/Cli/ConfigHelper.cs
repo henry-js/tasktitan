@@ -9,19 +9,6 @@ public static class ConfigHelper
     private static string UserProfileDirectoryDataFolder => Path.Combine(UserProfileDirectory, ".tasktitan");
     public static string UserProfileDbPath => Path.Combine(UserProfileDirectoryDataFolder, DbName);
 
-    // public static string FindTaskTitanDataFolder()
-    // {
-    //     if (Directory.Exists(SourceDirectoryDataFolder))
-    //     {
-    //         return SourceDirectoryDataFolder;
-    //     }
-    //     else if (Directory.Exists(UserProfileDirectoryDataFolder))
-    //     {
-    //         return UserProfileDirectoryDataFolder;
-    //     }
-    //     else throw new Exception("Could not find .tasktitan data folder");
-    // }
-
     internal static void FirstRun()
     {
         Directory.CreateDirectory(UserProfileDirectoryDataFolder);

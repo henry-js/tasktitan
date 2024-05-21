@@ -1,6 +1,3 @@
 namespace TaskTitan.Core;
 
-public enum TTaskState
-{
-    Pending, Started, Done
-}
+public enum TTaskState { Pending, Started, Done }

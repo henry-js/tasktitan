@@ -1,4 +1,4 @@
-﻿using Community.Extensions.Spectre.Cli.Hosting;
+using Community.Extensions.Spectre.Cli.Hosting;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -23,9 +23,7 @@ VelopackApp.Build()
 
 try
 {
-    // var configDir = ConfigHelper.FindTaskTitanDataFolder();
-
-    var builder = Host.CreateApplicationBuilder(args);
+        var builder = Host.CreateApplicationBuilder(args);
 
     // Bind configuration section to object
     // builder.Services.AddOptions<NestedSettings>()

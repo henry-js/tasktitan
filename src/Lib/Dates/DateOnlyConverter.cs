@@ -5,25 +5,8 @@ public class DateOnlyConverter(TimeProvider _timeProvider) : IDateTimeConverter
     public DateTimeOffset Now { get; } = _timeProvider.GetLocalNow();
     private readonly DayOfWeek[] _daysOfWeek = Enum.GetValues<DayOfWeek>();
 
-    private DateOnly NextDayOfWeek(string day)
-    {
-        var newNow = Now.AddDays(1);
 
-        while (newNow.DayOfWeek != ToDayOfWeek(day))
-        {
-            newNow = newNow.AddDays(1);
-        }
-        return DateOnly.FromDateTime(newNow.Date);
-    }
-
-    private DayOfWeek ToDayOfWeek(string day)
-    {
-        return _daysOfWeek.Single(d => d.ToString().Equals(day, StringComparison.InvariantCultureIgnoreCase));
-    }
-    private bool IsDayOfWeek(string input) =>
-        _daysOfWeek.Any(day => string.Equals(day.ToString(), input, StringComparison.InvariantCultureIgnoreCase));
-
-    public bool IsRelative(string strValue, out DateOnly? relativeDate)
+    private bool IsRelative(string strValue, out DateOnly? relativeDate)
     {
         relativeDate = RelativeToDate(strValue);
         return relativeDate != null;
@@ -59,6 +42,23 @@ public class DateOnlyConverter(TimeProvider _timeProvider) : IDateTimeConverter
         return nextDate != null;
     }
 
+    private DateOnly NextDayOfWeek(string day)
+    {
+        var newNow = Now.AddDays(1);
+
+        while (newNow.DayOfWeek != ToDayOfWeek(day))
+        {
+            newNow = newNow.AddDays(1);
+        }
+        return DateOnly.FromDateTime(newNow.Date);
+    }
+
+    private bool IsDayOfWeek(string input) =>
+        _daysOfWeek.Any(day => string.Equals(day.ToString(), input, StringComparison.InvariantCultureIgnoreCase));
+
+    private DayOfWeek ToDayOfWeek(string day) =>
+        _daysOfWeek.Single(d => d.ToString().Equals(day, StringComparison.InvariantCultureIgnoreCase));
+
     public DateOnly? ConvertFrom(string value)
     {
         if (value == string.Empty) return null;
@@ -68,9 +68,4 @@ public class DateOnlyConverter(TimeProvider _timeProvider) : IDateTimeConverter
         if (IsRelative(value, out date)) return date;
         return null;
     }
-}
-
-public interface IDateTimeConverter
-{
-    public DateOnly? ConvertFrom(string value);
 }

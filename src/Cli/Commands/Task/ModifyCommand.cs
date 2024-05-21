@@ -53,34 +53,7 @@ internal sealed class ModifyCommand(IAnsiConsole console, IDateTimeConverter dat
         public override ValidationResult Validate()
         {
             if (rowId < 1) return ValidationResult.Error("rowId cannot be less than 0");
-
-            // return IsInvalid(due, nameof(due))
-            //         ? ValidationResult.Error("due argument correct format: 'due:day'")
-            //     : IsInvalid(scheduled, nameof(scheduled))
-            //         ? ValidationResult.Error("scheduled argument correct format: 'scheduled:day'")
-            //     : IsInvalid(wait, nameof(wait))
-            //         ? ValidationResult.Error("wait argument correct format: 'wait:day'")
-            //     : IsInvalid(until, nameof(until))
-            //         ? ValidationResult.Error("until argument correct format: 'until:day'")
-            //     :
             return ValidationResult.Success();
-
-            // static bool IsInvalid(string? value, string argname)
-            // {
-            //     return value is not null && !value.StartsWith($"{argname}:", StringComparison.OrdinalIgnoreCase);
-            // }
         }
     }
-}
-
-internal class ParsedInput
-{
-    public bool UpdateDue { get; internal set; }
-    public DateValueOptions Due { get; internal set; }
-}
-
-public class DateValueOptions
-{
-    public bool Update { get; set; }
-    public DateOnly? Value { get; set; }
 }

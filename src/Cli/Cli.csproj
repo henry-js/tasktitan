@@ -35,10 +35,11 @@
     <AssemblyName>task</AssemblyName>
     <Nullable>enable</Nullable>
     <DebugType>embedded</DebugType>
+    <PublishReadyToRun>false</PublishReadyToRun>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="appsettings.*.json">
+    <None Include="appsettings*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
