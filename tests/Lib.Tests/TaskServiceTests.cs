@@ -1,21 +1,13 @@
-using System.Diagnostics;
-
-using Microsoft.Extensions.Logging.Abstractions;
-
-using TaskTitan.Core;
-
-using TaskTitan.Lib.Services;
-
-using Xunit.Abstractions;
-
 namespace TaskTitan.Lib.Tests;
-public class TaskServiceTests : IClassFixture<TestDatabaseFixture>
+
+[Category(TestCategory.Performance)]
+public class TaskServicePerformanceTests : IClassFixture<TestDatabaseFixture>
 {
     private readonly TestDatabaseFixture _fixture;
     private readonly ITestOutputHelper _outputHelper;
 
 
-    public TaskServiceTests(TestDatabaseFixture fixture, ITestOutputHelper outputHelper)
+    public TaskServicePerformanceTests(TestDatabaseFixture fixture, ITestOutputHelper outputHelper)
     {
         _fixture = fixture;
         _outputHelper = outputHelper;

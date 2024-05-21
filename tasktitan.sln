@@ -3,7 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{19B6F068-AEA1-4652-9EB7-52AAB7D6FACE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cli", "src\Cli\Cli.csproj", "{D617861C-AA60-4236-99E9-6F991AF96491}"
@@ -21,6 +20,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lib.Tests", "tests\Lib.Tests\Lib.Tests.csproj", "{3A942E08-F222-422B-8D69-45F5314EAF89}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{8A41AA67-BD10-4850-B51E-94A02BD0D46C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Common", "tests\Tests.Common\Tests.Common.csproj", "{AC847D8C-E161-408E-9695-3C14A406B7FB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +58,10 @@ Global
 		{3A942E08-F222-422B-8D69-45F5314EAF89}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3A942E08-F222-422B-8D69-45F5314EAF89}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3A942E08-F222-422B-8D69-45F5314EAF89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC847D8C-E161-408E-9695-3C14A406B7FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC847D8C-E161-408E-9695-3C14A406B7FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC847D8C-E161-408E-9695-3C14A406B7FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC847D8C-E161-408E-9695-3C14A406B7FB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{D617861C-AA60-4236-99E9-6F991AF96491} = {19B6F068-AEA1-4652-9EB7-52AAB7D6FACE}
@@ -65,5 +70,6 @@ Global
 		{F3197910-6B06-4AAB-B5BA-7FF1626ABF66} = {19B6F068-AEA1-4652-9EB7-52AAB7D6FACE}
 		{DD717A9D-24B6-4C1A-82A8-365BAE5EB5EC} = {3AA03B1F-DE41-44A1-B1BD-FA9662DE6D43}
 		{3A942E08-F222-422B-8D69-45F5314EAF89} = {3AA03B1F-DE41-44A1-B1BD-FA9662DE6D43}
+		{AC847D8C-E161-408E-9695-3C14A406B7FB} = {3AA03B1F-DE41-44A1-B1BD-FA9662DE6D43}
 	EndGlobalSection
 EndGlobal

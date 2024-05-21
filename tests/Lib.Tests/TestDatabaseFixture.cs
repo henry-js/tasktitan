@@ -1,13 +1,3 @@
-
-
-using Bogus;
-
-using Microsoft.EntityFrameworkCore;
-
-using TaskTitan.Core;
-
-using TaskTitan.Data;
-
 namespace TaskTitan.Lib.Tests;
 
 public class TestDatabaseFixture
@@ -29,8 +19,6 @@ public class TestDatabaseFixture
             context.SaveChanges();
 
             _dbInitialized = true;
-
-
         }
     }
 
@@ -55,5 +43,4 @@ public class FakeTtask
 
         return faker.Generate(quantity);
     }
-
 }
