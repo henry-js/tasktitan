@@ -10,22 +10,19 @@ public class TaskService(TaskTitanDbContext dbcontext, ILogger<TaskService> logg
         try
         {
             _dbcontext.Tasks.Add(task);
-            _dbcontext.SaveChanges();
+            return _dbcontext.SaveChanges();
         }
         catch (System.Exception ex)
         {
             _logger.LogError("Save failed: {exception}", ex.Message);
             return -1;
         }
-
-        return _dbcontext.Tasks.AsNoTracking().Count();
     }
 
     public void Delete(int rowId)
     {
         _logger.LogInformation("deleting Task {rowid}", rowId);
-        var tasks = GetTasks();
-        var task = tasks.SingleOrDefault(t => t.RowId == rowId);
+        var task = GetTasks(false).SingleOrDefault(t => t.RowId == rowId);
 
         if (task is null)
         {
@@ -35,6 +32,17 @@ public class TaskService(TaskTitanDbContext dbcontext, ILogger<TaskService> logg
 
         _dbcontext.Tasks.Remove(task);
         _logger.LogInformation("Task deleted");
+    }
+
+    public void Delete(TTask taskToDelete)
+    {
+        _dbcontext.Tasks.Remove(taskToDelete);
+        _dbcontext.Commit();
+    }
+
+    public TTask? Find(TTaskId id)
+    {
+        return _dbcontext.Tasks.SingleOrDefault(t => t.Id == id);
     }
 
     public TTask? Get(int rowId, bool asreadonly = true)

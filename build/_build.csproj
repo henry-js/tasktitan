@@ -31,6 +31,7 @@
     <Using Include="Nuke.Common.Tools.MinVer"/>
     <Using Include="Nuke.Common.Tools.ReportGenerator"/>
     <Using Include="Serilog" />
+    <Using Include="System.Diagnostics" />
     <Using Include="Nuke.Common.Tools.DotNet.DotNetTasks" Static="True" />
     <Using Include="Nuke.Common.Tools.ReportGenerator.ReportGeneratorTasks" Static="True" />
   </ItemGroup>

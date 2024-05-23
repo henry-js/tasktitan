@@ -98,9 +98,16 @@ partial class Build : NukeBuild
                 ReportGenerator(_ => _
                     .AddReports(coverageReports)
                     .SetTargetDirectory(RootDirectory / "coveragereport")
+                    .AddReportTypes("Html", "Badges")
+                    .AddAssemblyFilters("-Data")
                 );
             }
             TestResultsDirectory.DeleteDirectory();
+            if (IsLocalBuild)
+            {
+                var p = new Process() { StartInfo = new(RootDirectory / "coveragereport" / "index.html") { UseShellExecute = true } };
+                p.Start();
+            }
         });
 
     Target Publish => _ => _

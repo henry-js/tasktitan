@@ -7,4 +7,6 @@ public interface ITtaskService
     IEnumerable<TTask> GetTasks(bool asreadonly = true);
     TTaskResult Update(TTask task);
     void Delete(int rowId);
+    void Delete(TTask taskToDelete);
+    TTask? Find(TTaskId id);
 }

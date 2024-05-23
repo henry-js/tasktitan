@@ -32,7 +32,12 @@ internal sealed class ModifyCommand(IAnsiConsole console, IDateTimeConverter dat
         var updateResult = service.Update(task);
         Debug.WriteLine(task);
 
-        console.WriteLine(updateResult.IsSuccess ? "Update successful" : $"Update failed: {updateResult.Messaqge}");
+        console.WriteLine(updateResult.IsSuccess ? "Update successful" : $"Update failed");
+        if (updateResult.ErrorMessages.Length > 0)
+            console.WriteLine($@"
+Errors:
+    {string.Join(Environment.NewLine, updateResult.ErrorMessages)}
+");
         return Task.FromResult(0);
     }
 

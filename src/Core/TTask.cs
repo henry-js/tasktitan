@@ -6,10 +6,6 @@ namespace TaskTitan.Core;
 public class TTask
 {
     protected TTask() { }
-    public TTask(string description)
-    {
-        Description = description;
-    }
 
     public TTaskId Id { get; private set; } = TTaskId.Empty;
 
