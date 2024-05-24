@@ -18,7 +18,7 @@ partial class Build : NukeBuild
 
     Target PrintVersion => _ => _
         .Before(Publish)
-        .DependentFor(Release)
+        .DependentFor(Artifact)
         .Executes(() =>
         {
             MinVer = MinVerTasks.MinVer(_ => _
@@ -129,10 +129,10 @@ partial class Build : NukeBuild
             );
         });
 
-    Target Release => _ => _
+    Target Artifact => _ => _
         .TriggeredBy(Publish)
         .Requires(() => Configuration == "Release")
-        .Produces(ReleaseDirectory / Runtime / "*.exe")
+        .Produces(ReleaseDirectory / Runtime / "tasktitan-win-Setup.exe")
         .Executes(() =>
         {
             var packDir = PublishDirectory / Framework / Runtime;
