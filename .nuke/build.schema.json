@@ -72,11 +72,11 @@
           "items": {
             "type": "string",
             "enum": [
+              "Artifact",
               "Clean",
               "Compile",
               "PrintVersion",
               "Publish",
-              "Release",
               "Restore",
               "Test"
             ]
@@ -92,11 +92,11 @@
           "items": {
             "type": "string",
             "enum": [
+              "Artifact",
               "Clean",
               "Compile",
               "PrintVersion",
               "Publish",
-              "Release",
               "Restore",
               "Test"
             ]
