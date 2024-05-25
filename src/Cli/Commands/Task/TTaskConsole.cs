@@ -2,8 +2,6 @@ using System.Globalization;
 
 using Humanizer;
 
-using TaskTitan.Core;
-
 namespace TaskTitan.Cli.TaskCommands;
 
 internal static class TTaskConsole
@@ -12,29 +10,21 @@ internal static class TTaskConsole
     {
         var table = new Table()
             .Border(TableBorder.Horizontal)
-            .AddColumns(nameof(TTask.Id), nameof(TTask.Description));
+            .AddColumns("Id", nameof(TTask.Description), nameof(TTask.DueDate));
 
         foreach (var task in tasks)
         {
-            table.AddRow(task.Id.Value, task.Description);
-        }
-
-        console.Write(table);
-    }
-
-    internal static void ListPendingTasks(this IAnsiConsole console, List<PendingTTask> tasks)
-    {
-        var table = new Table()
-            .Border(TableBorder.Horizontal)
-            .AddColumns("Id", nameof(PendingTTask.Description));
-
-        foreach (var task in tasks)
-        {
-            table.AddRow(task.RowId.ToString(CultureInfo.CurrentCulture), task.Description);
+            var humanizedDate = task.DueDate?.Humanize() ?? "";
+            table.AddRow(task.RowId.ToString(CultureInfo.CurrentCulture), task.Description, humanizedDate);
         }
 
         console.Write(table);
         string taskSummary = "task".ToQuantity(tasks.Count);
         console.Write($"{taskSummary}.");
+    }
+
+    internal static void DisplayTask(this IAnsiConsole console, TTask task)
+    {
+
     }
 }

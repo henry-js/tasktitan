@@ -1,25 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
-using Nuke.Common;
-using Nuke.Common.CI.GitHubActions;
-using Nuke.Common.Git;
-using Nuke.Common.IO;
-using Nuke.Common.ProjectModel;
-using Nuke.Common.Tooling;
-using Nuke.Common.Tools.Coverlet;
-using Nuke.Common.Tools.DotNet;
-using Nuke.Common.Tools.Git;
-using Nuke.Common.Tools.MinVer;
-using Nuke.Common.Tools.ReportGenerator;
-
-using Serilog;
-
-using static Nuke.Common.Tools.DotNet.DotNetTasks;
-using static Nuke.Common.Tools.ReportGenerator.ReportGeneratorTasks;
-
 partial class Build : NukeBuild
 {
     public static int Main() => Execute<Build>(x => x.Compile);
@@ -40,7 +18,7 @@ partial class Build : NukeBuild
 
     Target PrintVersion => _ => _
         .Before(Publish)
-        .DependentFor(Release)
+        .DependentFor(Artifact)
         .Executes(() =>
         {
             MinVer = MinVerTasks.MinVer(_ => _
@@ -120,9 +98,16 @@ partial class Build : NukeBuild
                 ReportGenerator(_ => _
                     .AddReports(coverageReports)
                     .SetTargetDirectory(RootDirectory / "coveragereport")
+                    .AddReportTypes("Html", "Badges")
+                    .AddAssemblyFilters("-Data")
                 );
             }
             TestResultsDirectory.DeleteDirectory();
+            if (IsLocalBuild)
+            {
+                var p = new Process() { StartInfo = new(RootDirectory / "coveragereport" / "index.html") { UseShellExecute = true } };
+                p.Start();
+            }
         });
 
     Target Publish => _ => _
@@ -144,10 +129,10 @@ partial class Build : NukeBuild
             );
         });
 
-    Target Release => _ => _
+    Target Artifact => _ => _
         .TriggeredBy(Publish)
         .Requires(() => Configuration == "Release")
-        .Produces(ReleaseDirectory / Runtime / "*.exe")
+        .Produces(ReleaseDirectory / Runtime / "tasktitan-win-Setup.exe")
         .Executes(() =>
         {
             var packDir = PublishDirectory / Framework / Runtime;

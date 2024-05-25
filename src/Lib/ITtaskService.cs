@@ -1,10 +1,12 @@
-using TaskTitan.Core;
-
 namespace TaskTitan.Lib.Services;
 
 public interface ITtaskService
 {
     int Add(TTask task);
-    PendingTTask? Get(int rowId);
-    TTaskResult UpdateDueDate(PendingTTask task, string dueDate);
+    TTask? Get(int rowId, bool asreadonly = true);
+    IEnumerable<TTask> GetTasks(bool asreadonly = true);
+    TTaskResult Update(TTask task);
+    void Delete(int rowId);
+    void Delete(TTask taskToDelete);
+    TTask? Find(TTaskId id);
 }

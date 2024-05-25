@@ -1,21 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-using TaskTitan.Core;
-
-using TTask = TaskTitan.Core.TTask;
+﻿using TTask = TaskTitan.Core.TTask;
 
 namespace TaskTitan.Data;
 
 public class TaskTitanDbContext : DbContext
 {
-    // public const string MigrationExe = "tasksdb_migrations.exe";
     public TaskTitanDbContext(DbContextOptions<TaskTitanDbContext> options)
     : base(options)
     {
     }
 
     public DbSet<TTask> Tasks => base.Set<TTask>();
-    public DbSet<PendingTTask> PendingTasks => base.Set<PendingTTask>();
 
     public void Commit() => this.SaveChanges();
 
@@ -24,28 +18,25 @@ public class TaskTitanDbContext : DbContext
         modelBuilder.Entity<TTask>()
             .ToTable("tasks")
             .HasKey(t => t.Id);
-
         modelBuilder.Entity<TTask>()
-        .Property(task => task.Id)
-        .HasConversion(id => id.Value.ToString(), value => new TTaskId(value));
+            .Property(task => task.Id)
+            .HasConversion(id => id.Value.ToString(), value => new TTaskId(value));
+        modelBuilder.Entity<TTask>()
+            .HasQueryFilter(t => t.State == TTaskState.Pending);
         modelBuilder.Entity<TTask>()
             .Property(t => t.State)
             .HasConversion<string>();
 
-        // modelBuilder.Entity<TTask>().HasData(
-        //     [
-        //         TTask.CreateNew("Basic task"),
-        //         TTask.CreateNew("Wash the dog"),
-        //         TTask.CreateNew("Feed the cats"),
-        //         TTask.CreateNew("Started task").Start(),
-        //         TTask.CreateNew("Completed task").Complete(),
-        //     ]
-        // );
+        modelBuilder.Entity<TTask>().OwnsOne(
+            task => task.Metadata, ownedNavigationBuilder =>
+            {
+                ownedNavigationBuilder
+                    .ToJson();
+            }
+        );
 
-        modelBuilder.Entity<PendingTTask>()
-            .ToView(PendingTTask.ViewName);
-        // .HasKey(pt => pt.RowId);
-
+        // modelBuilder.Entity<PendingTTask>()
+        //     .ToView(PendingTTask.ViewName);
     }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

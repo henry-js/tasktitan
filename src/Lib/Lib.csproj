@@ -20,4 +20,13 @@
     <ProjectReference Include="..\Data\Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="System.ComponentModel" />
+    <Using Include="System.Globalization" />
+    <Using Include="TaskTitan.Core" />
+    <Using Include="TaskTitan.Data" />
+    <Using Include="Microsoft.EntityFrameworkCore" />
+    <Using Include="Microsoft.Extensions.Logging" />
+  </ItemGroup>
+
 </Project>

@@ -19,11 +19,28 @@ internal sealed class AddCommand(IAnsiConsole console, ITtaskService service, IL
 
     internal sealed class Settings : CommandSettings
     {
-        [CommandArgument(0, "<Description>")]
+        [CommandArgument(0, "<description>")]
         public string Description { get; set; } = string.Empty;
-        public override ValidationResult Validate() =>
-            string.IsNullOrWhiteSpace(Description)
-                ? ValidationResult.Error("Description cannot be empty")
-                : base.Validate();
+
+        [CommandArgument(1, "[due]")]
+        public string? Due { get; set; }
+
+
+        [CommandArgument(2, "[scheduled]")]
+        public string Scheduled { get; set; } = string.Empty;
+
+        public override ValidationResult Validate()
+        {
+            if (string.IsNullOrWhiteSpace(Description))
+                return ValidationResult.Error("Description cannot be empty.");
+
+            if (!string.IsNullOrWhiteSpace(Scheduled) && Scheduled.StartsWith("scheduled:", StringComparison.Ordinal))
+            {
+                return ValidationResult.Error("Incorrect syntax for scheduled.");
+            }
+
+            Scheduled = "Hello i have been edited";
+            return base.Validate();
+        }
     }
 }

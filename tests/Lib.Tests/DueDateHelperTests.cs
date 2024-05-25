@@ -1,5 +1,3 @@
-using System.Globalization;
-
 namespace TaskTitan.Lib.Tests;
 
 public class DueDateHelperTests
@@ -20,16 +18,39 @@ public class DueDateHelperTests
     public void GivenAStringDateShouldReturnAValidDateOnly(string input)
     {
         FakeTimeProvider fake = new();
-        var sut = new DueDateHelper(fake);
-        var date = sut.DateStringToDate(input);
+        var sut = new DateOnlyConverter(fake);
+        var date = sut.ConvertFrom(input);
 
         date.Should().NotBeNull("the default format for date strings is 'yyyy-MM-dd'");
+        var dateParts = input.Split("-").Select(s => Convert.ToInt32(s)).ToList();
+        dateParts[0].Should().Be(date?.Year);
+        dateParts[1].Should().Be(date?.Month);
+        dateParts[2].Should().Be(date?.Day);
     }
 
     [Theory]
     [InlineData("today", "2024-06-06")]
     [InlineData("yesterday", "2024-06-05")]
     [InlineData("tomorrow", "2024-06-07")]
+
+    [InlineData("eom", "2024-06-30")]
+    [InlineData("eoy", "2024-12-31")]
+    public void GivenARelativeSynonymShouldReturnAValidDateOnly(string synonym, string expected)
+    {
+        // Arrange
+        var today = new DateTime(2024, 06, 06);
+        _timeProvider.SetUtcNow(new DateTimeOffset(today));
+        var sut = new DateOnlyConverter(_timeProvider);
+        var exact = DateTime.ParseExact(expected, "yyyy-MM-dd", provider);
+
+        // Act
+        var date = sut.ConvertFrom(synonym);
+
+        // Assert
+        date.Should().Be(DateOnly.FromDateTime(exact), "a synoymn should correctly convert to a date");
+    }
+
+    [Theory]
     [InlineData("monday", "2024-06-10")]
     [InlineData("tuesday", "2024-06-11")]
     [InlineData("wednesday", "2024-06-12")]
@@ -37,20 +58,19 @@ public class DueDateHelperTests
     [InlineData("friday", "2024-06-07")]
     [InlineData("saturday", "2024-06-08")]
     [InlineData("sunday", "2024-06-09")]
-    [InlineData("eom", "2024-06-30")]
-    [InlineData("eoy", "2024-12-31")]
-    public void GivenADateSynonymShouldReturnAValidDateOnly(string synonym, string actual)
+    public void GivenADayoOfWeekShouldReturnDateFromToday(string dayOfWeek, string expected)
     {
         // Arrange
         var today = new DateTime(2024, 06, 06);
         _timeProvider.SetUtcNow(new DateTimeOffset(today));
-        var sut = new DueDateHelper(_timeProvider);
-        var expectedDate = DateTime.ParseExact(actual, "yyyy-MM-dd", provider);
+        var sut = new DateOnlyConverter(_timeProvider);
+        var exact = DateTime.ParseExact(expected, "yyyy-MM-dd", provider);
 
         // Act
-        var date = sut.DateSynonymToDate(synonym);
+        var date = sut.ConvertFrom(dayOfWeek);
 
         // Assert
-        date.Should().Be(DateOnly.FromDateTime(expectedDate), "a synoymn should correctly convert to a date");
+        date.Should().Be(DateOnly.FromDateTime(exact), "a synoymn should correctly convert to a date");
+
     }
 }

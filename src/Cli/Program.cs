@@ -1,13 +1,12 @@
 ﻿using Community.Extensions.Spectre.Cli.Hosting;
 
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using Serilog;
 
 using TaskTitan.Cli.TaskCommands;
-using TaskTitan.Lib;
+using TaskTitan.Lib.Dates;
 
 using Velopack;
 
@@ -19,21 +18,11 @@ Log.Logger = new LoggerConfiguration()
 VelopackApp.Build()
 .WithFirstRun(v =>
 {
-    // Log.Information("First run of tasktitan");
-    // Log.Information("Moving .db file");
-    // Directory.CreateDirectory(ConfigHelper.UserProfileDirectoryDataFolder);
-    // if (File.Exists(ConfigHelper.SourceDbPath))
-    // {
-    //     File.Move(ConfigHelper.SourceDbPath, ConfigHelper.UserProfileDbPath);
-    //     Log.Information("Moved .db file to %userprofile%");
-    // }
 })
 .Run();
 
 try
 {
-    // var configDir = ConfigHelper.FindTaskTitanDataFolder();
-
     var builder = Host.CreateApplicationBuilder(args);
 
     // Bind configuration section to object
@@ -55,10 +44,11 @@ try
     builder.Services.AddScoped<ListCommand>();
     builder.Services.AddScoped<ModifyCommand>();
     builder.Services.AddScoped<ITtaskService, TaskService>();
+    builder.Services.AddScoped<IDateTimeConverter, DateOnlyConverter>();
     builder.Services.AddSingleton(TimeProvider.System);
-    builder.Services.AddSingleton<DueDateHelper>();
+    // builder.Services.AddSingleton<DueDateHelper>();
 
-    builder.UseSpectreConsole(config =>
+    builder.UseSpectreConsole<ListCommand>(config =>
     {
         // All commands above are passed to config.AddCommand() by this point
         config.SetApplicationName("task");
@@ -71,15 +61,15 @@ try
 
         config.AddCommand<ModifyCommand>("modify")
             .WithDescription("Modify an existing task");
-        config.PropagateExceptions();
-#if DEBUG
-        config.UseBasicExceptionHandler();
-#endif
+        //         config.PropagateExceptions();
+        // #if DEBUG
+        //         config.UseBasicExceptionHandler();
+        // #endif
     });
 
     var app = builder.Build();
 
-    await ConfigHelper.FirstRun();
+    ConfigHelper.FirstRun();
 
     await app.RunAsync();
 }
@@ -92,6 +82,6 @@ finally
     await Log.CloseAndFlushAsync();
 }
 
-AnsiConsole.WriteLine();
-AnsiConsole.WriteLine("Press any key to exit.");
+Console.WriteLine();
+Console.WriteLine("Press any key to exit.");
 System.Console.ReadKey(intercept: false);

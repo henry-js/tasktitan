@@ -1,60 +1,82 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-
-using TaskTitan.Core;
-using TaskTitan.Data;
-
 namespace TaskTitan.Lib.Services;
 
-public class TaskService(TaskTitanDbContext dbcontext, DueDateHelper dateHelper, ILogger<TaskService> logger) : ITtaskService
+public class TaskService(TaskTitanDbContext dbcontext, ILogger<TaskService> logger) : ITtaskService
 {
     private readonly TaskTitanDbContext _dbcontext = dbcontext;
-    private readonly DueDateHelper _dateHelper = dateHelper;
     private readonly ILogger<TaskService> _logger = logger;
 
     public int Add(TTask task)
     {
-        _dbcontext.Tasks.Add(task);
-        _dbcontext.SaveChanges();
-
-        return _dbcontext.PendingTasks.AsNoTracking().Count();
+        try
+        {
+            _dbcontext.Tasks.Add(task);
+            return _dbcontext.SaveChanges();
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError("Save failed: {exception}", ex.Message);
+            return -1;
+        }
     }
 
-    public PendingTTask? Get(int rowId)
+    public void Delete(int rowId)
     {
-        var task = _dbcontext.PendingTasks.AsNoTracking().FirstOrDefault(t => t.RowId == rowId);
+        _logger.LogInformation("deleting Task {rowid}", rowId);
+        var task = GetTasks(false).SingleOrDefault(t => t.RowId == rowId);
+
+        if (task is null)
+        {
+            _logger.LogWarning("Task not found");
+            return;
+        }
+
+        _dbcontext.Tasks.Remove(task);
+        _logger.LogInformation("Task deleted");
+    }
+
+    public void Delete(TTask taskToDelete)
+    {
+        _dbcontext.Tasks.Remove(taskToDelete);
+        _dbcontext.Commit();
+    }
+
+    public TTask? Find(TTaskId id)
+    {
+        return _dbcontext.Tasks.SingleOrDefault(t => t.Id == id);
+    }
+
+    public TTask? Get(int rowId, bool asreadonly = true)
+    {
+        var task = GetTasks(asreadonly)
+        .FirstOrDefault(t => t.RowId == rowId);
         if (task == null)
         {
-            _logger.LogInformation("Task not found"); _logger.LogInformation("Task {rowId} not found", rowId);
+            _logger.LogInformation("Task {rowId} not found", rowId);
         }
         return task;
     }
 
-    public TTaskResult UpdateDueDate(PendingTTask pendingTask, string dueString)
+    public IEnumerable<TTask> GetTasks(bool asreadonly = true)
+    {
+        int index = 1;
+        return _dbcontext.Tasks.AsNoTracking().AsEnumerable().Select(t => t.WithIndex(index++));
+    }
+
+    public TTaskResult Update(TTask pendingTask)
     {
         List<string> errors = [];
-        if (dueString != string.Empty)
-        {
-            var due = _dateHelper.DateStringToDate(dueString);
-            if (due is null)
-            {
-                _logger.LogWarning("Could not parse received dueDate: {dueDate}", dueString);
-                errors.Add("Could not parse due date");
-            }
-            else
-            {
-                pendingTask.DueDate = due;
-            }
-        }
-        else
-        {
-            _logger.LogInformation("Removing due date");
-            pendingTask.DueDate = null;
-        }
-        var task = TTask.FromPending(pendingTask);
+
         _logger.LogInformation("Updating task {rowId}", pendingTask.RowId);
-        _dbcontext.Tasks.Update(task);
-        _dbcontext.Commit();
-        return new TTaskResult(task != null, task);
+        try
+        {
+            _dbcontext.Tasks.Update(pendingTask);
+            _dbcontext.Commit();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return TTaskResult.Fail(ex.Message);
+        }
+        return TTaskResult.Success();
     }
 }
