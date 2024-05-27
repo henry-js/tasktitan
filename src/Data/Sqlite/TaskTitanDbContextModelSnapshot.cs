@@ -22,21 +22,36 @@ namespace Data.Sqlite
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateOnly?>("DueDate")
+                    b.Property<DateTime?>("Due")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("RowId")
-                        .HasColumnType("INTEGER");
+                    b.Property<DateTime?>("Ended")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("Scheduled")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("Started")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("State")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("Until")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("Wait")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -51,20 +66,8 @@ namespace Data.Sqlite
                             b1.Property<string>("TTaskId")
                                 .HasColumnType("TEXT");
 
-                            b1.Property<bool>("Blocked")
+                            b1.Property<bool?>("Blocked")
                                 .HasColumnType("INTEGER");
-
-                            b1.Property<int>("Priority")
-                                .HasColumnType("INTEGER");
-
-                            b1.Property<DateOnly?>("Scheduled")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<DateOnly?>("Until")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<DateOnly?>("Wait")
-                                .HasColumnType("TEXT");
 
                             b1.HasKey("TTaskId");
 
@@ -76,7 +79,8 @@ namespace Data.Sqlite
                                 .HasForeignKey("TTaskId");
                         });
 
-                    b.Navigation("Metadata");
+                    b.Navigation("Metadata")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

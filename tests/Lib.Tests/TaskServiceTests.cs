@@ -82,8 +82,8 @@ public class TaskServiceTests : IClassFixture<TestDatabaseFixture>
 
         // When
         TTask taskToUpdate = sut.Find(id) ?? throw new Exception();
-        DateOnly newDate = new(2025, 12, 12);
-        taskToUpdate.DueDate = newDate;
+        DateTime newDate = new(2025, 12, 12);
+        taskToUpdate.Due = newDate;
         var result = sut.Update(taskToUpdate);
 
         // Then

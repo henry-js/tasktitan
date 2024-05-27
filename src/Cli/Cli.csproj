@@ -51,7 +51,7 @@
     <Using Include="Spectre.Console.AnsiConsole" Alias="Console" />
     <Using Include="System.Collections.Generic" />
     <Using Include="TaskTitan.Cli" />
-    <Using Include="TaskTitan.Cli.Commands" />
+    <Using Include="TaskTitan.Cli.TaskItem.Commands" />
     <Using Include="TaskTitan.Core" />
     <Using Include="TaskTitan.Data" />
     <Using Include="TaskTitan.Lib.Services" />

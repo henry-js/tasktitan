@@ -12,9 +12,15 @@ public class TTask
     [NotMapped]
     public int RowId { get; private set; }
     public string Description { get; private set; } = string.Empty;
-    public DateTime CreatedAt { get; private set; }
     public TTaskState State { get; private set; }
-    public DateOnly? DueDate { get; set; }
+    public DateTime Created { get; private set; }
+    public DateTime Modified { get; set; }
+    public DateTime? Due { get; set; }
+    public DateTime? Until { get; set; }
+    public DateTime? Wait { get; set; }
+    public DateTime? Started { get; set; }
+    public DateTime? Ended { get; set; }
+    public DateTime? Scheduled { get; set; }
     public TTaskMetadata Metadata { get; set; } = new();
 
     public static TTask CreateNew(string description, TTaskMetadata? metadata = null)
@@ -23,7 +29,7 @@ public class TTask
         {
             Id = TTaskId.NewTaskId(),
             Description = description,
-            CreatedAt = DateTime.UtcNow,
+            Created = DateTime.UtcNow,
             State = TTaskState.Pending,
         };
 
@@ -53,9 +59,9 @@ public class TTask
         {
             Id = pendingTask.Id,
             Description = pendingTask.Description,
-            CreatedAt = pendingTask.CreatedAt,
+            Created = pendingTask.Created,
             State = pendingTask.State,
-            DueDate = pendingTask.DueDate,
+            Due = pendingTask.Due,
         };
     }
 

@@ -5,7 +5,8 @@ using Microsoft.Extensions.Hosting;
 
 using Serilog;
 
-using TaskTitan.Cli.TaskCommands;
+using TaskTitan.Cli.TaskItem.Commands;
+using TaskTitan.Cli.TaskItem.Commands.Actions;
 using TaskTitan.Lib.Dates;
 
 using Velopack;
@@ -50,8 +51,10 @@ try
     builder.Services.AddScoped<AddCommand>();
     builder.Services.AddScoped<ListCommand>();
     builder.Services.AddScoped<ModifyCommand>();
+    builder.Services.AddScoped<StartCommand>();
     builder.Services.AddScoped<ITtaskService, TaskService>();
     builder.Services.AddScoped<IDateTimeConverter, DateOnlyConverter>();
+    builder.Services.AddScoped<IStringFilterConverter<DateTime>, DateTimeConverter>();
     builder.Services.AddSingleton(TimeProvider.System);
     // builder.Services.AddSingleton<DueDateHelper>();
 
@@ -68,6 +71,8 @@ try
 
         config.AddCommand<ModifyCommand>("modify")
             .WithDescription("Modify an existing task");
+        config.AddCommand<StartCommand>("start")
+            .WithDescription("Start an existing task or create with description.");
         //         config.PropagateExceptions();
         // #if DEBUG
         //         config.UseBasicExceptionHandler();
