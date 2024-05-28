@@ -7,6 +7,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Bogus" Version="35.5.1" />
     <PackageReference Include="Community.Extensions.Spectre.Cli.Hosting" Version="1.0.6" />
     <PackageReference Include="Humanizer.Core" Version="2.14.1" />
     <PackageReference Include="Meziantou.Analyzer" Version="2.0.146">
@@ -51,7 +52,7 @@
     <Using Include="Spectre.Console.AnsiConsole" Alias="Console" />
     <Using Include="System.Collections.Generic" />
     <Using Include="TaskTitan.Cli" />
-    <Using Include="TaskTitan.Cli.TaskItem.Commands" />
+    <Using Include="TaskTitan.Cli.TaskItems.Commands" />
     <Using Include="TaskTitan.Core" />
     <Using Include="TaskTitan.Data" />
     <Using Include="TaskTitan.Lib.Services" />

@@ -4,15 +4,15 @@ using TaskTitan.Core;
 
 namespace TaskTitan.Tests.Common.Data;
 
-public class FakeTtask
+public class FakeTaskItem
 {
-    public FakeTtask() { }
+    public FakeTaskItem() { }
 
-    public static IEnumerable<TTask> Generate(int quantity)
+    public static IEnumerable<TaskItem> Generate(int quantity)
     {
         Randomizer.Seed = new Random(123456);
-        var faker = new Faker<TTask>()
-        .CustomInstantiator(f => TTask.CreateNew(f.Lorem.Sentence(3, 2)))
+        var faker = new Faker<TaskItem>()
+        .CustomInstantiator(f => TaskItem.CreateNew(f.Lorem.Sentence(3, 2)))
         .RuleFor(t => t.Created, f => f.Date.Recent(30))
         .RuleFor(t => t.Due, (f, t) => f.Date.Future(1));
 

@@ -5,13 +5,13 @@ using Xunit.Categories;
 namespace TaskTitan.Lib.Tests;
 
 [Category("Performance")]
-public class TaskServicePerformanceTests : IClassFixture<TestDatabaseFixture>
+public class TaskItemServicePerformanceTests : IClassFixture<TestDatabaseFixture>
 {
     private readonly TestDatabaseFixture _fixture;
     private readonly ITestOutputHelper _outputHelper;
 
 
-    public TaskServicePerformanceTests(TestDatabaseFixture fixture, ITestOutputHelper outputHelper)
+    public TaskItemServicePerformanceTests(TestDatabaseFixture fixture, ITestOutputHelper outputHelper)
     {
         _fixture = fixture;
         _outputHelper = outputHelper;
@@ -22,11 +22,11 @@ public class TaskServicePerformanceTests : IClassFixture<TestDatabaseFixture>
     {
         using var context = _fixture.CreateContext();
 
-        var fakeTasks = FakeTtask.Generate(100000);
+        var fakeTasks = FakeTaskItem.Generate(100000);
         context.AddRange(fakeTasks);
         context.SaveChanges();
 
-        var service = new TaskService(context, new NullLogger<TaskService>());
+        var service = new TaskItemService(context, new NullLogger<TaskItemService>());
         var st = Stopwatch.StartNew();
         var tasks = service.GetTasks();
         st.Stop();

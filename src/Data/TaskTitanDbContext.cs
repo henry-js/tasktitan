@@ -1,4 +1,4 @@
-﻿using TTask = TaskTitan.Core.TTask;
+﻿using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace TaskTitan.Data;
 
@@ -9,25 +9,34 @@ public class TaskTitanDbContext : DbContext
     {
     }
 
-    public DbSet<TTask> Tasks => base.Set<TTask>();
+    public DbSet<TaskItem> Tasks => base.Set<TaskItem>();
 
     public void Commit() => this.SaveChanges();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<TTask>()
+        modelBuilder.Entity<TaskItem>()
             .ToTable("tasks")
             .HasKey(t => t.Id);
-        modelBuilder.Entity<TTask>()
+        modelBuilder.Entity<TaskItem>()
             .Property(task => task.Id)
-            .HasConversion(id => id.Value.ToString(), value => new TTaskId(value));
-        modelBuilder.Entity<TTask>()
-            .HasQueryFilter(t => t.State == TTaskState.Pending);
-        modelBuilder.Entity<TTask>()
+            .HasConversion(id => id.Value.ToString(), value => new TaskItemId(value));
+        modelBuilder.Entity<TaskItem>()
+            .HasQueryFilter(t => t.State == TaskItemState.Pending);
+        modelBuilder.Entity<TaskItem>()
             .Property(t => t.State)
-            .HasConversion<string>();
+            .HasConversion<string>()
+            .HasDefaultValue(TaskItemState.Pending);
+        modelBuilder.Entity<TaskItem>()
+            .Property(task => task.Created)
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+        modelBuilder.Entity<TaskItem>()
+            .Property(task => task.Modified)
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
-        modelBuilder.Entity<TTask>().OwnsOne(
+        modelBuilder.Entity<TaskItem>().OwnsOne(
             task => task.Metadata, ownedNavigationBuilder =>
             {
                 ownedNavigationBuilder
@@ -35,11 +44,10 @@ public class TaskTitanDbContext : DbContext
             }
         );
 
-        // modelBuilder.Entity<PendingTTask>()
-        //     .ToView(PendingTTask.ViewName);
     }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+
         // Database.EnsureCreated();
     }
 }
