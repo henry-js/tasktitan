@@ -18,7 +18,7 @@ internal sealed class ListCommand(IAnsiConsole console, ITaskItemService service
             var pending = service.GetTasks().ToList().Select(t => TaskItemDto.FromTaskItem(t));
 
             console.ListTasks(pending);
-            return System.Threading.Tasks.Task.FromResult(0);
+            return Task.FromResult(0);
         }
         logger.LogDebug("Fetching task {taskNum}", settings.taskNum);
         var task = service.Get(settings.taskNum.Value);

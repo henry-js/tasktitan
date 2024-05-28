@@ -20,7 +20,6 @@ public class TaskItemDto
     public DateTime? Scheduled { get; set; }
     public IList<TaskItemDto>? Depends { get; set; }
 
-
     public static TaskItemDto FromTaskItem(Core.TaskItem task)
     {
         return new TaskItemDto

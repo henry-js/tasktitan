@@ -10,6 +10,7 @@ public class TaskTitanDbContext : DbContext
     }
 
     public DbSet<TaskItem> Tasks => base.Set<TaskItem>();
+    public IEnumerable<TaskItem> PendingTasks => Tasks.Where(t => t.State == TaskItemState.Pending).OrderBy(t => t.Created).AsEnumerable().Select((t, i) => t.WithIndex(i + 1));
 
     public void Commit() => this.SaveChanges();
 

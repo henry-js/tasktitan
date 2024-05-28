@@ -12,10 +12,8 @@
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/src/Cli/bin/Debug/net8.0/task.exe",
             "args": [
-                "bogus",
-                "-q",
-                "50"
-                // "8",
+                "start",
+                "1",
                 // "modify",
                 // "1",
                 // "-w",
