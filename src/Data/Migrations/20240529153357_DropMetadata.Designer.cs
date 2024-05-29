@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskTitan.Data;
 
@@ -10,9 +11,11 @@ using TaskTitan.Data;
 namespace Data.Migrations
 {
     [DbContext(typeof(TaskTitanDbContext))]
-    partial class TaskTitanDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240529153357_DropMetadata")]
+    partial class DropMetadata
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.4");

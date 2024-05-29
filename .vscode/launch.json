@@ -13,7 +13,7 @@
             "program": "${workspaceFolder}/src/Cli/bin/Debug/net8.0/task.exe",
             "args": [
                 "start",
-                "1",
+                "1,2,3,1-3",
                 // "modify",
                 // "1",
                 // "-w",

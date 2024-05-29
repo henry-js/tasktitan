@@ -1,3 +1,5 @@
+using TaskTitan.Lib.Text;
+
 namespace TaskTitan.Lib.Services;
 
 public class TaskItemService(TaskTitanDbContext dbcontext, ILogger<TaskItemService> logger) : ITaskItemService
@@ -59,7 +61,21 @@ public class TaskItemService(TaskTitanDbContext dbcontext, ILogger<TaskItemServi
     public IEnumerable<TaskItem> GetTasks(bool asreadonly = true)
     {
         int index = 1;
-        return _dbcontext.Tasks.AsNoTracking().AsEnumerable().Select(t => t.WithIndex(index++));
+        return _dbcontext.Tasks
+            .ToList();
+    }
+
+    public IEnumerable<TaskItem> GetTasks(List<ITaskQueryFilter> filters)
+    {
+        IEnumerable<TaskItem> queryable = GetTasks(false);
+        foreach (var filter in filters)
+        {
+            if (filter is IdQueryFilter idFilter)
+            {
+                queryable = queryable.Where(t => idFilter.SoleIds.Contains(t.RowId));
+            }
+        }
+        return queryable;
     }
 
     public TaskItemResult Update(TaskItem pendingTask)

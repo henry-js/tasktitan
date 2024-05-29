@@ -9,6 +9,7 @@ using TaskTitan.Cli.AdminCommands;
 using TaskTitan.Cli.TaskItems.Commands;
 using TaskTitan.Cli.TaskItems.Commands.Actions;
 using TaskTitan.Lib.Dates;
+using TaskTitan.Lib.Text;
 
 using Velopack;
 
@@ -58,6 +59,7 @@ try
     builder.Services.AddScoped<IDateTimeConverter, DateOnlyConverter>();
     builder.Services.AddScoped<IStringFilterConverter<DateTime>, DateTimeConverter>();
     builder.Services.AddSingleton(TimeProvider.System);
+    builder.Services.AddSingleton<ITextFilterParser, TextFilterParser>();
     // builder.Services.AddSingleton<DueDateHelper>();
 
     builder.UseSpectreConsole<ListCommand>(config =>

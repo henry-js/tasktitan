@@ -1,3 +1,8 @@
+
+using System.Collections;
+
+using TaskTitan.Lib.Text;
+
 namespace TaskTitan.Lib.Services;
 
 public interface ITaskItemService
@@ -9,4 +14,5 @@ public interface ITaskItemService
     void Delete(int rowId);
     void Delete(TaskItem taskToDelete);
     TaskItem? Find(TaskItemId id);
+    IEnumerable<TaskItem> GetTasks(List<ITaskQueryFilter> filters);
 }
