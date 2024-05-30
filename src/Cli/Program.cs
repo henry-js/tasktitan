@@ -5,8 +5,11 @@ using Microsoft.Extensions.Hosting;
 
 using Serilog;
 
-using TaskTitan.Cli.TaskCommands;
+using TaskTitan.Cli.AdminCommands;
+using TaskTitan.Cli.TaskItems.Commands;
+using TaskTitan.Cli.TaskItems.Commands.Actions;
 using TaskTitan.Lib.Dates;
+using TaskTitan.Lib.Text;
 
 using Velopack;
 
@@ -15,10 +18,10 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.File("logs/setup-.log", rollingInterval: RollingInterval.Day)
     .CreateBootstrapLogger();
 
-#if DEBUG
-ConfigHelper.FirstRun();
-ConfigHelper.AddToPath();
-#endif
+// #if DEBUG
+// ConfigHelper.FirstRun();
+// ConfigHelper.AddToPath();
+// #endif
 
 VelopackApp.Build()
 .WithFirstRun(v =>
@@ -50,9 +53,13 @@ try
     builder.Services.AddScoped<AddCommand>();
     builder.Services.AddScoped<ListCommand>();
     builder.Services.AddScoped<ModifyCommand>();
-    builder.Services.AddScoped<ITtaskService, TaskService>();
+    builder.Services.AddScoped<StartCommand>();
+    builder.Services.AddScoped<BogusCommand>();
+    builder.Services.AddScoped<ITaskItemService, TaskItemService>();
     builder.Services.AddScoped<IDateTimeConverter, DateOnlyConverter>();
+    builder.Services.AddScoped<IStringFilterConverter<DateTime>, DateTimeConverter>();
     builder.Services.AddSingleton(TimeProvider.System);
+    builder.Services.AddSingleton<ITextFilterParser, TextFilterParser>();
     // builder.Services.AddSingleton<DueDateHelper>();
 
     builder.UseSpectreConsole<ListCommand>(config =>
@@ -68,6 +75,11 @@ try
 
         config.AddCommand<ModifyCommand>("modify")
             .WithDescription("Modify an existing task");
+        config.AddCommand<StartCommand>("start")
+            .WithDescription("Start an existing task or create with description.");
+        config.AddCommand<BogusCommand>("bogus")
+            .WithDescription("Empty tasks table and fill with bogus data")
+            .IsHidden();
         //         config.PropagateExceptions();
         // #if DEBUG
         //         config.UseBasicExceptionHandler();

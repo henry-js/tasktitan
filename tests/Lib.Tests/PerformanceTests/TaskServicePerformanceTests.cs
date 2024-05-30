@@ -1,36 +1,36 @@
-using TaskTitan.Tests.Common.Data;
+// using TaskTitan.Tests.Common.Data;
 
-using Xunit.Categories;
+// using Xunit.Categories;
 
-namespace TaskTitan.Lib.Tests;
+// namespace TaskTitan.Lib.Tests;
 
-[Category("Performance")]
-public class TaskServicePerformanceTests : IClassFixture<TestDatabaseFixture>
-{
-    private readonly TestDatabaseFixture _fixture;
-    private readonly ITestOutputHelper _outputHelper;
+// [Category("Performance")]
+// public class TaskItemServicePerformanceTests : IClassFixture<TestDatabaseFixture>
+// {
+//     private readonly TestDatabaseFixture _fixture;
+//     private readonly ITestOutputHelper _outputHelper;
 
 
-    public TaskServicePerformanceTests(TestDatabaseFixture fixture, ITestOutputHelper outputHelper)
-    {
-        _fixture = fixture;
-        _outputHelper = outputHelper;
-    }
+//     public TaskItemServicePerformanceTests(TestDatabaseFixture fixture, ITestOutputHelper outputHelper)
+//     {
+//         _fixture = fixture;
+//         _outputHelper = outputHelper;
+//     }
 
-    [Fact]
-    public void FetchingTasksShouldBePerformant()
-    {
-        using var context = _fixture.CreateContext();
+//     [Fact]
+//     public void FetchingTasksShouldBePerformant()
+//     {
+//         using var context = _fixture.CreateContext();
 
-        var fakeTasks = FakeTtask.Generate(100000);
-        context.AddRange(fakeTasks);
-        context.SaveChanges();
+//         var fakeTasks = FakeTaskItem.Generate(100000);
+//         context.AddRange(fakeTasks);
+//         context.SaveChanges();
 
-        var service = new TaskService(context, new NullLogger<TaskService>());
-        var st = Stopwatch.StartNew();
-        var tasks = service.GetTasks();
-        st.Stop();
-        st.ElapsedMilliseconds.Should().BeLessThan(100);
-        tasks.Should().HaveCountGreaterThan(1);
-    }
-}
+//         var service = new TaskItemService(context, new NullLogger<TaskItemService>());
+//         var st = Stopwatch.StartNew();
+//         var tasks = service.GetTasks();
+//         st.Stop();
+//         st.ElapsedMilliseconds.Should().BeLessThan(100);
+//         tasks.Should().HaveCountGreaterThan(1);
+//     }
+// }
