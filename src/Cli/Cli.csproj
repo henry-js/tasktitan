@@ -35,7 +35,7 @@
     <AssemblyName>task</AssemblyName>
     <Nullable>enable</Nullable>
     <DebugType>embedded</DebugType>
-    <PublishReadyToRun>false</PublishReadyToRun>
+    <PublishReadyToRun>true</PublishReadyToRun>
   </PropertyGroup>
 
   <ItemGroup>

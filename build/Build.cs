@@ -132,7 +132,10 @@ partial class Build : NukeBuild
     Target Artifact => _ => _
         .TriggeredBy(Publish)
         .Requires(() => Configuration == "Release")
-        .Produces(ReleaseDirectory / Runtime / "tasktitan-win-Setup.exe")
+        .Produces([
+            ReleaseDirectory / Runtime / "tasktitan-win-Setup.exe",
+            ReleaseDirectory / Runtime / "tasktitan-win-Portable.zip",
+        ])
         .Executes(() =>
         {
             var packDir = PublishDirectory / Framework / Runtime;

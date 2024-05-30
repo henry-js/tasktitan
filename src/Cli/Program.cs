@@ -15,9 +15,16 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.File("logs/setup-.log", rollingInterval: RollingInterval.Day)
     .CreateBootstrapLogger();
 
+#if DEBUG
+ConfigHelper.FirstRun();
+ConfigHelper.AddToPath();
+#endif
+
 VelopackApp.Build()
 .WithFirstRun(v =>
 {
+    ConfigHelper.FirstRun();
+    ConfigHelper.AddToPath();
 })
 .Run();
 
@@ -69,7 +76,6 @@ try
 
     var app = builder.Build();
 
-    ConfigHelper.FirstRun();
 
     await app.RunAsync();
 }
@@ -82,6 +88,8 @@ finally
     await Log.CloseAndFlushAsync();
 }
 
+#if DEBUG
 Console.WriteLine();
 Console.WriteLine("Press any key to exit.");
 System.Console.ReadKey(intercept: false);
+#endif

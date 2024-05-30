@@ -1,5 +1,7 @@
 using System.Diagnostics;
 
+using Serilog;
+
 namespace TaskTitan.Cli;
 
 public static class ConfigHelper
@@ -12,11 +14,10 @@ public static class ConfigHelper
     internal static void FirstRun()
     {
         Directory.CreateDirectory(UserProfileDirectoryDataFolder);
-        Directory.CreateDirectory(UserProfileDirectoryDataFolder);
         if (File.Exists(UserProfileDbPath)) return;
 
         var path = new TextPath(UserProfileDbPath.Replace(UserProfileDirectory, @"~\"));
-        AnsiConsole.MarkupLine("A task database could [bold]not[/] be found in:");
+        AnsiConsole.Markup("A task database could [bold]not[/] be found in: ");
         AnsiConsole.Write(path);
         AnsiConsole.WriteLine();
 
@@ -24,5 +25,25 @@ public static class ConfigHelper
 
         var dbbundle = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tasksdb_migrations.exe");
         Process.Start(dbbundle);
+    }
+
+    internal static void AddToPath()
+    {
+        var expectedPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "tasktitan", "current");
+
+        string? currentPath = Environment.GetEnvironmentVariable("Path", EnvironmentVariableTarget.User);
+
+        if (!string.IsNullOrEmpty(currentPath) && currentPath.Split(';').Contains(expectedPath, StringComparer.Ordinal))
+        {
+            Log.Information("tasktitan path is already in the PATH environment variable.");
+        }
+        else
+        {
+            string updatedPath = string.IsNullOrEmpty(currentPath) ? expectedPath : currentPath + ';' + expectedPath;
+
+            Environment.SetEnvironmentVariable("Path", updatedPath, EnvironmentVariableTarget.User);
+
+            Log.Information("tasktitan path has been added to the PATH environment variable.");
+        }
     }
 }
