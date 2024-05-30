@@ -5,7 +5,7 @@ namespace TaskTitan.Lib.Text;
 public class IdQueryFilter : ITaskQueryFilter
 {
     public List<IdRange> IdRange { get; } = [];
-    public List<int> SoleIds { get; } = [];
+    public SoleIds SoleIds { get; } = [];
 
     public IdQueryFilter(string text)
     {
@@ -26,5 +26,13 @@ public class IdQueryFilter : ITaskQueryFilter
             }
         }
     }
-    public TaskFilterType Type => TaskFilterType.IdFilter;
+    public TaskQueryFilterType Type => TaskQueryFilterType.IdFilter;
+}
+
+public class SoleIds : List<int>
+{
+    public override string ToString()
+    {
+        return string.Join(',', this);
+    }
 }

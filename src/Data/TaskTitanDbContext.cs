@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
+﻿using static TaskTitan.Data.DbConstants;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace TaskTitan.Data;
 
@@ -17,7 +18,7 @@ public class TaskTitanDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<TaskItem>()
-            .ToTable("tasks")
+            .ToTable(TasksTable)
             .HasKey(t => t.Id);
         modelBuilder.Entity<TaskItem>()
             .Property(task => task.Id)

@@ -1,3 +1,6 @@
+using Microsoft.Data.Sqlite;
+
+using TaskTitan.Data.Repositories;
 using TaskTitan.Tests.Common.Data;
 
 using Xunit.Categories;
@@ -20,9 +23,12 @@ public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>
     public void AddShouldAddTaskAndReturnCount()
     {
         // Arrange
+        using var dbContext = _fixture.CreateContext();
+        using var dbConnection = new SqliteConnection(_fixture.ConnectionString);
+        ITaskItemRepository repository = new TaskItemRepository(dbContext, dbConnection);
+
         var task = TaskItem.CreateNew("Test Task");
-        using var context = _fixture.CreateContext();
-        var sut = new TaskItemService(context, _nullLogger);
+        var sut = new TaskItemService(repository, dbContext, _nullLogger);
 
         // Act
         var result = sut.Add(task);
@@ -35,18 +41,19 @@ public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>
     public void DeleteShouldDeleteTaskWhenTaskExists()
     {
         // Given
-        using var context = _fixture.CreateContext();
-        ITaskItemService sut = new TaskItemService(context, _nullLogger);
+        using var dbContext = _fixture.CreateContext();
+        using var dbConnection = new SqliteConnection(_fixture.ConnectionString);
+        ITaskItemRepository repository = new TaskItemRepository(dbContext, dbConnection);
+        ITaskItemService sut = new TaskItemService(repository, dbContext, _nullLogger);
         var newTask = TaskItem.CreateNew("Test Delete Task");
         var id = newTask.Id;
-        context.Tasks.Add(newTask);
-        context.SaveChanges();
+        dbContext.Tasks.Add(newTask);
+        dbContext.SaveChanges();
 
         // When
         var fetchedTask = sut.Find(id);
         fetchedTask.Should().NotBeNull();
         sut.Delete(newTask);
-
 
         // Then
         var deletedTask = sut.GetTasks().SingleOrDefault(t => t.Id == id);
@@ -57,28 +64,33 @@ public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>
     public void GetTasksShouldReturnAllTasks()
     {
         // Arrange
-        using var context = _fixture.CreateContext();
-        context.Tasks.AddRange(FakeTaskItem.Generate(2));
-        context.SaveChanges();
-        ITaskItemService sut = new TaskItemService(context, _nullLogger);
+        using var dbContext = _fixture.CreateContext();
+        using var dbConnection = new SqliteConnection(_fixture.ConnectionString);
+        ITaskItemRepository repository = new TaskItemRepository(dbContext, dbConnection);
+        dbContext.Tasks.AddRange(FakeTaskItem.Generate(2));
+        dbContext.SaveChanges();
+        ITaskItemService sut = new TaskItemService(repository, dbContext, _nullLogger);
 
         // Act
         var tasks = sut.GetTasks();
 
         // Assert
         tasks.Should().HaveCount(2);
+        tasks.Should().AllSatisfy(t => t.RowId.Should().NotBe(0), "The database should correctly assign row number");
     }
 
     [Fact]
     public void UpdateShouldUpdateAndReturnSuccessResult()
     {
         // Given
-        using var context = _fixture.CreateContext();
+        using var dbContext = _fixture.CreateContext();
+        using var dbConnection = new SqliteConnection(_fixture.ConnectionString);
+        ITaskItemRepository repository = new TaskItemRepository(dbContext, dbConnection);
         var newTask = TaskItem.CreateNew("Task to update");
         var id = newTask.Id;
-        context.Tasks.Add(newTask);
-        context.SaveChanges();
-        ITaskItemService sut = new TaskItemService(context, _nullLogger);
+        dbContext.Tasks.Add(newTask);
+        dbContext.SaveChanges();
+        ITaskItemService sut = new TaskItemService(repository, dbContext, _nullLogger);
 
         // When
         TaskItem taskToUpdate = sut.Find(id) ?? throw new Exception();

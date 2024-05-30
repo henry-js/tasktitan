@@ -14,7 +14,7 @@ internal sealed class ModifyCommand(IAnsiConsole console, IStringFilterConverter
     public override Task<int> ExecuteAsync(CommandContext context, ModifySettings settings)
     {
         logger.LogInformation("Querying task with rowId: {rowId}", settings.rowId);
-        var task = service.Get(settings.rowId, false);
+        var task = service.Get(settings.rowId);
         Debug.WriteLine(task);
         // ParsedInput input = ParseInput(settings);
         if (task == null)
