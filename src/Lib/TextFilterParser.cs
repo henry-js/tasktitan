@@ -1,4 +1,6 @@
-using static TaskTitan.Lib.Text.RegexPatterns;
+
+using TaskTitan.Core.Queries;
+using TaskTitan.Core.RegularExpressions;
 
 namespace TaskTitan.Lib.Text;
 

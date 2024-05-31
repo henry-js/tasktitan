@@ -7,7 +7,7 @@ using TaskTitan.Data;
 
 namespace TaskTitan.Tests.Common.Data;
 
-public class TestDatabaseFixture
+public class TestDatabaseFixture : IDisposable
 {
     public readonly string ConnectionString = @$"DataSource={Path.Combine(Path.GetTempPath(), "test.db")}";
     private static readonly object _lock = new();
@@ -39,4 +39,9 @@ public class TestDatabaseFixture
             new DbContextOptionsBuilder<TaskTitanDbContext>()
                 .UseSqlite(ConnectionString)
                 .Options);
+
+    public void Dispose()
+    {
+        CreateContext().Database.EnsureDeleted();
+    }
 }

@@ -8,16 +8,15 @@ internal sealed class StartCommand(IAnsiConsole console, ITaskItemService servic
 {
     public override Task<int> ExecuteAsync(CommandContext context, ActionSettings settings)
     {
-        var pendingTasks = dbContext.PendingTasks;
-        var tasksToStart = pendingTasks.Where(pt => pt.RowId == settings.rowId);
+        var tasksToStart = service.GetTasks();
         var tasktext = "task".ToQuantity(tasksToStart.Count());
         logger.LogInformation("Found {foundTasks} task(s)", tasksToStart.Count());
         foreach (var task in tasksToStart)
         {
             task.Start();
+            service.Update(task);
         }
 
-        dbContext.Tasks.UpdateRange(tasksToStart);
         dbContext.Commit();
         logger.LogInformation("Started {foundTasks} task(s)", tasksToStart.Count());
 

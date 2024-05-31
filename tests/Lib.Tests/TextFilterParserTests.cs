@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Attributes;
 
+using TaskTitan.Core.Queries;
 using TaskTitan.Lib.Text;
 
 using Xunit.Categories;

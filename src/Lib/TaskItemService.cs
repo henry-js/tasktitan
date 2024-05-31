@@ -1,3 +1,4 @@
+using TaskTitan.Core.Queries;
 using TaskTitan.Lib.Text;
 
 namespace TaskTitan.Lib.Services;
@@ -13,8 +14,7 @@ public class TaskItemService(ITaskItemRepository repository, TaskTitanDbContext 
         try
         {
             var result = _repository.AddAsync(task).Result;
-            if (result.IsSuccess) return 1;
-            else return 0;
+            return result;
         }
         catch (System.Exception ex)
         {

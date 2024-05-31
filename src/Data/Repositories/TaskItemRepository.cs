@@ -1,18 +1,17 @@
 using System.Data;
 
 using Dapper;
-using static TaskTitan.Data.DbConstants;
-using Microsoft.Data.Sqlite;
 
-using TaskTitan.Core.OperationResults;
+using static TaskTitan.Data.DbConstants;
 using TaskTitan.Data.DapperSqliteTypeHandlers;
+using TaskTitan.Core.Queries;
 
 namespace TaskTitan.Data.Repositories;
 
 public class TaskItemRepository : ITaskItemRepository
 {
     private readonly TaskTitanDbContext _dbContext;
-    private IDbConnection _connection;
+    private readonly IDbConnection _connection;
 
     public TaskItemRepository(TaskTitanDbContext dbContext, IDbConnection dbConnection)
     {
@@ -21,19 +20,18 @@ public class TaskItemRepository : ITaskItemRepository
         SqlMapper.AddTypeHandler(new TaskItemIdHandler());
     }
 
-    public async Task<Result> AddAsync(TaskItem task)
+    public async Task<int> AddAsync(TaskItem task)
     {
         _dbContext.Tasks.Add(task);
-        var result = await _dbContext.SaveChangesAsync();
-        return result > 0 ? Result.Success() : Result.Failure(new Error(-99, "I have not been defined yet"));
+        return await _dbContext.SaveChangesAsync();
     }
 
-    public async Task<Result> DeleteAsync(TaskItem task)
+    public async Task<int> DeleteAsync(TaskItem task)
     {
-        throw new NotImplementedException();
+        return await _dbContext.Tasks.Where(t => t.Id == task.Id).ExecuteDeleteAsync();
     }
 
-    public async Task<Result> DeleteRangeAsync(IEnumerable<TaskItem> tasks)
+    public async Task<int> DeleteRangeAsync(IEnumerable<TaskItem> tasks)
     {
         throw new NotImplementedException();
     }
@@ -47,9 +45,10 @@ SELECT * FROM {TasksWithRowId}
         return tasks;
     }
 
-    public async Task<TaskItem> GetById(TaskItemId id)
+    public async Task<TaskItem?> GetById(TaskItemId id)
     {
-        throw new NotImplementedException();
+        var task = await _dbContext.Tasks.FindAsync(id);
+        return task;
     }
 
     public async Task<IEnumerable<TaskItem>> GetByQueryFilter(IEnumerable<ITaskQueryFilter> queryFilters)
@@ -57,19 +56,17 @@ SELECT * FROM {TasksWithRowId}
         throw new NotImplementedException();
     }
 
-    public async Task<Result> UpdateAsync(TaskItem task)
+    public async Task<int> UpdateAsync(TaskItem task)
     {
-        throw new NotImplementedException();
+        _dbContext.Tasks.Update(task);
+        return await _dbContext.SaveChangesAsync();
     }
 
-    public async Task<Result> UpdateRangeAsync(IEnumerable<TaskItem> tasks)
+    public async Task<int> UpdateRangeAsync(IEnumerable<TaskItem> tasks)
     {
-        throw new NotImplementedException();
+        _dbContext.Tasks.UpdateRange(tasks);
+        return await _dbContext.SaveChangesAsync();
     }
 
     // private IDbConnection CreateConnection() => new SqliteConnection(_connectionString);
-}
-
-public class RepositoryExtensions
-{
 }

@@ -1,6 +1,7 @@
 
 using System.Collections;
 
+using TaskTitan.Core.Queries;
 using TaskTitan.Lib.Text;
 
 namespace TaskTitan.Lib.Services;
