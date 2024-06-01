@@ -29,7 +29,7 @@ public class TestDatabaseFixture : IDisposable
         }
         using (var connection = new SqliteConnection(ConnectionString))
         {
-            connection.Execute(DbConstants.CreateViewTasksWithRowId);
+            connection.Execute(DbConstants.TasksTable.CreateViewTasksWithRowId);
         }
 
     }

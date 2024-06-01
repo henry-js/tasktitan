@@ -12,12 +12,12 @@ public class TaskTitanDbContext : DbContext
 
     public DbSet<TaskItem> Tasks => base.Set<TaskItem>();
 
-    public void Commit() => this.SaveChanges();
+    // public void Commit() => this.SaveChanges();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<TaskItem>()
-            .ToTable(TasksTable)
+            .ToTable(TasksTable.Name)
             .HasKey(t => t.Id);
         modelBuilder.Entity<TaskItem>()
             .Property(task => task.Id)

@@ -1,6 +1,7 @@
 using BenchmarkDotNet.Attributes;
-
+using static TaskTitan.Data.DbConstants.TasksTable;
 using TaskTitan.Core.Queries;
+using TaskTitan.Lib.Queries;
 using TaskTitan.Lib.Text;
 
 using Xunit.Categories;
@@ -37,13 +38,29 @@ public class TextFilterParserTests
         // Act
         ITaskQueryFilter filter = sut.Parse(input);
         IdQueryFilter rangeFilter = (IdQueryFilter)filter;
-        var filterParamCount = rangeFilter.SoleIds.Count + rangeFilter.IdRange.Count;
+        var filterParamCount = rangeFilter.SoleIds.Count + rangeFilter.IdRange.Count();
 
         // Assert
         filter.Should().BeAssignableTo<IdQueryFilter>();
         filterParamCount.Should().Be(input.Split(',').Length);
     }
 
+    [Theory]
+    [InlineData("1", $"{RowId} IN (1)")]
+    [InlineData("5-9", $"{RowId} BETWEEN 5 AND 9")]
+    [InlineData("5-20,1,3,5", $"{RowId} IN (1,3,5) OR {RowId} BETWEEN 5 AND 20")]
+    [InlineData("7,5,1-4,2-7,1,3,5", $"{RowId} IN (1,3,5,7) OR {RowId} BETWEEN 1 AND 4 OR {RowId} BETWEEN 2 AND 7")]
+    public void GivenAStringIdQueryFilterShouldConvertToValidSql(string input, string expected)
+    {
+        // Arrange
+        ITextFilterParser sut = new TextFilterParser();
+
+        // Act
+        ITaskQueryFilter filter = sut.Parse(input);
+
+        // Assert
+        filter.ToQueryString().Should().BeEquivalentTo(expected);
+    }
     // [Theory]
     // [InlineData("4,3f-s,11", 2)]
     // [InlineData("23,", 1)]

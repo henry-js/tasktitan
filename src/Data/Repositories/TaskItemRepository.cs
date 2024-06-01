@@ -39,7 +39,7 @@ public class TaskItemRepository : ITaskItemRepository
     public async Task<IEnumerable<TaskItem>> GetAllAsync()
     {
         var sql = $"""
-SELECT * FROM {TasksWithRowId}
+SELECT * FROM {TasksTable.TasksWithRowId}
 """;
         var tasks = await _connection.QueryAsync<TaskItem>(sql);
         return tasks;
@@ -53,7 +53,14 @@ SELECT * FROM {TasksWithRowId}
 
     public async Task<IEnumerable<TaskItem>> GetByQueryFilter(IEnumerable<ITaskQueryFilter> queryFilters)
     {
-        throw new NotImplementedException();
+        string whereFilter = queryFilters.Any() ? "WHERE " + queryFilters.ToQueryString() : "";
+        var sql = $"""
+SELECT * FROM {TasksTable.TasksWithRowId}
+{whereFilter}
+""";
+
+        var tasks = await _connection.QueryAsync<TaskItem>(sql);
+        return tasks;
     }
 
     public async Task<int> UpdateAsync(TaskItem task)

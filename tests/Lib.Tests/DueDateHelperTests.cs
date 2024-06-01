@@ -58,7 +58,7 @@ public class DueDateHelperTests
     [InlineData("friday", "2024-06-07")]
     [InlineData("saturday", "2024-06-08")]
     [InlineData("sunday", "2024-06-09")]
-    public void GivenADayoOfWeekShouldReturnDateFromToday(string dayOfWeek, string expected)
+    public void GivenADayOfWeekShouldReturnDateFromToday(string dayOfWeek, string expected)
     {
         // Arrange
         var today = new DateTime(2024, 06, 06);

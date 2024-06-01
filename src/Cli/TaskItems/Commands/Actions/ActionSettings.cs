@@ -6,9 +6,3 @@ internal class ActionSettings : CommandSettings
     public int rowId { get; set; }
 
 }
-
-internal class StartCommandSettings : CommandSettings
-{
-    [CommandArgument(1, "[filter]")]
-    public string[]? filterText { get; set; }
-}

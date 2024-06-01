@@ -8,12 +8,12 @@ namespace TaskTitan.Lib.Services;
 
 public interface ITaskItemService
 {
-    int Add(TaskItem task);
-    TaskItem? Get(int rowId);
-    IEnumerable<TaskItem> GetTasks();
-    TaskItemResult Update(TaskItem task);
-    void Delete(int rowId);
-    void Delete(TaskItem taskToDelete);
-    TaskItem? Find(TaskItemId id);
-    IEnumerable<TaskItem> GetTasks(List<ITaskQueryFilter> filters);
+    Task<int> Add(TaskItem task);
+    Task<TaskItem?> Get(int rowId);
+    Task<IEnumerable<TaskItem>> GetTasks();
+    Task<TaskItemResult> Update(TaskItem task);
+    Task Delete(int rowId);
+    Task Delete(TaskItem taskToDelete);
+    Task<TaskItem?> Find(TaskItemId id);
+    Task<IEnumerable<TaskItem>> GetTasks(IEnumerable<ITaskQueryFilter> filters);
 }

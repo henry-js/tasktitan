@@ -20,7 +20,7 @@ public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>
     }
 
     [Fact]
-    public void AddShouldAddTaskAndReturnCount()
+    public async Task AddShouldAddTaskAndReturnCount()
     {
         // Arrange
         using var dbContext = _fixture.CreateContext();
@@ -31,14 +31,14 @@ public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>
         var sut = new TaskItemService(repository, dbContext, _nullLogger);
 
         // Act
-        var result = sut.Add(task);
+        var result = await sut.Add(task);
 
         // Assert
         result.Should().Be(1);
     }
 
     [Fact]
-    public void DeleteShouldDeleteTaskWhenTaskExists()
+    public async Task DeleteShouldDeleteTaskWhenTaskExists()
     {
         // Given
         using var dbContext = _fixture.CreateContext();
@@ -51,17 +51,17 @@ public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>
         dbContext.SaveChanges();
 
         // When
-        var fetchedTask = sut.Find(id);
+        var fetchedTask = await sut.Find(id);
         fetchedTask.Should().NotBeNull();
-        sut.Delete(newTask);
+        await sut.Delete(newTask);
 
         // Then
-        var deletedTask = sut.GetTasks().SingleOrDefault(t => t.Id == id);
+        var deletedTask = (await sut.GetTasks()).SingleOrDefault(t => t.Id == id);
         deletedTask.Should().BeNull();
     }
 
     [Fact]
-    public void GetTasksShouldReturnAllTasks()
+    public async Task GetTasksShouldReturnAllTasks()
     {
         // Arrange
         using var dbContext = _fixture.CreateContext();
@@ -72,7 +72,7 @@ public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>
         ITaskItemService sut = new TaskItemService(repository, dbContext, _nullLogger);
 
         // Act
-        var tasks = sut.GetTasks();
+        var tasks = await sut.GetTasks();
 
         // Assert
         tasks.Should().HaveCount(2);
@@ -80,7 +80,7 @@ public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>
     }
 
     [Fact]
-    public void UpdateShouldUpdateAndReturnSuccessResult()
+    public async Task UpdateShouldUpdateAndReturnSuccessResult()
     {
         // Given
         using var dbContext = _fixture.CreateContext();
@@ -93,10 +93,10 @@ public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>
         ITaskItemService sut = new TaskItemService(repository, dbContext, _nullLogger);
 
         // When
-        TaskItem taskToUpdate = sut.Find(id) ?? throw new Exception();
+        TaskItem taskToUpdate = await sut.Find(id) ?? throw new Exception();
         DateTime newDate = new(2025, 12, 12);
         taskToUpdate.Due = newDate;
-        var result = sut.Update(taskToUpdate);
+        var result = await sut.Update(taskToUpdate);
 
         // Then
         result.IsSuccess.Should().Be(true);
