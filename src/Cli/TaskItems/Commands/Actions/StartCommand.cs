@@ -2,28 +2,35 @@ using System.Threading.Tasks;
 
 using Humanizer;
 
+using TaskTitan.Core.Queries;
+using TaskTitan.Lib.Text;
+
 namespace TaskTitan.Cli.TaskItems.Commands.Actions;
 
-internal sealed class StartCommand(IAnsiConsole console, ITaskItemService service, TaskTitanDbContext dbContext, ILogger<AddCommand> logger) : AsyncCommand<ActionSettings>
+internal sealed class StartCommand(IAnsiConsole console, ITextFilterParser filterParser, ITaskItemService service, TaskTitanDbContext dbContext, ILogger<AddCommand> logger) : AsyncCommand<StartCommandSettings>
 {
-    public override Task<int> ExecuteAsync(CommandContext context, ActionSettings settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, StartCommandSettings settings)
     {
-        var pendingTasks = dbContext.PendingTasks;
-        var tasksToStart = pendingTasks.Where(pt => pt.RowId == settings.rowId);
+        IEnumerable<ITaskQueryFilter> filters = [];
+        if (settings.filterText is not null)
+        {
+            filters = settings.filterText.Select(f => filterParser.Parse(f));
+        }
+        var tasksToStart = await service.GetTasks(filters);
         var tasktext = "task".ToQuantity(tasksToStart.Count());
         logger.LogInformation("Found {foundTasks} task(s)", tasksToStart.Count());
         foreach (var task in tasksToStart)
         {
             task.Start();
+            await service.Update(task);
         }
 
-        dbContext.Tasks.UpdateRange(tasksToStart);
-        dbContext.Commit();
+        await dbContext.SaveChangesAsync();
         logger.LogInformation("Started {foundTasks} task(s)", tasksToStart.Count());
 
         var text = $"Updated " + tasktext;
 
         console.WriteLine(text);
-        return Task.FromResult(0);
+        return 0;
     }
 }

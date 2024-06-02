@@ -1,18 +1,20 @@
-using TaskTitan.Lib.Text;
+using TaskTitan.Core.Queries;
+using TaskTitan.Lib.Queries;
 
 namespace TaskTitan.Lib.Services;
 
-public class TaskItemService(TaskTitanDbContext dbcontext, ILogger<TaskItemService> logger) : ITaskItemService
+public class TaskItemService(ITaskItemRepository repository, TaskTitanDbContext dbContext, ILogger<TaskItemService> logger) : ITaskItemService
 {
-    private readonly TaskTitanDbContext _dbcontext = dbcontext;
+    private readonly ITaskItemRepository _repository = repository;
+    private readonly TaskTitanDbContext dbContext = dbContext;
     private readonly ILogger<TaskItemService> _logger = logger;
 
-    public int Add(TaskItem task)
+    public async Task<int> Add(TaskItem task)
     {
         try
         {
-            _dbcontext.Tasks.Add(task);
-            return _dbcontext.SaveChanges();
+            var result = await _repository.AddAsync(task);
+            return result;
         }
         catch (System.Exception ex)
         {
@@ -21,10 +23,10 @@ public class TaskItemService(TaskTitanDbContext dbcontext, ILogger<TaskItemServi
         }
     }
 
-    public void Delete(int rowId)
+    public async Task Delete(int rowId)
     {
         _logger.LogInformation("deleting Task {rowid}", rowId);
-        var task = GetTasks(false).SingleOrDefault(t => t.RowId == rowId);
+        var task = (await GetTasks()).SingleOrDefault(t => t.RowId == rowId);
 
         if (task is null)
         {
@@ -32,24 +34,24 @@ public class TaskItemService(TaskTitanDbContext dbcontext, ILogger<TaskItemServi
             return;
         }
 
-        _dbcontext.Tasks.Remove(task);
+        dbContext.Tasks.Remove(task);
         _logger.LogInformation("Task deleted");
     }
 
-    public void Delete(TaskItem taskToDelete)
+    public async Task Delete(TaskItem taskToDelete)
     {
-        _dbcontext.Tasks.Remove(taskToDelete);
-        _dbcontext.Commit();
+        dbContext.Tasks.Remove(taskToDelete);
+        await dbContext.SaveChangesAsync();
     }
 
-    public TaskItem? Find(TaskItemId id)
+    public async Task<TaskItem?> Find(TaskItemId id)
     {
-        return _dbcontext.Tasks.SingleOrDefault(t => t.Id == id);
+        return await dbContext.Tasks.FindAsync(id);
     }
 
-    public TaskItem? Get(int rowId, bool asreadonly = true)
+    public async Task<TaskItem?> Get(int rowId)
     {
-        var task = GetTasks(asreadonly)
+        var task = (await GetTasks())
         .FirstOrDefault(t => t.RowId == rowId);
         if (task == null)
         {
@@ -58,35 +60,25 @@ public class TaskItemService(TaskTitanDbContext dbcontext, ILogger<TaskItemServi
         return task;
     }
 
-    public IEnumerable<TaskItem> GetTasks(bool asreadonly = true)
+    public async Task<IEnumerable<TaskItem>> GetTasks()
     {
-        int index = 1;
-        return _dbcontext.Tasks
-            .ToList();
+        return await _repository.GetAllAsync();
     }
 
-    public IEnumerable<TaskItem> GetTasks(List<ITaskQueryFilter> filters)
+    public async Task<IEnumerable<TaskItem>> GetTasks(IEnumerable<ITaskQueryFilter> filters)
     {
-        IEnumerable<TaskItem> queryable = GetTasks(false);
-        foreach (var filter in filters)
-        {
-            if (filter is IdQueryFilter idFilter)
-            {
-                queryable = queryable.Where(t => idFilter.SoleIds.Contains(t.RowId));
-            }
-        }
-        return queryable;
+        return await _repository.GetByQueryFilter(filters);
     }
 
-    public TaskItemResult Update(TaskItem pendingTask)
+    public async Task<TaskItemResult> Update(TaskItem pendingTask)
     {
         List<string> errors = [];
 
         _logger.LogInformation("Updating task {rowId}", pendingTask.RowId);
         try
         {
-            _dbcontext.Tasks.Update(pendingTask);
-            _dbcontext.Commit();
+            dbContext.Tasks.Update(pendingTask);
+            await dbContext.SaveChangesAsync();
         }
         catch (Exception ex)
         {

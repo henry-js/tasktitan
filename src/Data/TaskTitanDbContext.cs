@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
+﻿using static TaskTitan.Data.DbConstants;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace TaskTitan.Data;
 
@@ -10,14 +11,13 @@ public class TaskTitanDbContext : DbContext
     }
 
     public DbSet<TaskItem> Tasks => base.Set<TaskItem>();
-    public IEnumerable<TaskItem> PendingTasks => Tasks.Where(t => t.State == TaskItemState.Pending).OrderBy(t => t.Created).AsEnumerable().Select((t, i) => t.WithIndex(i + 1));
 
-    public void Commit() => this.SaveChanges();
+    // public void Commit() => this.SaveChanges();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<TaskItem>()
-            .ToTable("tasks")
+            .ToTable(TasksTable.Name)
             .HasKey(t => t.Id);
         modelBuilder.Entity<TaskItem>()
             .Property(task => task.Id)

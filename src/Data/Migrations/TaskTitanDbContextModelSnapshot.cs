@@ -65,13 +65,27 @@ namespace Data.Migrations
                     b.ToTable("tasks", (string)null);
                 });
 
-            modelBuilder.Entity("TaskTitan.Data.TaskItemWithRowId", b =>
+            modelBuilder.Entity("TaskTitan.Core.TaskItem", b =>
                 {
-                    b.HasBaseType("TaskTitan.Core.TaskItem");
+                    b.OwnsOne("TaskTitan.Core.TaskItemMetadata", "Metadata", b1 =>
+                        {
+                            b1.Property<string>("TaskItemId")
+                                .HasColumnType("TEXT");
 
-                    b.ToTable((string)null);
+                            b1.Property<bool?>("Blocked")
+                                .HasColumnType("INTEGER");
 
-                    b.ToView("pending_tasks", (string)null);
+                            b1.HasKey("TaskItemId");
+
+                            b1.ToTable("tasks");
+
+                            b1.ToJson("Metadata");
+
+                            b1.WithOwner()
+                                .HasForeignKey("TaskItemId");
+                        });
+
+                    b.Navigation("Metadata");
                 });
 #pragma warning restore 612, 618
         }

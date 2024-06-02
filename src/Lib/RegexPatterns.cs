@@ -1,8 +1,8 @@
 using System.Text.RegularExpressions;
 
-namespace TaskTitan.Lib.Text;
+namespace TaskTitan.Lib.RegularExpressions;
 
-internal static partial class RegexPatterns
+public static partial class RegexPatterns
 {
     [GeneratedRegex(@"", RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase)]
     private static partial Regex AttributePatternRegex();

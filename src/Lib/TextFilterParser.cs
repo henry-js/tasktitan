@@ -1,8 +1,11 @@
-using static TaskTitan.Lib.Text.RegexPatterns;
+using TaskTitan.Core.Queries;
+using TaskTitan.Lib.Queries;
+
+using static TaskTitan.Lib.RegularExpressions.RegexPatterns;
 
 namespace TaskTitan.Lib.Text;
 
-public partial class TextFilterParser : ITextFilterParser
+public class TextFilterParser : ITextFilterParser
 {
     public ITaskQueryFilter Parse(string text)
     {

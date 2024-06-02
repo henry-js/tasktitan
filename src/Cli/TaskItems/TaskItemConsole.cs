@@ -10,6 +10,12 @@ internal static class TaskItemConsole
 {
     internal static void ListTasks(this IAnsiConsole console, IEnumerable<TaskItemDto> tasks)
     {
+        if (!tasks.Any())
+        {
+            console.MarkupLine("No matches found");
+            return;
+        }
+
         var table = new Table()
             .Border(TableBorder.Horizontal)
             .AddColumns("Id", nameof(Core.TaskItem.Description), nameof(Core.TaskItem.Due));

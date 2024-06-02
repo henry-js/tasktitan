@@ -1,18 +1,19 @@
 
 using System.Collections;
 
+using TaskTitan.Core.Queries;
 using TaskTitan.Lib.Text;
 
 namespace TaskTitan.Lib.Services;
 
 public interface ITaskItemService
 {
-    int Add(TaskItem task);
-    TaskItem? Get(int rowId, bool asreadonly = true);
-    IEnumerable<TaskItem> GetTasks(bool asreadonly = true);
-    TaskItemResult Update(TaskItem task);
-    void Delete(int rowId);
-    void Delete(TaskItem taskToDelete);
-    TaskItem? Find(TaskItemId id);
-    IEnumerable<TaskItem> GetTasks(List<ITaskQueryFilter> filters);
+    Task<int> Add(TaskItem task);
+    Task<TaskItem?> Get(int rowId);
+    Task<IEnumerable<TaskItem>> GetTasks();
+    Task<TaskItemResult> Update(TaskItem task);
+    Task Delete(int rowId);
+    Task Delete(TaskItem taskToDelete);
+    Task<TaskItem?> Find(TaskItemId id);
+    Task<IEnumerable<TaskItem>> GetTasks(IEnumerable<ITaskQueryFilter> filters);
 }

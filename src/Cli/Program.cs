@@ -48,6 +48,7 @@ try
     );
 
     builder.Services.RegisterDb($"Data Source={ConfigHelper.UserProfileDbPath}", Log.Logger);
+    // builder.Services.RegisterDb(builder.Configuration, Log.Logger);
 
     // Add a command and optionally configure it.
     builder.Services.AddScoped<AddCommand>();
