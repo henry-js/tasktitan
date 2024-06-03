@@ -1,4 +1,4 @@
-namespace TaskTitan.Cli.TaskItems.Commands;
+namespace TaskTitan.Cli.TaskCommands;
 
 internal sealed class ModifySettings : CommandSettings
 {

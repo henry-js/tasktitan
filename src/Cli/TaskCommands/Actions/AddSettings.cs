@@ -1,5 +1,5 @@
 
-namespace TaskTitan.Cli.TaskItems.Commands;
+namespace TaskTitan.Cli.TaskCommands;
 
 internal class AddSettings : CommandSettings
 {

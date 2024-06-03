@@ -1,4 +1,4 @@
-namespace TaskTitan.Cli.TaskItems.Commands;
+namespace TaskTitan.Cli.TaskCommands;
 
 // internal class ActionSettings : CommandSettings
 // {

@@ -5,7 +5,7 @@ using TaskTitan.Core.Queries;
 using TaskTitan.Lib.Dates;
 using TaskTitan.Lib.Text;
 
-namespace TaskTitan.Cli.TaskItems.Commands;
+namespace TaskTitan.Cli.TaskCommands;
 
 // TODO: Should use a filter to LIST commands first then perform modification
 internal sealed class ModifyCommand(IAnsiConsole console, ITextFilterParser filterParser, IStringFilterConverter<DateTime> dateConverter, ITaskItemService service, ILogger<ModifyCommand> logger)

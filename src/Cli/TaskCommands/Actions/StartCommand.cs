@@ -5,7 +5,7 @@ using Humanizer;
 using TaskTitan.Core.Queries;
 using TaskTitan.Lib.Text;
 
-namespace TaskTitan.Cli.TaskItems.Commands.Actions;
+namespace TaskTitan.Cli.TaskCommands.Actions;
 
 internal sealed class StartCommand(IAnsiConsole console, ITextFilterParser filterParser, ITaskItemService service, TaskTitanDbContext dbContext, ILogger<AddCommand> logger) : AsyncCommand<StartCommandSettings>
 {

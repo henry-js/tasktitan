@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace TaskTitan.Cli.TaskItems.Commands.Actions;
+namespace TaskTitan.Cli.TaskCommands.Actions;
 
 internal sealed class AddCommand(IAnsiConsole console, ITaskItemService service, ILogger<AddCommand> logger) : AsyncCommand<AddSettings>
 {

@@ -1,9 +1,9 @@
 using System.Threading.Tasks;
 
-using TaskTitan.Cli.TaskItems.Models;
+using TaskTitan.Cli.TaskCommands.Models;
 using TaskTitan.Lib.Text;
 
-namespace TaskTitan.Cli.TaskItems.Commands;
+namespace TaskTitan.Cli.TaskCommands;
 
 internal sealed class ListCommand(IAnsiConsole console, ITextFilterParser filterParser, ITaskItemService service, ILogger<ListCommand> logger) : AsyncCommand<ListSettings>
 {

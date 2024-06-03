@@ -6,8 +6,8 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 
 using TaskTitan.Cli.AdminCommands;
-using TaskTitan.Cli.TaskItems.Commands;
-using TaskTitan.Cli.TaskItems.Commands.Actions;
+using TaskTitan.Cli.TaskCommands;
+using TaskTitan.Cli.TaskCommands.Actions;
 using TaskTitan.Lib.Dates;
 using TaskTitan.Lib.Text;
 

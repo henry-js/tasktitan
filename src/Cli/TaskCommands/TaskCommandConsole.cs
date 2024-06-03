@@ -2,9 +2,9 @@ using System.Globalization;
 
 using Humanizer;
 
-using TaskTitan.Cli.TaskItems.Models;
+using TaskTitan.Cli.TaskCommands.Models;
 
-namespace TaskTitan.Cli.TaskItems.Commands;
+namespace TaskTitan.Cli.TaskCommands;
 
 internal static class TaskItemConsole
 {

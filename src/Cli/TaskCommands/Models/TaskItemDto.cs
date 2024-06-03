@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace TaskTitan.Cli.TaskItems.Models;
+namespace TaskTitan.Cli.TaskCommands.Models;
 
 public class TaskItemDto
 {
