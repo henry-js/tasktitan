@@ -1,44 +1,48 @@
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.Threading.Tasks;
 
+using TaskTitan.Core.Queries;
 using TaskTitan.Lib.Dates;
+using TaskTitan.Lib.Text;
 
 namespace TaskTitan.Cli.TaskItems.Commands;
 
 // TODO: Should use a filter to LIST commands first then perform modification
-internal sealed class ModifyCommand(IAnsiConsole console, IStringFilterConverter<DateTime> dateConverter, ITaskItemService service, ILogger<ModifyCommand> logger)
+internal sealed class ModifyCommand(IAnsiConsole console, ITextFilterParser filterParser, IStringFilterConverter<DateTime> dateConverter, ITaskItemService service, ILogger<ModifyCommand> logger)
 : AsyncCommand<ModifySettings>
 {
     public override async Task<int> ExecuteAsync(CommandContext context, ModifySettings settings)
     {
-        logger.LogInformation("Querying task with rowId: {rowId}", settings.rowId);
-        var task = await service.Get(settings.rowId);
-        Debug.WriteLine(task);
-        // ParsedInput input = ParseInput(settings);
-        if (task == null)
+        IEnumerable<ITaskQueryFilter> filters = [];
+        if (settings.filterText is not null)
         {
-            console.MarkupLineInterpolated(CultureInfo.CurrentCulture, $"Task {settings.rowId} not found");
+            filters = settings.filterText.Select(f => filterParser.Parse(f));
+        }
+        var tasks = await service.GetTasks(filters);
+        logger.LogDebug(tasks.Count() + " tasks found");
+        // ParsedInput input = ParseInput(settings);
+        if (!tasks.Any())
+        {
             return -1;
         }
         if (settings.due != null)
         {
-            task.Due = dateConverter.ConvertFrom(settings.due);
-        }
-        // if (settings.wait != null)
-        // {
-        //     task.Metadata.Wait = dateConverter.ConvertFrom(settings.wait);
-        // }
-        var updateResult = await service.Update(task);
-        Debug.WriteLine(task);
-
-        console.WriteLine(updateResult.IsSuccess ? "Update successful" : $"Update failed");
-        if (updateResult.ErrorMessages.Length > 0)
-            console.WriteLine($@"
+            foreach (var task in tasks)
+            {
+                task.Due = dateConverter.ConvertFrom(settings.due);
+                var updateResult = await service.Update(task);
+                Debug.WriteLine(task);
+                console.WriteLine(updateResult.IsSuccess ? "Update successful" : $"Update failed");
+                if (updateResult.ErrorMessages.Length > 0)
+                {
+                    console.WriteLine($@"
 Errors:
     {string.Join(Environment.NewLine, updateResult.ErrorMessages)}
 ");
+                }
+            }
+        }
+
         return 0;
     }
 }

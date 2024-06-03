@@ -85,6 +85,8 @@ try
         // #if DEBUG
         //         config.UseBasicExceptionHandler();
         // #endif
+        config.AddCommand<TestCommand>("test")
+            .WithDescription("testing array argument vectors");
     });
 
     var app = builder.Build();

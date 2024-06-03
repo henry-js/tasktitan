@@ -30,8 +30,8 @@ internal sealed class ListCommand(IAnsiConsole console, ITextFilterParser filter
     }
 }
 
-internal sealed class ListSettings : CommandSettings
+internal class ListSettings : CommandSettings
 {
-    [CommandArgument(1, "[filter]")]
+    [CommandOption("-f|--filter")]
     public string[]? filterText { get; set; }
 }

@@ -2,19 +2,19 @@ using System.Threading.Tasks;
 
 namespace TaskTitan.Cli.TaskItems.Commands.Actions;
 
-internal sealed class AddCommand(IAnsiConsole console, ITaskItemService service, ILogger<AddCommand> logger) : AsyncCommand<ModifySettings>
+internal sealed class AddCommand(IAnsiConsole console, ITaskItemService service, ILogger<AddCommand> logger) : AsyncCommand<AddSettings>
 {
     private readonly IAnsiConsole console = console;
     private readonly ITaskItemService service = service;
     private readonly ILogger logger = logger;
 
-    public override Task<int> ExecuteAsync(CommandContext context, ModifySettings settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, AddSettings settings)
     {
-        var task = Core.TaskItem.CreateNew(settings.text);
-        var rowid = service.Add(task);
+        var task = Core.TaskItem.CreateNew(string.Join(' ', settings.Description));
+        var rowid = await service.Add(task);
 
         console.WriteLine($"Created task {rowid}.");
-        return System.Threading.Tasks.Task.FromResult(0);
+        return 0;
     }
 
     internal sealed class Settings : CommandSettings
@@ -39,7 +39,6 @@ internal sealed class AddCommand(IAnsiConsole console, ITaskItemService service,
                 return ValidationResult.Error("Incorrect syntax for scheduled.");
             }
 
-            Scheduled = "Hello i have been edited";
             return base.Validate();
         }
     }

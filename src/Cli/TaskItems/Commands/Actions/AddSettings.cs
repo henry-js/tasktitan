@@ -1,9 +1,8 @@
+
 namespace TaskTitan.Cli.TaskItems.Commands;
 
-internal sealed class ModifySettings : CommandSettings
+internal class AddSettings : CommandSettings
 {
-    [CommandOption("-f|--filter")]
-    public string[]? filterText { get; set; }
     [CommandArgument(0, "[description]")]
     public string[] Description { get; set; } = [];
     [CommandOption("-d|--due")]
@@ -14,4 +13,10 @@ internal sealed class ModifySettings : CommandSettings
     public string? wait { get; internal set; }
     [CommandOption("-u|--until")]
     public string? until { get; internal set; }
+
+    public override ValidationResult Validate()
+    {
+        if (Description.Length == 0) return ValidationResult.Error("Task description cannot be empty");
+        return ValidationResult.Success();
+    }
 }
