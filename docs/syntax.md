@@ -36,6 +36,8 @@ expression -> tag
 
 tag        -> ( "-" | "+" ) STRING ;
 filter     -> (attribute | uda) ":" STRING
+grouping   -> "(" expression ( "and" | "or" ) expression)
+
 ```
 status:completed
 project:Garden

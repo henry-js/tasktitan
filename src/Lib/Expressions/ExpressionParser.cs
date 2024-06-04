@@ -1,123 +1,101 @@
+using System.Collections.Concurrent;
 using System.Linq.Expressions;
-using System.Text.RegularExpressions;
+using System.Windows.Markup;
 
 namespace TaskTitan.Lib.Expressions;
 
 public class ExpressionParser : IExpressionParser
 {
+    private int _current;
+    private List<Token> _tokens;
 
+    public bool IsAtEnd => _current >= _tokens.Count;
 
-    public object ParseFilter(string expression)
+    public Expression ParseFilter(string expression)
     {
+        _current = 0;
         var tokenizer = new Tokenizer(expression);
-        var tokens = tokenizer.ScanTokens();
-        return tokens;
+        _tokens = tokenizer.ScanTokens();
+        return ParseExpression();
     }
 
-}
-
-public class Tokenizer
-{
-    private readonly string _expression;
-    private int _currentPos;
-    private readonly int _maxLength;
-    private readonly List<Token> _tokens = [];
-
-    private static readonly Dictionary<string, TokenType> keywords = new()
+    private Expression ParseExpression()
     {
-        ["status"] = TokenType.STATUS,
-        ["project"] = TokenType.PROJECT,
-        ["due"] = TokenType.DUE,
-        ["recur"] = TokenType.RECUR,
-        ["until"] = TokenType.UNTIL,
-        ["limit"] = TokenType.LIMIT,
-        ["wait"] = TokenType.WAIT,
-        ["entry"] = TokenType.ENTRY,
-        ["wait"] = TokenType.WAIT,
-        ["entry"] = TokenType.ENTRY,
-        ["end"] = TokenType.END,
-        ["start"] = TokenType.START,
-        ["scheduled"] = TokenType.SCHEDULED,
-        ["modified"] = TokenType.MODIFIED,
-        ["depends"] = TokenType.DEPENDS,
-    };
-    public Tokenizer(string expression)
-    {
-        _expression = expression;
-        _maxLength = expression.Length;
-        _currentPos = 0;
+        if (Match(TokenType.ADDITIVE_TAG, TokenType.NEGATIVE_TAG))
+        {
+            return ParseTagFilter();
+        }
+        if (Match(TokenType.ATTRIBUTE_KEY))
+        {
+            return ParseAttributeFilter();
+        }
+        if (Match(TokenType.LEFT_PAREN))
+        {
+            return ParseGroupedExpression();
+        }
+        return null;
     }
 
-    public bool HasMoreTokens => _currentPos < _maxLength;
-
-    public List<Token> ScanTokens()
+    private GroupedExpression ParseGroupedExpression()
     {
-
-        while (HasMoreTokens)
-        {
-            NextToken();
-        }
-
-        return _tokens;
-    }
-    public void NextToken()
-    {
-        if (!HasMoreTokens)
-            return;
-        switch (_expression)
-        {
-            case var _ when _expression.StartsWith('+'):
-                _currentPos++;
-                _tokens.Add(new Token(TokenType.ADDITIVE_TAG, "+"));
-                ReadTag();
-                break;
-            case var _ when _expression.StartsWith('-'):
-                _currentPos++;
-                _tokens.Add(new Token(TokenType.NEGATIVE_TAG, "-"));
-                ReadTag();
-                break;
-            case var _ when Regex.IsMatch(_expression, @"\w+:\w+"):
-                ReadKeyValuePair();
-                break;
-            default:
-                return;
-        }
+        Consume(TokenType.LEFT_PAREN, "Expect '(' before expression");
+        var left = ParseExpression();
+        var @operator = ConsumeOneOf("Expect 'and' or 'or' operator", TokenType.AND, TokenType.OR).Value;
+        var right = ParseExpression();
+        Consume(TokenType.RIGHT_PAREN, "Expecte ')' after expression");
+        return new GroupedExpression(left, @operator, right);
     }
 
-    private void ReadKeyValuePair()
+    private AttributeFilter ParseAttributeFilter()
     {
-        int from = _currentPos;
-
-        while (_currentPos < _maxLength & char.IsLetterOrDigit(_expression[_currentPos]))
-        {
-            _currentPos++;
-        }
-        var key = _expression[from.._currentPos];
-
-        if (keywords.TryGetValue(key, out var keyType))
-        {
-            _tokens.Add(new Token(keyType, key));
-        }
-        else
-        {
-            _tokens.Add(new Token(TokenType.UNDEFINED_KEY, key));
-        }
-
-        _tokens.Add(new Token(TokenType.COLON, ":"));
-        _currentPos++;
-        _tokens.Add(new Token(TokenType.ATTRIBUTE_VALUE, _expression[_currentPos..]));
-        _currentPos = _maxLength;
+        var attributeName = Previous().Value;
+        var colon = Consume(TokenType.COLON, "Attribute key should be followed by a colon");
+        var attributeValue = Consume(TokenType.ATTRIBUTE_VALUE, "Separator should be followed by a value");
+        return new AttributeFilter(attributeName, attributeValue.Value);
     }
 
-    private void ReadTag()
+    private TagFilter ParseTagFilter()
     {
-        int from = _currentPos;
-
-        while (_currentPos < _maxLength && char.IsLetterOrDigit(_expression[_currentPos]))
-        {
-            _currentPos++;
-        }
-        var tag = _expression[from.._currentPos];
-        _tokens.Add(new Token(TokenType.TAGNAME, tag));
+        var sign = Previous().Type == TokenType.ADDITIVE_TAG ? '+' : '-';
+        var name = Consume(TokenType.TAGNAME, "Expect tag name after sign.").Value;
+        return new TagFilter(sign, name);
     }
+
+    private Token Consume(TokenType tokenType, string message)
+    {
+        return Check(tokenType) ? Advance() : throw new Exception(message);
+    }
+    private Token ConsumeOneOf(string message, params TokenType[] tokenType)
+    {
+        foreach (var type in tokenType)
+        {
+            if (Check(type)) return Advance();
+        }
+        throw new Exception(message);
+    }
+
+    private bool Match(params TokenType[] types)
+    {
+        foreach (var tokenType in types)
+        {
+            if (Check(tokenType))
+            {
+                Advance();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Token Advance()
+    {
+        if (!IsAtEnd) _current++;
+        return Previous();
+    }
+
+    private Token Previous() => _tokens[_current - 1];
+
+    private bool Check(TokenType tokenType) => !IsAtEnd && Peek().Type == tokenType;
+
+    private Token Peek() => _tokens[_current];
 }

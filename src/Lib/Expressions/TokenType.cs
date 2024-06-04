@@ -1,3 +1,5 @@
+namespace TaskTitan.Lib.Expressions;
+
 public enum TokenType
 {
     LEFT_PAREN,
@@ -9,13 +11,14 @@ public enum TokenType
     // Attributes
     STATUS, PROJECT, DUE, RECUR, UNTIL, LIMIT, WAIT,
     ENTRY, END, START, SCHEDULED, MODIFIED, DEPENDS,
+    ATTRIBUTE_KEY,
+    ATTRIBUTE_VALUE,
 
     // Keywords
     OR, AND,
     TAGNAME,
     UNDEFINED_KEY,
-    ATTRIBUTE_VALUE,
-
+    Text,
 }
 
 public record struct Token(TokenType Type, string Value);
