@@ -28,8 +28,14 @@ task modify -f due:eom -f scheduled:tomorrow -m due:1y -m scheduled:due-1d
 
 Date attributes should accept a string representation of a relative date i.e. `monday, eom, 1w (1 week)`
 
-## Expressions
+## Expression Grammar
 
+expression -> tag
+            | filter
+            | grouping ;
+
+tag        -> ( "-" | "+" ) STRING ;
+filter     -> (attribute | uda) ":" STRING
 ```
 status:completed
 project:Garden

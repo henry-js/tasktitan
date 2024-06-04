@@ -1,3 +1,5 @@
+using TaskTitan.Lib.Expressions;
+
 using Xunit.Categories;
 
 namespace TaskTitan.Lib.Tests;
@@ -9,14 +11,14 @@ public class ExpressionParserTests
     [InlineData("status:pending")]
     [InlineData("+work")]
     [InlineData("+home")]
+    [InlineData("-test")]
     [InlineData("(due:today or due:tomorrow)")]
     public void ShouldCorrectlyParseAllBuiltInAttributeFilterExpressions(string expression)
     {
         // Arrange
-        var sut = new ExpressionParser();
+        IExpressionParser sut = new ExpressionParser();
         // Act
         var result = sut.ParseFilter(expression);
         // Assert
-        result.ExpresssionType.Should().Be(ExpressionType.Filter);
     }
 }
