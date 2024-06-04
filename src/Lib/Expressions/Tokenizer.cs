@@ -104,6 +104,7 @@ public class Tokenizer
         if (Peek() == ':')
         {
             ReadKeyValuePair(text);
+            return;
         }
         if (keywords.TryGetValue(text, out TokenType type))
         {

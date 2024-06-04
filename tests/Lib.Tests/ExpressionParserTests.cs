@@ -48,6 +48,9 @@ public class ExpressionParserTests
 
     [Theory]
     [InlineData("(due:today or due:tomorrow)")]
+    [InlineData("(scheduled:wednesday and due:thursday)")]
+    [InlineData("(scheduled:wednesday and +home)")]
+    [InlineData("(-home or end:eom)")]
     public void ShouldCorrectlyParseCompoundFilterExpressions(string expression)
     {
         // Arrange

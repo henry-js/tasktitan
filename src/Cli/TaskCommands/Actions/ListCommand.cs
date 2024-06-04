@@ -1,11 +1,12 @@
 using System.Threading.Tasks;
 
 using TaskTitan.Cli.TaskCommands.Models;
+using TaskTitan.Lib.Expressions;
 using TaskTitan.Lib.Text;
 
 namespace TaskTitan.Cli.TaskCommands;
 
-internal sealed class ListCommand(IAnsiConsole console, ITextFilterParser filterParser, ITaskItemService service, ILogger<ListCommand> logger) : AsyncCommand<ListSettings>
+internal sealed class ListCommand(IAnsiConsole console, IExpressionParser expressionParser, ITextFilterParser filterParser, ITaskItemService service, ILogger<ListCommand> logger) : AsyncCommand<ListSettings>
 {
     private readonly IAnsiConsole console = console;
     private readonly ITaskItemService service = service;
@@ -21,6 +22,12 @@ internal sealed class ListCommand(IAnsiConsole console, ITextFilterParser filter
             console.ListTasks(pending);
             return 0;
         }
+        var expressions = settings.filterText.Select(expressionParser.ParseFilter);
+        foreach (var exp in expressions)
+        {
+            console.WriteLine(exp.ToString());
+        }
+        return 0;
         var filters = settings.filterText.Select(f => filterParser.Parse(f));
 
         var tasks = await service.GetTasks(filters);

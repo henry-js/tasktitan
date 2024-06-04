@@ -40,6 +40,7 @@ public class ExpressionParser : IExpressionParser
     {
         Consume(TokenType.LEFT_PAREN, "Expect '(' before expression");
         var left = ParseExpression();
+        // Advance();
         var @operator = ConsumeOneOf("Expect 'and' or 'or' operator", TokenType.AND, TokenType.OR).Value;
         var right = ParseExpression();
         Consume(TokenType.RIGHT_PAREN, "Expecte ')' after expression");
@@ -48,7 +49,8 @@ public class ExpressionParser : IExpressionParser
 
     private AttributeFilter ParseAttributeFilter()
     {
-        var attributeName = Previous().Value;
+        var attributeName = Peek().Value;
+        Advance();
         var colon = Consume(TokenType.COLON, "Attribute key should be followed by a colon");
         var attributeValue = Consume(TokenType.ATTRIBUTE_VALUE, "Separator should be followed by a value");
         return new AttributeFilter(attributeName, attributeValue.Value);
@@ -56,13 +58,20 @@ public class ExpressionParser : IExpressionParser
 
     private TagFilter ParseTagFilter()
     {
-        var sign = Previous().Type == TokenType.ADDITIVE_TAG ? '+' : '-';
+        var sign = Peek().Type == TokenType.ADDITIVE_TAG ? '+' : '-';
+        Advance();
         var name = Consume(TokenType.TAGNAME, "Expect tag name after sign.").Value;
         return new TagFilter(sign, name);
     }
 
     private Token Consume(TokenType tokenType, string message)
     {
+        return Check(tokenType) ? Advance() : throw new Exception(message);
+    }
+
+    private Token ConsumeNext(TokenType tokenType, string message)
+    {
+        Advance();
         return Check(tokenType) ? Advance() : throw new Exception(message);
     }
     private Token ConsumeOneOf(string message, params TokenType[] tokenType)
@@ -80,7 +89,7 @@ public class ExpressionParser : IExpressionParser
         {
             if (Check(tokenType))
             {
-                Advance();
+                // Advance();
                 return true;
             }
         }
