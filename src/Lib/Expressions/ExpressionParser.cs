@@ -2,17 +2,30 @@ using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Windows.Markup;
 
+using static TaskTitan.Lib.RegularExpressions.RegexPatterns;
+
 namespace TaskTitan.Lib.Expressions;
 
 public class ExpressionParser : IExpressionParser
 {
     private int _current;
-    private List<Token> _tokens;
+    private List<Token> _tokens = [];
 
     public bool IsAtEnd => _current >= _tokens.Count;
 
     public Expression ParseFilter(string expression)
     {
+        // var idFilterMatch = IdFilterPattern.Match(expression);
+        // if (idFilterMatch.Success)
+        // {
+        //     return ParseIdFilterExpression();
+        // }
+        // switch (expression)
+        // {
+        //     case string input when IdFilterPattern.IsMatch(input):
+        //         filter = new IdQueryFilter(input);
+        //         break;
+        // }
         _current = 0;
         var tokenizer = new Tokenizer(expression);
         _tokens = tokenizer.ScanTokens();

@@ -80,12 +80,36 @@ public class Tokenizer
             case var c when char.IsLetter(c):
                 ReadString();
                 break;
+            case var c when char.IsDigit(c):
+                ReadNumber();
+                break;
             // case var _ when Regex.IsMatch(_expression[_currentPos..], @"^\w+:\w+"):
             //     ReadKeyValuePair();
             //     break;
             default:
                 return;
         }
+    }
+
+    private void ReadNumber()
+    {
+        int start = _currentPos;
+        while (_currentPos < _maxLength && char.IsDigit(_expression[_currentPos]))
+        {
+            _currentPos++;
+        }
+        string text = _expression[start.._currentPos];
+        if (!HasMoreTokens)
+        {
+            _tokens.Add(new Token(Number, text));
+            return;
+        }
+        if (Peek() == '-')
+        {
+            _currentPos++;
+            _tokens.Add(new Token(DASH, "-"));
+        }
+
     }
 
     private void ReadString()

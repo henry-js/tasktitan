@@ -19,6 +19,8 @@ public enum TokenType
     TAGNAME,
     UNDEFINED_KEY,
     Text,
+    Number,
+    DASH,
 }
 
 public record struct Token(TokenType Type, string Value);
