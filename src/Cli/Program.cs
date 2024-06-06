@@ -6,11 +6,9 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 
 using TaskTitan.Cli.AdminCommands;
-using TaskTitan.Cli.TaskCommands;
 using TaskTitan.Cli.TaskCommands.Actions;
 using TaskTitan.Lib.Dates;
 using TaskTitan.Lib.Expressions;
-using TaskTitan.Lib.Text;
 
 using Velopack;
 
@@ -58,12 +56,12 @@ try
     builder.Services.AddScoped<StartCommand>();
     builder.Services.AddScoped<BogusCommand>();
     builder.Services.AddScoped<ITaskItemService, TaskItemService>();
-    builder.Services.AddScoped<IDateTimeConverter, DateOnlyConverter>();
+    // builder.Services.AddScoped<IDateTimeConverter, DateOnlyConverter>();
     builder.Services.AddScoped<IStringFilterConverter<DateTime>, DateTimeConverter>();
     builder.Services.AddScoped<IExpressionParser, ExpressionParser>();
 
     builder.Services.AddSingleton(TimeProvider.System);
-    builder.Services.AddSingleton<ITextFilterParser, TextFilterParser>();
+    // builder.Services.AddSingleton<ITextFilterParser, TextFilterParser>();
     // builder.Services.AddSingleton<DueDateHelper>();
 
     builder.UseSpectreConsole<ListCommand>(config =>
@@ -88,8 +86,6 @@ try
         // #if DEBUG
         //         config.UseBasicExceptionHandler();
         // #endif
-        config.AddCommand<TestCommand>("test")
-            .WithDescription("testing array argument vectors");
     });
 
     var app = builder.Build();

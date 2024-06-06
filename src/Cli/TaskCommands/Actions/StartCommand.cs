@@ -3,18 +3,18 @@ using System.Threading.Tasks;
 using Humanizer;
 
 using TaskTitan.Core.Queries;
-using TaskTitan.Lib.Text;
+using TaskTitan.Lib.Expressions;
 
 namespace TaskTitan.Cli.TaskCommands.Actions;
 
-internal sealed class StartCommand(IAnsiConsole console, ITextFilterParser filterParser, ITaskItemService service, TaskTitanDbContext dbContext, ILogger<AddCommand> logger) : AsyncCommand<StartCommandSettings>
+internal sealed class StartCommand(IAnsiConsole console, IExpressionParser parser, ITaskItemService service, TaskTitanDbContext dbContext, ILogger<AddCommand> logger) : AsyncCommand<StartCommandSettings>
 {
     public override async Task<int> ExecuteAsync(CommandContext context, StartCommandSettings settings)
     {
-        IEnumerable<ITaskQueryFilter> filters = [];
+        IEnumerable<Expression> filters = [];
         if (settings.filterText is not null)
         {
-            filters = settings.filterText.Select(f => filterParser.Parse(f));
+            filters = settings.filterText.Select(f => parser.ParseFilter(f));
         }
         var tasksToStart = await service.GetTasks(filters);
         var tasktext = "task".ToQuantity(tasksToStart.Count());

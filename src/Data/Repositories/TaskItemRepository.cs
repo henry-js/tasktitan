@@ -5,6 +5,8 @@ using Dapper;
 using static TaskTitan.Data.DbConstants;
 using TaskTitan.Data.DapperSqliteTypeHandlers;
 using TaskTitan.Core.Queries;
+using TaskTitan.Lib.Expressions;
+using static TaskTitan.Data.ExpressionExtensions;
 
 namespace TaskTitan.Data.Repositories;
 
@@ -33,7 +35,7 @@ public class TaskItemRepository : ITaskItemRepository
 
     public async Task<int> DeleteRangeAsync(IEnumerable<TaskItem> tasks)
     {
-        throw new NotImplementedException();
+        return await _dbContext.Tasks.Where(t => tasks.Select(task => task.Id).Contains(t.Id)).ExecuteDeleteAsync();
     }
 
     public async Task<IEnumerable<TaskItem>> GetAllAsync()
@@ -51,7 +53,7 @@ SELECT * FROM {TasksTable.TasksWithRowId}
         return task;
     }
 
-    public async Task<IEnumerable<TaskItem>> GetByQueryFilter(IEnumerable<ITaskQueryFilter> queryFilters)
+    public async Task<IEnumerable<TaskItem>> GetByQueryFilter(IEnumerable<Expression> queryFilters)
     {
         string whereFilter = queryFilters.Any() ? "WHERE " + queryFilters.ToQueryString() : "";
         var sql = $"""

@@ -1,5 +1,5 @@
 using TaskTitan.Core.Queries;
-using TaskTitan.Lib.Queries;
+using TaskTitan.Lib.Expressions;
 
 namespace TaskTitan.Lib.Services;
 
@@ -65,7 +65,7 @@ public class TaskItemService(ITaskItemRepository repository, TaskTitanDbContext 
         return await _repository.GetAllAsync();
     }
 
-    public async Task<IEnumerable<TaskItem>> GetTasks(IEnumerable<ITaskQueryFilter> filters)
+    public async Task<IEnumerable<TaskItem>> GetTasks(IEnumerable<Expression> filters)
     {
         return await _repository.GetByQueryFilter(filters);
     }

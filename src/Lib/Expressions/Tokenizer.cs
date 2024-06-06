@@ -57,6 +57,7 @@ public class Tokenizer
         switch (_expression[_currentPos])
         {
             case ' ':
+            case ',':
                 _currentPos++;
                 break;
             case '+':
@@ -99,18 +100,21 @@ public class Tokenizer
             _currentPos++;
         }
         string text = _expression[start.._currentPos];
-        if (!HasMoreTokens)
+        if (!HasMoreTokens || Peek() != '-')
         {
-            _tokens.Add(new Token(Number, text));
+            _tokens.Add(new Token(NUMBER, text));
             return;
         }
-        if (Peek() == '-')
+
+        _currentPos++;
+        while (_currentPos < _maxLength && char.IsDigit(_expression[_currentPos]))
         {
             _currentPos++;
-            _tokens.Add(new Token(DASH, "-"));
         }
-
+        text = _expression[start.._currentPos];
+        _tokens.Add(new Token(RANGE, text));
     }
+
 
     private void ReadString()
     {
@@ -137,6 +141,7 @@ public class Tokenizer
     }
 
     private char Peek() => _expression[_currentPos];
+    // private char? PeekNext() => _currentPos + 1 > _maxLength ? null : _expression[_currentPos + 1];
 
     private void ReadKeyValuePair(string? key = null)
     {

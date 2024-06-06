@@ -1,8 +1,4 @@
-using System.Collections.Concurrent;
-using System.Linq.Expressions;
-using System.Windows.Markup;
-
-using static TaskTitan.Lib.RegularExpressions.RegexPatterns;
+using TaskTitan.Core.Queries;
 
 namespace TaskTitan.Lib.Expressions;
 
@@ -15,17 +11,6 @@ public class ExpressionParser : IExpressionParser
 
     public Expression ParseFilter(string expression)
     {
-        // var idFilterMatch = IdFilterPattern.Match(expression);
-        // if (idFilterMatch.Success)
-        // {
-        //     return ParseIdFilterExpression();
-        // }
-        // switch (expression)
-        // {
-        //     case string input when IdFilterPattern.IsMatch(input):
-        //         filter = new IdQueryFilter(input);
-        //         break;
-        // }
         _current = 0;
         var tokenizer = new Tokenizer(expression);
         _tokens = tokenizer.ScanTokens();
@@ -34,6 +19,10 @@ public class ExpressionParser : IExpressionParser
 
     private Expression ParseExpression()
     {
+        if (Match(TokenType.NUMBER, TokenType.RANGE))
+        {
+            return ParseIdFilterExpression();
+        }
         if (Match(TokenType.ADDITIVE_TAG, TokenType.NEGATIVE_TAG))
         {
             return ParseTagFilter();
@@ -47,6 +36,32 @@ public class ExpressionParser : IExpressionParser
             return ParseGroupedExpression();
         }
         return null;
+    }
+
+    private IdFilterExpression ParseIdFilterExpression()
+    {
+        List<int> ids = [];
+        SoleIds soleIds = [];
+        List<IdRange> ranges = [];
+        while (Check(TokenType.NUMBER) || Check(TokenType.RANGE))
+        {
+            var value = Advance();
+            if (value.Type == TokenType.NUMBER)
+            {
+                var val = Convert.ToInt32(value.Value);
+                if (!ids.Contains(val))
+                    ids.Add(val);
+            }
+            else
+            {
+                var split = value.Value.Split("-");
+                var from = Convert.ToInt32(split[0]);
+                var to = Convert.ToInt32(split[^1]);
+                ranges.Add(new IdRange(from, to));
+            }
+        }
+        soleIds.AddRange(ids.Order());
+        return new IdFilterExpression(ranges.ToArray(), soleIds);
     }
 
     private GroupedExpression ParseGroupedExpression()

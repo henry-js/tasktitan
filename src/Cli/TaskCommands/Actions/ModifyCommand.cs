@@ -1,22 +1,21 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-using TaskTitan.Core.Queries;
 using TaskTitan.Lib.Dates;
-using TaskTitan.Lib.Text;
+using TaskTitan.Lib.Expressions;
 
 namespace TaskTitan.Cli.TaskCommands;
 
 // TODO: Should use a filter to LIST commands first then perform modification
-internal sealed class ModifyCommand(IAnsiConsole console, ITextFilterParser filterParser, IStringFilterConverter<DateTime> dateConverter, ITaskItemService service, ILogger<ModifyCommand> logger)
+internal sealed class ModifyCommand(IAnsiConsole console, IExpressionParser expressionParser, IStringFilterConverter<DateTime> dateConverter, ITaskItemService service, ILogger<ModifyCommand> logger)
 : AsyncCommand<ModifySettings>
 {
     public override async Task<int> ExecuteAsync(CommandContext context, ModifySettings settings)
     {
-        IEnumerable<ITaskQueryFilter> filters = [];
+        IEnumerable<Expression> filters = [];
         if (settings.filterText is not null)
         {
-            filters = settings.filterText.Select(f => filterParser.Parse(f));
+            filters = settings.filterText.Select(f => expressionParser.ParseFilter(f));
         }
         var tasks = await service.GetTasks(filters);
         logger.LogDebug(tasks.Count() + " tasks found");

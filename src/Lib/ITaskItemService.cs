@@ -1,8 +1,4 @@
-
-using System.Collections;
-
-using TaskTitan.Core.Queries;
-using TaskTitan.Lib.Text;
+using TaskTitan.Lib.Expressions;
 
 namespace TaskTitan.Lib.Services;
 
@@ -15,5 +11,5 @@ public interface ITaskItemService
     Task Delete(int rowId);
     Task Delete(TaskItem taskToDelete);
     Task<TaskItem?> Find(TaskItemId id);
-    Task<IEnumerable<TaskItem>> GetTasks(IEnumerable<ITaskQueryFilter> filters);
+    Task<IEnumerable<TaskItem>> GetTasks(IEnumerable<Expression> filters);
 }
