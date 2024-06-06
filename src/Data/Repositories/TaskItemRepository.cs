@@ -4,9 +4,6 @@ using Dapper;
 
 using static TaskTitan.Data.DbConstants;
 using TaskTitan.Data.DapperSqliteTypeHandlers;
-using TaskTitan.Core.Queries;
-using TaskTitan.Lib.Expressions;
-using static TaskTitan.Data.ExpressionExtensions;
 
 namespace TaskTitan.Data.Repositories;
 
@@ -55,7 +52,7 @@ SELECT * FROM {TasksTable.TasksWithRowId}
 
     public async Task<IEnumerable<TaskItem>> GetByQueryFilter(IEnumerable<Expression> queryFilters)
     {
-        string whereFilter = queryFilters.Any() ? "WHERE " + queryFilters.ToQueryString() : "";
+        string whereFilter = /* queryFilters.Any() ? "WHERE " + queryFilters.ToQueryString() : */ "";
         var sql = $"""
 SELECT * FROM {TasksTable.TasksWithRowId}
 {whereFilter}

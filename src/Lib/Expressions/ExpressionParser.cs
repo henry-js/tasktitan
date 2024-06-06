@@ -35,7 +35,7 @@ public class ExpressionParser : IExpressionParser
         {
             return ParseGroupedExpression();
         }
-        return null;
+        throw new Exception($"Parsing expression failed at: {_tokens[_current]}");
     }
 
     private IdFilterExpression ParseIdFilterExpression()
@@ -64,7 +64,7 @@ public class ExpressionParser : IExpressionParser
         return new IdFilterExpression(ranges.ToArray(), soleIds);
     }
 
-    private GroupedExpression ParseGroupedExpression()
+    private GroupedFilterExpression ParseGroupedExpression()
     {
         Consume(TokenType.LEFT_PAREN, "Expect '(' before expression");
         var left = ParseExpression();
@@ -72,24 +72,28 @@ public class ExpressionParser : IExpressionParser
         var @operator = ConsumeOneOf("Expect 'and' or 'or' operator", TokenType.AND, TokenType.OR).Value;
         var right = ParseExpression();
         Consume(TokenType.RIGHT_PAREN, "Expecte ')' after expression");
-        return new GroupedExpression(left, @operator, right);
+        return new GroupedFilterExpression(left, @operator, right);
     }
 
-    private AttributeFilter ParseAttributeFilter()
+    private AttributeFilterExpression ParseAttributeFilter()
     {
         var attributeName = Peek().Value;
         Advance();
         var colon = Consume(TokenType.COLON, "Attribute key should be followed by a colon");
-        var attributeValue = Consume(TokenType.ATTRIBUTE_VALUE, "Separator should be followed by a value");
-        return new AttributeFilter(attributeName, attributeValue.Value);
+        var attrValue = Consume(TokenType.ATTRIBUTE_VALUE, "Separator should be followed by a value").Value;
+        if (Enum.TryParse<TaskItemState>(attrValue, true, out TaskItemState state))
+        {
+            return new AttributeFilterExpression(attributeName, state.ToString());
+        }
+        return new AttributeFilterExpression(attributeName, attrValue);
     }
 
-    private TagFilter ParseTagFilter()
+    private TagFilterExpression ParseTagFilter()
     {
         var sign = Peek().Type == TokenType.ADDITIVE_TAG ? '+' : '-';
         Advance();
         var name = Consume(TokenType.TAGNAME, "Expect tag name after sign.").Value;
-        return new TagFilter(sign, name);
+        return new TagFilterExpression(sign, name);
     }
 
     private Token Consume(TokenType tokenType, string message)
@@ -97,11 +101,6 @@ public class ExpressionParser : IExpressionParser
         return Check(tokenType) ? Advance() : throw new Exception(message);
     }
 
-    private Token ConsumeNext(TokenType tokenType, string message)
-    {
-        Advance();
-        return Check(tokenType) ? Advance() : throw new Exception(message);
-    }
     private Token ConsumeOneOf(string message, params TokenType[] tokenType)
     {
         foreach (var type in tokenType)

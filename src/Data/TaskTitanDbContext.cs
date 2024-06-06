@@ -12,8 +12,6 @@ public class TaskTitanDbContext : DbContext
 
     public DbSet<TaskItem> Tasks => base.Set<TaskItem>();
 
-    // public void Commit() => this.SaveChanges();
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<TaskItem>()
@@ -44,7 +42,6 @@ public class TaskTitanDbContext : DbContext
                     .ToJson();
             }
         );
-
     }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

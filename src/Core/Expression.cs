@@ -1,13 +1,18 @@
-using System.Text;
+namespace TaskTitan.Core;
 
-using TaskTitan.Core.Queries;
+public abstract record Expression
+{
+    public abstract string ToQueryString(IExpressionConversionOptions? options = null);
+}
 
+public interface IExpressionConversionOptions
+{
+    string[] StandardDateAttributes { get; }
+    string[] StandardStringAttributes { get; }
+    IStringFilterConverter<DateTime> StandardDateConverter { get; set; }
 
-
-namespace TaskTitan.Lib.Expressions;
-
-public abstract record Expression { }
-public record TagFilter(char Sign, string Value) : Expression;
-public record AttributeFilter(string attribute, string Value) : Expression;
-public record GroupedExpression(Expression Left, string Operator, Expression Right) : Expression;
-public record IdFilterExpression(IdRange[] Ranges, SoleIds Ids) : Expression;
+}
+public interface IStringFilterConverter<T> where T : struct
+{
+    public T? ConvertFrom(string value);
+}

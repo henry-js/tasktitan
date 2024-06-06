@@ -9,7 +9,7 @@ namespace TaskTitan.Tests.Common.Data;
 
 public class TestDatabaseFixture : IDisposable
 {
-    public readonly string ConnectionString = @$"DataSource={Path.Combine(Path.GetTempPath(), "test.db")}";
+    public readonly string ConnectionString = @$"DataSource={Path.Combine(Path.GetTempPath(), $"{Path.GetRandomFileName()}.db")}";
     private static readonly object _lock = new();
     private static bool _dbInitialized;
 

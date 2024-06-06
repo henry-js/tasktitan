@@ -1,6 +1,9 @@
 namespace TaskTitan.Lib.Dates;
 
-public interface IStringFilterConverter<T> where T : struct
+public class AttributeFilterConversionOptions : IExpressionConversionOptions
 {
-    public DateTime? ConvertFrom(string value);
+    public static AttributeFilterConversionOptions Default { get; } = new();
+    public string[] StandardDateAttributes { get; } = ["due", "scheduled", "created", "modified", "started", "wait"];
+    public string[] StandardStringAttributes { get; } = ["status", "project"];
+    public IStringFilterConverter<DateTime> StandardDateConverter { get; set; } = new DateTimeConverter(TimeProvider.System);
 }

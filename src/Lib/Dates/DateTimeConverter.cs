@@ -5,7 +5,6 @@ public class DateTimeConverter(TimeProvider _timeProvider) : IStringFilterConver
     public DateTimeOffset Now { get; } = _timeProvider.GetLocalNow();
     private readonly DayOfWeek[] _daysOfWeek = Enum.GetValues<DayOfWeek>();
 
-
     private bool IsRelative(string strValue, out DateTime? relativeDate)
     {
         relativeDate = RelativeToDate(strValue);

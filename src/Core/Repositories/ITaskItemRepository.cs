@@ -1,6 +1,3 @@
-using TaskTitan.Core.Queries;
-using TaskTitan.Lib.Expressions;
-
 namespace TaskTitan.Core;
 
 public interface ITaskItemRepository

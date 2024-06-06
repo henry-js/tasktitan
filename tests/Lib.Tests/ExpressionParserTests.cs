@@ -9,6 +9,14 @@ namespace TaskTitan.Lib.Tests;
 [UnitTest]
 public class ExpressionParserTests
 {
+    private readonly DateTime _today;
+    private readonly TimeProvider _timeProvider;
+
+    public ExpressionParserTests()
+    {
+        _today = new DateTime(2024, 06, 14);
+        _timeProvider = new FakeTimeProvider(_today);
+    }
     [Theory]
     [InlineData("+work")]
     [InlineData("+home")]
@@ -22,29 +30,31 @@ public class ExpressionParserTests
         var result = sut.ParseFilter(expression);
 
         // Assert
-        result.Should().BeAssignableTo<TagFilter>();
+        result.Should().BeAssignableTo<TagFilterExpression>();
     }
 
     [Theory]
-    [InlineData("status:pending")]
-    [InlineData("due:tomorrow")]
-    [InlineData("recur:daily")]
-    [InlineData("until:1w")]
-    [InlineData("limit:1000")]
-    [InlineData("wait:5d")]
-    [InlineData("end:eom")]
-    [InlineData("start:yesterday")]
-    [InlineData("scheduled:eoy")]
-    public void ShouldCorrectlyParseAttributeFilterExpressions(string expression)
+    [InlineData("status:pending", "status")]
+    [InlineData("due:tomorrow", "due")]
+    [InlineData("recur:daily", "recur")]
+    [InlineData("until:1w", "until")]
+    [InlineData("limit:1000", "limit")]
+    [InlineData("wait:5d", "wait")]
+    [InlineData("end:eom", "end")]
+    [InlineData("start:yesterday", "start")]
+    [InlineData("scheduled:eoy", "scheduled")]
+    public void ShouldCorrectlyParseAttributeFilterExpressions(string expression, string expectedKey)
     {
-        // Arrange
         IExpressionParser sut = new ExpressionParser();
 
         // Act
         var result = sut.ParseFilter(expression);
 
         // Assert
-        result.Should().BeAssignableTo<AttributeFilter>();
+        result.Should().BeAssignableTo<AttributeFilterExpression>();
+        var af = result as AttributeFilterExpression;
+        af!.attribute.Should().BeEquivalentTo(expectedKey);
+        af.Value.Should().NotBeNull();
 
     }
 
@@ -63,7 +73,7 @@ public class ExpressionParserTests
         var result = sut.ParseFilter(expression);
 
         // Assert
-        result.Should().BeAssignableTo<GroupedExpression>();
+        result.Should().BeAssignableTo<GroupedFilterExpression>();
     }
 
     [Theory]
@@ -114,5 +124,40 @@ public class ExpressionParserTests
 
         // Assert
         result!.ToQueryString().Should().BeEquivalentTo(expected);
+    }
+
+    [Theory]
+    [InlineData("due:eom", $"date(due) = date('2024-06-30')")]
+    [InlineData("due:tomorrow", $"date(due) = date('2024-06-15')")]
+    [InlineData("due:today", $"date(due) = date('2024-06-14')")]
+    [InlineData("due:yesterday", $"date(due) = date('2024-06-13')")]
+    public void GivenAStringAttributeFilterShouldConvertToValidSql(string input, string expected)
+    {
+        // Arrange
+        IExpressionParser sut = new ExpressionParser();
+        var dtConverter = new DateTimeConverter(_timeProvider);
+        var options = new AttributeFilterConversionOptions() { StandardDateConverter = dtConverter };
+        // Act
+        var result = sut.ParseFilter(input) as AttributeFilterExpression;
+
+        // Assert
+        result!.ToQueryString(options).Should().BeEquivalentTo(expected);
+    }
+
+    [Theory]
+    [InlineData("(due:eom and status:pending)", $"(date(due) = date('2024-06-30')) AND (status = 'Pending')")]
+    [InlineData("(project:home or due:tomorrow)", $"(project = 'home') OR (date(due) = date('2024-06-15'))")]
+    [InlineData("(modified:yesterday and due:today)", $"(date(modified) = date('2024-06-13')) AND (date(due) = date('2024-06-14'))")]
+    public void GivenAGroupAttributeFilterShouldConvertToValidSql(string input, string expected)
+    {
+        // Arrange
+        IExpressionParser sut = new ExpressionParser();
+        var dtConverter = new DateTimeConverter(_timeProvider);
+        var options = new AttributeFilterConversionOptions() { StandardDateConverter = dtConverter };
+        // Act
+        var result = sut.ParseFilter(input) as GroupedFilterExpression;
+
+        // Assert
+        result!.ToQueryString(options).Should().BeEquivalentTo(expected);
     }
 }

@@ -1,6 +1,3 @@
-using TaskTitan.Core.Queries;
-using TaskTitan.Lib.Expressions;
-
 namespace TaskTitan.Lib.Services;
 
 public class TaskItemService(ITaskItemRepository repository, TaskTitanDbContext dbContext, ILogger<TaskItemService> logger) : ITaskItemService
@@ -16,7 +13,7 @@ public class TaskItemService(ITaskItemRepository repository, TaskTitanDbContext 
             var result = await _repository.AddAsync(task);
             return result;
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError("Save failed: {exception}", ex.Message);
             return -1;

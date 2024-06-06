@@ -23,5 +23,3 @@ public enum TokenType
     DASH,
     RANGE,
 }
-
-public record struct Token(TokenType Type, string Value);

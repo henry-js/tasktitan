@@ -1,5 +1,3 @@
-using System.Text.RegularExpressions;
-
 using static TaskTitan.Lib.Expressions.TokenType;
 
 namespace TaskTitan.Lib.Expressions;
@@ -21,8 +19,6 @@ public class Tokenizer
         ["limit"] = LIMIT,
         ["wait"] = WAIT,
         ["entry"] = ENTRY,
-        ["wait"] = WAIT,
-        ["entry"] = ENTRY,
         ["end"] = END,
         ["start"] = START,
         ["scheduled"] = SCHEDULED,
@@ -42,7 +38,6 @@ public class Tokenizer
 
     public List<Token> ScanTokens()
     {
-
         while (HasMoreTokens)
         {
             NextToken();
@@ -84,9 +79,6 @@ public class Tokenizer
             case var c when char.IsDigit(c):
                 ReadNumber();
                 break;
-            // case var _ when Regex.IsMatch(_expression[_currentPos..], @"^\w+:\w+"):
-            //     ReadKeyValuePair();
-            //     break;
             default:
                 return;
         }
@@ -115,7 +107,6 @@ public class Tokenizer
         _tokens.Add(new Token(RANGE, text));
     }
 
-
     private void ReadString()
     {
         int start = _currentPos;
@@ -141,7 +132,6 @@ public class Tokenizer
     }
 
     private char Peek() => _expression[_currentPos];
-    // private char? PeekNext() => _currentPos + 1 > _maxLength ? null : _expression[_currentPos + 1];
 
     private void ReadKeyValuePair(string? key = null)
     {
@@ -160,7 +150,6 @@ public class Tokenizer
             key = _expression[from.._currentPos];
             _tokens.Add(new Token(ATTRIBUTE_KEY, key));
         }
-
 
         _tokens.Add(new Token(COLON, ":"));
         _currentPos++;
