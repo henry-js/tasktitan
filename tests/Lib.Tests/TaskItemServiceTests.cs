@@ -30,9 +30,9 @@ public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>
         // Arrange
         using var dbContext = _fixture.CreateContext();
         using var dbConnection = new SqliteConnection(_fixture.ConnectionString);
-        ITaskItemRepository repository = new TaskItemRepository(dbContext, dbConnection, _repoLogger);
+        ITaskItemRepository repository = new TaskItemRepository(dbConnection, _repoLogger);
         var task = TaskItem.CreateNew("Test Task");
-        var sut = new TaskItemService(repository, dbContext, _parser, _serviceLogger);
+        var sut = new TaskItemService(repository, _parser, _serviceLogger);
 
         // Act
         var result = await sut.Add(task);
@@ -47,8 +47,8 @@ public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>
         // Given
         using var dbContext = _fixture.CreateContext();
         using var dbConnection = new SqliteConnection(_fixture.ConnectionString);
-        ITaskItemRepository repository = new TaskItemRepository(dbContext, dbConnection, _repoLogger);
-        ITaskItemService sut = new TaskItemService(repository, dbContext, _parser, _serviceLogger);
+        ITaskItemRepository repository = new TaskItemRepository(dbConnection, _repoLogger);
+        ITaskItemService sut = new TaskItemService(repository, _parser, _serviceLogger);
         var newTask = TaskItem.CreateNew("Test Delete Task");
         var id = newTask.Id;
         dbContext.Tasks.Add(newTask);
@@ -70,10 +70,10 @@ public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>
         // Arrange
         using var dbContext = _fixture.CreateContext();
         using var dbConnection = new SqliteConnection(_fixture.ConnectionString);
-        ITaskItemRepository repository = new TaskItemRepository(dbContext, dbConnection, _repoLogger);
+        ITaskItemRepository repository = new TaskItemRepository(dbConnection, _repoLogger);
         dbContext.Tasks.AddRange(FakeTaskItem.Generate(2));
         dbContext.SaveChanges();
-        ITaskItemService sut = new TaskItemService(repository, dbContext, _parser, _serviceLogger);
+        ITaskItemService sut = new TaskItemService(repository, _parser, _serviceLogger);
 
         // Act
         var tasks = await sut.GetTasks([]);
@@ -89,12 +89,12 @@ public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>
         // Given
         using var dbContext = _fixture.CreateContext();
         using var dbConnection = new SqliteConnection(_fixture.ConnectionString);
-        ITaskItemRepository repository = new TaskItemRepository(dbContext, dbConnection, _repoLogger);
+        ITaskItemRepository repository = new TaskItemRepository(dbConnection, _repoLogger);
         var newTask = TaskItem.CreateNew("Task to update");
         var id = newTask.Id;
         dbContext.Tasks.Add(newTask);
         dbContext.SaveChanges();
-        ITaskItemService sut = new TaskItemService(repository, dbContext, _parser, _serviceLogger);
+        ITaskItemService sut = new TaskItemService(repository, _parser, _serviceLogger);
 
         // When
         TaskItem taskToUpdate = await sut.Find(id) ?? throw new Exception();

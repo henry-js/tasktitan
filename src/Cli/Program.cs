@@ -1,6 +1,4 @@
-﻿using Community.Extensions.Spectre.Cli.Hosting;
-
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using Serilog;
@@ -30,73 +28,66 @@ VelopackApp.Build()
 })
 .Run();
 
-try
+var builder = Host.CreateApplicationBuilder(args);
+
+builder.Logging.ClearProviders();
+builder.Services.AddLogging(lbuilder =>
+    lbuilder.AddSerilog(
+        new LoggerConfiguration()
+            .ReadFrom.Configuration(builder.Configuration)
+            .CreateLogger())
+);
+
+builder.Services.RegisterDb($"Data Source={ConfigHelper.UserProfileDbPath}", Log.Logger);
+// builder.Services.RegisterDb(builder.Configuration, Log.Logger);
+
+// Add a command and optionally configure it.
+builder.Services.AddScoped<AddCommand>();
+builder.Services.AddScoped<ListCommand>();
+builder.Services.AddScoped<ModifyCommand>();
+builder.Services.AddScoped<StartCommand>();
+builder.Services.AddScoped<BogusCommand>();
+builder.Services.AddScoped<ITaskItemService, TaskItemService>();
+builder.Services.AddScoped<IStringFilterConverter<DateTime>, DateTimeConverter>();
+builder.Services.AddScoped<IExpressionParser, ExpressionParser>();
+builder.Services.AddSingleton(TimeProvider.System);
+
+builder.UseSpectreConsole<ListCommand>(config =>
 {
-    var builder = Host.CreateApplicationBuilder(args);
+    // All commands above are passed to config.AddCommand() by this point
+    config.PropagateExceptions();
+    config.CaseSensitivity(CaseSensitivity.None);
 
-    // Bind configuration section to object
-    // builder.Services.AddOptions<NestedSettings>()
-    //     .Bind(builder.Configuration.GetSection(NestedSettings.Key));
-    //Disable logging
-    builder.Logging.ClearProviders();
-    builder.Services.AddLogging(lbuilder =>
-        lbuilder.AddSerilog(
-            new LoggerConfiguration()
-                .ReadFrom.Configuration(builder.Configuration)
-                .CreateLogger())
-    );
+    config.SetApplicationName("task");
 
-    builder.Services.RegisterDb($"Data Source={ConfigHelper.UserProfileDbPath}", Log.Logger);
-    // builder.Services.RegisterDb(builder.Configuration, Log.Logger);
+    config.AddCommand<AddCommand>("add")
+        .WithDescription("Add a task to the list");
 
-    // Add a command and optionally configure it.
-    builder.Services.AddScoped<AddCommand>();
-    builder.Services.AddScoped<ListCommand>();
-    builder.Services.AddScoped<ModifyCommand>();
-    builder.Services.AddScoped<StartCommand>();
-    builder.Services.AddScoped<BogusCommand>();
-    builder.Services.AddScoped<ITaskItemService, TaskItemService>();
-    builder.Services.AddScoped<IStringFilterConverter<DateTime>, DateTimeConverter>();
-    builder.Services.AddScoped<IExpressionParser, ExpressionParser>();
-    builder.Services.AddSingleton(TimeProvider.System);
+    config.AddCommand<ListCommand>("list")
+        .WithDescription("List tasks in default collection");
 
-    builder.UseSpectreConsole<ListCommand>(config =>
-    {
-        // All commands above are passed to config.AddCommand() by this point
-        config.SetApplicationName("task");
+    config.AddCommand<ModifyCommand>("modify")
+        .WithDescription("Modify an existing task");
+    config.AddCommand<StartCommand>("start")
+        .WithDescription("Start an existing task or create with description.");
+    config.AddCommand<BogusCommand>("bogus")
+        .WithDescription("Empty tasks table and fill with bogus data")
+        .IsHidden();
+    // #if DEBUG
+    // #endif
+});
 
-        config.AddCommand<AddCommand>("add")
-            .WithDescription("Add a task to the list");
-
-        config.AddCommand<ListCommand>("list")
-            .WithDescription("List tasks in default collection");
-
-        config.AddCommand<ModifyCommand>("modify")
-            .WithDescription("Modify an existing task");
-        config.AddCommand<StartCommand>("start")
-            .WithDescription("Start an existing task or create with description.");
-        config.AddCommand<BogusCommand>("bogus")
-            .WithDescription("Empty tasks table and fill with bogus data")
-            .IsHidden();
-        //         config.PropagateExceptions();
-        // #if DEBUG
-        //         config.UseBasicExceptionHandler();
-        // #endif
-    });
-
-    var app = builder.Build();
+var app = builder.Build();
 
 
-    await app.RunAsync();
-}
-catch (Exception ex)
-{
-    Log.Fatal(ex, "Application terminated unexpectedly");
-}
-finally
-{
-    await Log.CloseAndFlushAsync();
-}
+await app.RunAsync();
+// {
+//     Log.Fatal(ex, "Application terminated unexpectedly");
+// }
+// finally
+// {
+await Log.CloseAndFlushAsync();
+// }
 
 #if DEBUG
 Console.WriteLine();

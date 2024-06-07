@@ -2,10 +2,9 @@ using TaskTitan.Lib.Expressions;
 
 namespace TaskTitan.Lib.Services;
 
-public class TaskItemService(ITaskItemRepository repository, TaskTitanDbContext dbContext, IExpressionParser parser, ILogger<TaskItemService> logger) : ITaskItemService
+public class TaskItemService(ITaskItemRepository repository, IExpressionParser parser, ILogger<TaskItemService> logger) : ITaskItemService
 {
     private readonly ITaskItemRepository _repository = repository;
-    private readonly TaskTitanDbContext dbContext = dbContext;
     private readonly IExpressionParser _parser = parser;
     private readonly ILogger<TaskItemService> _logger = logger;
 
@@ -34,19 +33,18 @@ public class TaskItemService(ITaskItemRepository repository, TaskTitanDbContext 
             return;
         }
 
-        dbContext.Tasks.Remove(task);
+        // dbContext.Tasks.Remove(task);
         _logger.LogInformation("Task deleted");
     }
 
     public async Task Delete(TaskItem taskToDelete)
     {
-        dbContext.Tasks.Remove(taskToDelete);
-        await dbContext.SaveChangesAsync();
+        await _repository.DeleteAsync(taskToDelete);
     }
 
     public async Task<TaskItem?> Find(TaskItemId id)
     {
-        return await dbContext.Tasks.FindAsync(id);
+        return await _repository.GetById(id);
     }
 
     public async Task<TaskItem?> Get(int rowId)
@@ -77,8 +75,7 @@ public class TaskItemService(ITaskItemRepository repository, TaskTitanDbContext 
         _logger.LogInformation("Updating task {rowId}", pendingTask.RowId);
         try
         {
-            dbContext.Tasks.Update(pendingTask);
-            await dbContext.SaveChangesAsync();
+            await _repository.UpdateAsync(pendingTask);
         }
         catch (Exception ex)
         {
