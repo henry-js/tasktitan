@@ -16,7 +16,10 @@ public record IdFilterExpression(IdRange[] Ranges, SoleIds Ids) : Expression
         var builder = new StringBuilder();
         if (Ids.Count > 0)
         {
-            builder.AppendJoin(separator, RowId, In, $"({Ids})");
+            var idString = "(" + Ids + ")";
+            builder.Append('(')
+                   .AppendJoin(separator, RowId, In, idString)
+                   .Append(')');
             if (requiredOrKeywords > 0)
             {
                 builder.Append(separator);
@@ -26,7 +29,9 @@ public record IdFilterExpression(IdRange[] Ranges, SoleIds Ids) : Expression
         }
         foreach (var range in Ranges)
         {
-            builder.AppendJoin(separator, RowId, Between, range.From, And, range.To);
+            builder.Append('(');
+            builder.AppendJoin(separator, RowId, range.ToString());
+            builder.Append(')');
             if (requiredOrKeywords > 0)
             {
                 builder.Append(separator);

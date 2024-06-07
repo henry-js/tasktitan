@@ -7,18 +7,13 @@ using TaskTitan.Lib.Expressions;
 namespace TaskTitan.Cli.TaskCommands;
 
 // TODO: Should use a filter to LIST commands first then perform modification
-internal sealed class ModifyCommand(IAnsiConsole console, IExpressionParser expressionParser, IStringFilterConverter<DateTime> dateConverter, ITaskItemService service, ILogger<ModifyCommand> logger)
+internal sealed class ModifyCommand(IAnsiConsole console, IStringFilterConverter<DateTime> dateConverter, ITaskItemService service, ILogger<ModifyCommand> logger)
 : AsyncCommand<ModifySettings>
 {
     public override async Task<int> ExecuteAsync(CommandContext context, ModifySettings settings)
     {
-        IEnumerable<Expression> filters = [];
-        if (settings.filterText is not null)
-        {
-            filters = settings.filterText.Select(f => expressionParser.ParseFilter(f));
-        }
-        var tasks = await service.GetTasks(filters);
-        logger.LogDebug(tasks.Count() + " tasks found");
+        var tasks = await service.GetTasks(settings.filterText ?? []);
+        logger.LogInformation(tasks.Count() + " tasks found");
         // ParsedInput input = ParseInput(settings);
         if (!tasks.Any())
         {

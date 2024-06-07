@@ -16,19 +16,21 @@ internal static class TaskItemConsole
             return;
         }
 
-        var table = new Table()
-            .Border(TableBorder.Horizontal)
-            .AddColumns("Id", nameof(Core.TaskItem.Description), nameof(Core.TaskItem.Due));
+        var grid = new Grid();
+        grid.AddColumn();
+        grid.AddColumn();
+        grid.AddColumn();
 
+        grid.AddRow(["Id", nameof(TaskItem.Description), nameof(TaskItem.Due)]);
         foreach (var task in tasks)
         {
             var humanizedDate = task.Due?.Humanize() ?? "";
-            table.AddRow(task.RowId.ToString(CultureInfo.CurrentCulture), task.Description, humanizedDate);
+            grid.AddRow([$"{task.RowId}", $"{task.Description}", $"{humanizedDate}"]);
         }
 
-        console.Write(table);
-        string taskSummary = "task".ToQuantity(tasks.Count());
-        console.Write($"{taskSummary}.");
+        console.Write(grid);
+        // string taskSummary = "task".ToQuantity(tasks.Count());
+        // console.Write($"{taskSummary}.");
     }
 
     internal static void DisplayTask(this IAnsiConsole console, Core.TaskItem task)

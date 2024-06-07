@@ -110,10 +110,10 @@ public class ExpressionParserTests
     }
 
     [Theory]
-    [InlineData("1", $"{RowId} IN (1)")]
-    [InlineData("5-9", $"{RowId} BETWEEN 5 AND 9")]
-    [InlineData("5-20,1,3,5", $"{RowId} IN (1,3,5) OR {RowId} BETWEEN 5 AND 20")]
-    [InlineData("7,5,1-4,2-7,1,3,5", $"{RowId} IN (1,3,5,7) OR {RowId} BETWEEN 1 AND 4 OR {RowId} BETWEEN 2 AND 7")]
+    [InlineData("1", $"({RowId} IN (1))")]
+    [InlineData("5-9", $"({RowId} BETWEEN 5 AND 9)")]
+    [InlineData("5-20,1,3,5", $"({RowId} IN (1,3,5)) OR ({RowId} BETWEEN 5 AND 20)")]
+    [InlineData("7,5,1-4,2-7,1,3,5", $"({RowId} IN (1,3,5,7)) OR ({RowId} BETWEEN 1 AND 4) OR ({RowId} BETWEEN 2 AND 7)")]
     public void GivenAStringIdQueryFilterShouldConvertToValidSql(string input, string expected)
     {
         // Arrange

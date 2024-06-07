@@ -5,7 +5,7 @@ using TaskTitan.Lib.Expressions;
 
 namespace TaskTitan.Cli.TaskCommands;
 
-internal sealed class ListCommand(IAnsiConsole console, IExpressionParser expressionParser, ITaskItemService service, ILogger<ListCommand> logger) : AsyncCommand<ListSettings>
+internal sealed class ListCommand(IAnsiConsole console, ITaskItemService service, ILogger<ListCommand> logger) : AsyncCommand<ListSettings>
 {
     private readonly IAnsiConsole console = console;
     private readonly ITaskItemService service = service;
@@ -13,21 +13,9 @@ internal sealed class ListCommand(IAnsiConsole console, IExpressionParser expres
 
     public override async Task<int> ExecuteAsync(CommandContext context, ListSettings settings)
     {
-        if (settings.filterText is null)
-        {
-            logger.LogDebug("Fetching all pending tasks");
-            var pending = (await service.GetTasks()).Select(t => TaskItemDto.FromTaskItem(t));
-
-            console.ListTasks(pending);
-            return 0;
-        }
-        var expressions = settings.filterText.Select(expressionParser.ParseFilter);
-        foreach (var exp in expressions)
-        {
-            console.WriteLine(exp.ToString());
-        }
-        var tasks = await service.GetTasks(expressions);
-        console.ListTasks(tasks.Select(t => TaskItemDto.FromTaskItem(t)));
+        logger.LogInformation("Received filter: {filters}", string.Join(", ", settings.filterText ?? []));
+        var tasks = settings.filterText is null ? await service.GetTasks([]) : await service.GetTasks(settings.filterText);
+        console.ListTasks(tasks.Select(TaskItemDto.FromTaskItem));
 
         return 0;
     }

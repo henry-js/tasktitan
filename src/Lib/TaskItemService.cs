@@ -1,9 +1,12 @@
+using TaskTitan.Lib.Expressions;
+
 namespace TaskTitan.Lib.Services;
 
-public class TaskItemService(ITaskItemRepository repository, TaskTitanDbContext dbContext, ILogger<TaskItemService> logger) : ITaskItemService
+public class TaskItemService(ITaskItemRepository repository, TaskTitanDbContext dbContext, IExpressionParser parser, ILogger<TaskItemService> logger) : ITaskItemService
 {
     private readonly ITaskItemRepository _repository = repository;
     private readonly TaskTitanDbContext dbContext = dbContext;
+    private readonly IExpressionParser _parser = parser;
     private readonly ILogger<TaskItemService> _logger = logger;
 
     public async Task<int> Add(TaskItem task)
@@ -23,7 +26,7 @@ public class TaskItemService(ITaskItemRepository repository, TaskTitanDbContext 
     public async Task Delete(int rowId)
     {
         _logger.LogInformation("deleting Task {rowid}", rowId);
-        var task = (await GetTasks()).SingleOrDefault(t => t.RowId == rowId);
+        var task = (await GetTasks([])).SingleOrDefault(t => t.RowId == rowId);
 
         if (task is null)
         {
@@ -48,7 +51,7 @@ public class TaskItemService(ITaskItemRepository repository, TaskTitanDbContext 
 
     public async Task<TaskItem?> Get(int rowId)
     {
-        var task = (await GetTasks())
+        var task = (await GetTasks([]))
         .FirstOrDefault(t => t.RowId == rowId);
         if (task == null)
         {
@@ -57,14 +60,14 @@ public class TaskItemService(ITaskItemRepository repository, TaskTitanDbContext 
         return task;
     }
 
-    public async Task<IEnumerable<TaskItem>> GetTasks()
+    public async Task<IEnumerable<TaskItem>> GetTasks(IEnumerable<string> filters)
     {
-        return await _repository.GetAllAsync();
-    }
-
-    public async Task<IEnumerable<TaskItem>> GetTasks(IEnumerable<Expression> filters)
-    {
-        return await _repository.GetByQueryFilter(filters);
+        if (!filters.Any())
+        {
+            return await _repository.GetByQueryFilter([]);
+        }
+        var filter = string.Join(" OR ", filters.Select(f => _parser.ParseFilter(f).ToQueryString()));
+        return await _repository.GetByQueryFilter([filter]);
     }
 
     public async Task<TaskItemResult> Update(TaskItem pendingTask)

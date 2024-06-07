@@ -56,13 +56,9 @@ try
     builder.Services.AddScoped<StartCommand>();
     builder.Services.AddScoped<BogusCommand>();
     builder.Services.AddScoped<ITaskItemService, TaskItemService>();
-    // builder.Services.AddScoped<IDateTimeConverter, DateOnlyConverter>();
     builder.Services.AddScoped<IStringFilterConverter<DateTime>, DateTimeConverter>();
     builder.Services.AddScoped<IExpressionParser, ExpressionParser>();
-
     builder.Services.AddSingleton(TimeProvider.System);
-    // builder.Services.AddSingleton<ITextFilterParser, TextFilterParser>();
-    // builder.Services.AddSingleton<DueDateHelper>();
 
     builder.UseSpectreConsole<ListCommand>(config =>
     {

@@ -2,6 +2,7 @@ using FluentAssertions;
 
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Abstractions;
 
 using TaskTitan.Core;
 using TaskTitan.Core.OperationResults;
@@ -13,6 +14,7 @@ namespace TaskTitan.Data.Tests;
 public class TaskItemRepositoryTests : IClassFixture<TestDatabaseFixture>, IDisposable
 {
     private readonly TestDatabaseFixture _fixture;
+    private readonly NullLogger<TaskItemRepository> _nullLogger = new();
 
     public TaskItemRepositoryTests(TestDatabaseFixture fixture)
     {
@@ -41,7 +43,7 @@ public class TaskItemRepositoryTests : IClassFixture<TestDatabaseFixture>, IDisp
         // Arrange
         using var dbContext = _fixture.CreateContext();
         using var dbConnection = new SqliteConnection(_fixture.ConnectionString);
-        ITaskItemRepository sut = new TaskItemRepository(dbContext, dbConnection);
+        ITaskItemRepository sut = new TaskItemRepository(dbContext, dbConnection, _nullLogger);
 
         var task = TaskItem.CreateNew("Test Task");
 
@@ -58,7 +60,7 @@ public class TaskItemRepositoryTests : IClassFixture<TestDatabaseFixture>, IDisp
         // Arrange
         using var dbContext = _fixture.CreateContext();
         using var dbConnection = new SqliteConnection(_fixture.ConnectionString);
-        ITaskItemRepository sut = new TaskItemRepository(dbContext, dbConnection);
+        ITaskItemRepository sut = new TaskItemRepository(dbContext, dbConnection, _nullLogger);
 
         var tasks = FakeTaskItem.Generate(10);
         dbContext.Tasks.AddRange(tasks);
@@ -79,7 +81,7 @@ public class TaskItemRepositoryTests : IClassFixture<TestDatabaseFixture>, IDisp
         // Given
         using var dbContext = _fixture.CreateContext();
         using var dbConnection = new SqliteConnection(_fixture.ConnectionString);
-        ITaskItemRepository sut = new TaskItemRepository(dbContext, dbConnection);
+        ITaskItemRepository sut = new TaskItemRepository(dbContext, dbConnection, _nullLogger);
         var newTask = TaskItem.CreateNew("Test Delete Task");
         var id = newTask.Id;
         dbContext.Tasks.Add(newTask);
@@ -101,7 +103,7 @@ public class TaskItemRepositoryTests : IClassFixture<TestDatabaseFixture>, IDisp
         // Given
         using var dbContext = _fixture.CreateContext();
         using var dbConnection = new SqliteConnection(_fixture.ConnectionString);
-        ITaskItemRepository sut = new TaskItemRepository(dbContext, dbConnection);
+        ITaskItemRepository sut = new TaskItemRepository(dbContext, dbConnection, _nullLogger);
         var newTask = TaskItem.CreateNew("Task to update");
         var id = newTask.Id;
         dbContext.Tasks.Add(newTask);
