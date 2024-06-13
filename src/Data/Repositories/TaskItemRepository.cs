@@ -6,6 +6,12 @@ using static TaskTitan.Data.DbConstants;
 using TaskTitan.Data.DapperSqliteTypeHandlers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Data.Sqlite;
+using TaskTitan.Core.Enums;
+using SqlKata.Compilers;
+using SqlKata.Execution;
+using TaskTitan.Core.Expressions;
+using SqlKata.Extensions;
+using SqlKata;
 
 namespace TaskTitan.Data.Repositories;
 
@@ -21,13 +27,14 @@ public class TaskItemRepository : ITaskItemRepository
         _connection = dbConnection;
         _log = log;
         SqlMapper.AddTypeHandler(new TaskItemIdHandler());
+        SqlMapper.AddTypeHandler(typeof(TaskItemAttribute), new TaskItemAttributeHandler());
     }
 
     public async Task<int> AddAsync(TaskItem task)
     {
-        throw new NotImplementedException();
-        // _dbContext.Tasks.Add(task);
-        // return await _dbContext.SaveChangesAsync();
+        var compiler = new SqliteCompiler();
+        var db = new QueryFactory(_connection, compiler);
+        return await db.Query("tasks").InsertAsync(task);
     }
 
     public async Task<int> DeleteAsync(TaskItem task)
@@ -36,10 +43,22 @@ public class TaskItemRepository : ITaskItemRepository
         // return await _dbContext.Tasks.Where(t => t.Id == task.Id).ExecuteDeleteAsync();
     }
 
-    public async Task<int> DeleteRangeAsync(IEnumerable<TaskItem> tasks)
+    public async Task<int> DeleteByFilter(IEnumerable<Expression> filterExpressions)
     {
-        throw new NotImplementedException();
-        // return await _dbContext.Tasks.Where(t => tasks.Select(task => task.Id).Contains(t.Id)).ExecuteDeleteAsync();
+        var compiler = new SqliteCompiler();
+        var db = new QueryFactory(_connection, compiler);
+        var query = db.Query(TasksTable.TasksWithRowId).Select();
+        foreach (var exp in filterExpressions)
+        {
+            query = exp switch
+            {
+                IdFilterExpression idExp => query.AddIdFilter(idExp),
+                AttributeFilterExpression attrExp => query.AddAttributeFilterExpression(attrExp),
+            };
+        }
+        var result = compiler.Compile(query);
+        Console.WriteLine(result.RawSql);
+        return await query.DeleteAsync();
     }
 
     public async Task<IEnumerable<TaskItem>> GetAllAsync()
@@ -51,40 +70,73 @@ SELECT * FROM {TasksTable.TasksWithRowId}
         return tasks;
     }
 
-    public async Task<TaskItem?> GetById(TaskItemId id)
+    public Task<IEnumerable<TaskItem>> GetByFilterAsync(IEnumerable<Expression> expressions)
     {
-        throw new NotImplementedException();
-        // var task = await _dbContext.Tasks.FindAsync(id);
-        // return task;
+        var compiler = new SqliteCompiler();
+        var db = new QueryFactory(_connection, compiler);
+        var query = db.Query(TasksTable.TasksWithRowId).Select("*");
+        foreach (var exp in expressions)
+        {
+            query = exp switch
+            {
+                IdFilterExpression idExp => query.AddIdFilter(idExp),
+                AttributeFilterExpression attrExp => query.AddAttributeFilterExpression(attrExp),
+            };
+        }
+        return query.GetAsync<TaskItem>();
     }
 
-    public async Task<IEnumerable<TaskItem>> GetByQueryFilter(IEnumerable<string> queryFilters)
+    private Query BuildFromExpressions(IEnumerable<Expression> expressions)
     {
-        string whereFilter = queryFilters.Any() ? "WHERE" : "";
-        var sql = $"""
-SELECT * FROM {TasksTable.TasksWithRowId}
+        throw new NotImplementedException();
+    }
+
+    public async Task<IEnumerable<TaskItem>> GetByQueryFilter(string queryFilters)
+    {
+        string whereFilter = !string.IsNullOrWhiteSpace(queryFilters) ? $"WHERE\n\t{string.Join('\n', queryFilters)}" : "";
+        var query = $"""
+    SELECT * FROM {TasksTable.TasksWithRowId}
     {whereFilter}
-        {string.Join('\n', queryFilters)}
-""";
+    """;
 
-        _log.LogInformation("SQL: {sql}", sql);
+        _log.LogInformation("SQL:\n{sql}", query);
 
-        var tasks = await _connection.QueryAsync<TaskItem>(sql);
+        var tasks = await _connection.QueryAsync<TaskItem>(query);
         _log.LogInformation("Fetched {0} tasks", tasks.Count());
         return tasks;
     }
 
-    public async Task<int> UpdateAsync(TaskItem task)
+    public async Task<int> UpdateByFilter(IEnumerable<Expression> expressions, IEnumerable<KeyValuePair<TaskItemAttribute, string>> keyValues)
     {
-        throw new NotImplementedException();
-        // _dbContext.Tasks.Update(task);
-        // return await _dbContext.SaveChangesAsync();
-    }
+        var compiler = new SqliteCompiler();
+        var db = new QueryFactory(_connection, compiler);
+        var query = db.Query("tasks");
+        foreach (var exp in expressions)
+        {
+            query = exp switch
+            {
+                IdFilterExpression idExp => query.AddIdFilter(idExp),
+                OperatorExpression opExp when opExp.Value == "Or" => query.Or(),
+            };
+        }
 
-    public async Task<int> UpdateRangeAsync(IEnumerable<TaskItem> tasks)
+        return await query.UpdateAsync(keyValues);
+    }
+}
+
+public static class SqlKataQueryExtensions
+{
+    internal static Query AddIdFilter(this Query query, IdFilterExpression expression)
     {
-        throw new NotImplementedException();
-        // _dbContext.Tasks.UpdateRange(tasks);
-        // return await _dbContext.SaveChangesAsync();
+        foreach (var range in expression.Ranges)
+        {
+            query.OrWhereBetween("RowId", range.From, range.To);
+        }
+        query.OrWhereIn("RowId", expression.Ids);
+        return query;
+    }
+    internal static Query AddAttributeFilterExpression(this Query query, AttributeFilterExpression expression)
+    {
+        return query.Where(expression.attribute, expression.Value);
     }
 }

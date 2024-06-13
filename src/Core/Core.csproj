@@ -5,6 +5,7 @@
     <RuntimeIndentifiers>win-x64</RuntimeIndentifiers>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RootNamespace>TaskTitan.Core</RootNamespace>
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 

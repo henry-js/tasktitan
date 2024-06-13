@@ -1,14 +1,12 @@
 using System.Text;
 
-using TaskTitan.Lib.Dates;
-
-namespace TaskTitan.Lib.Expressions;
+namespace TaskTitan.Core.Expressions;
 
 public record AttributeFilterExpression(string attribute, string Value) : Expression
 {
     public override string ToQueryString(IExpressionConversionOptions? options = null)
     {
-        options ??= AttributeFilterConversionOptions.Default;
+        // options ??= AttributeFilterConversionOptions.Default;
         var builder = new StringBuilder();
         if (options.StandardDateAttributes.Contains(attribute))
         {

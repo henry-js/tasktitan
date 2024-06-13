@@ -7,4 +7,9 @@ public readonly record struct TaskItemId(string Value)
     public static TaskItemId Empty => new(string.Empty);
 
     public static TaskItemId NewTaskId() => new(ShortId.Generate(Options));
+
+    public override string ToString()
+    {
+        return Value;
+    }
 }

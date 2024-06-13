@@ -1,3 +1,4 @@
+using TaskTitan.Core.Expressions;
 using TaskTitan.Lib.Expressions;
 
 using Xunit.Categories;
@@ -123,7 +124,7 @@ public class ExpressionParserTests
         var result = sut.ParseFilter(input) as IdFilterExpression;
 
         // Assert
-        result!.ToQueryString().Should().BeEquivalentTo(expected);
+        result!.ToQueryString(AttributeFilterConversionOptions.Default).Should().BeEquivalentTo(expected);
     }
 
     [Theory]
@@ -141,7 +142,7 @@ public class ExpressionParserTests
         var result = sut.ParseFilter(input) as AttributeFilterExpression;
 
         // Assert
-        result!.ToQueryString(options).Should().BeEquivalentTo(expected);
+        result!.ToQueryString(AttributeFilterConversionOptions.Default).Should().BeEquivalentTo(expected);
     }
 
     [Theory]

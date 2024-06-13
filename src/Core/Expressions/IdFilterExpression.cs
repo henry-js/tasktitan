@@ -2,10 +2,7 @@ using System.Text;
 
 using TaskTitan.Core.Queries;
 
-using static TaskTitan.Data.DbConstants.KeyWords;
-using static TaskTitan.Data.DbConstants.TasksTable;
-
-namespace TaskTitan.Lib.Expressions;
+namespace TaskTitan.Core.Expressions;
 
 public record IdFilterExpression(IdRange[] Ranges, SoleIds Ids) : Expression
 {
@@ -18,7 +15,7 @@ public record IdFilterExpression(IdRange[] Ranges, SoleIds Ids) : Expression
         {
             var idString = "(" + Ids + ")";
             builder.Append('(')
-                   .AppendJoin(separator, RowId, In, idString)
+                   .AppendJoin(separator, "RowId", "IN", idString)
                    .Append(')');
             if (requiredOrKeywords > 0)
             {
@@ -30,7 +27,7 @@ public record IdFilterExpression(IdRange[] Ranges, SoleIds Ids) : Expression
         foreach (var range in Ranges)
         {
             builder.Append('(');
-            builder.AppendJoin(separator, RowId, range.ToString());
+            builder.AppendJoin(separator, "RowId", range.ToString());
             builder.Append(')');
             if (requiredOrKeywords > 0)
             {

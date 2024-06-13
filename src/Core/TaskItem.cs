@@ -12,16 +12,18 @@ public class TaskItem
     [NotMapped]
     public int RowId { get; private set; }
     public string Description { get; private set; } = string.Empty;
-    public TaskItemState State { get; private set; }
-    public DateTime Created { get; private set; }
+    public TaskItemState Status { get; private set; }
+    public DateTime Entry { get; private set; }
     public DateTime? Modified { get; private set; }
     public DateTime? Due { get; set; }
     public DateTime? Until { get; set; }
     public DateTime? Wait { get; set; }
-    public DateTime? Started { get; set; }
-    public DateTime? Ended { get; set; }
+    public DateTime? Start { get; set; }
+    public DateTime? End { get; set; }
     public DateTime? Scheduled { get; set; }
     public TaskItemMetadata? Metadata { get; set; }
+    public string Project { get; set; }
+    public DateTime Created { get; set; }
 
     public static TaskItem CreateNew(string description, TaskItemMetadata? metadata = null)
     {
@@ -30,45 +32,21 @@ public class TaskItem
             Id = TaskItemId.NewTaskId(),
             Description = description,
             // Created = DateTime.UtcNow,
-            State = TaskItemState.Pending,
+            Status = TaskItemState.Pending,
         };
 
         return task;
     }
 
-    public TaskItem Start()
+    public TaskItem Begin()
     {
-        this.Started = DateTime.UtcNow;
+        this.Start = DateTime.UtcNow;
         return this;
     }
 
     public TaskItem Complete()
     {
-        State = TaskItemState.Completed;
+        Status = TaskItemState.Completed;
         return this;
-    }
-
-    // public static TaskItem FromPending(TaskItem pendingTask)
-    // {
-    //     return new()
-    //     {
-    //         Id = pendingTask.Id,
-    //         Description = pendingTask.Description,
-    //         Created = pendingTask.Created,
-    //         State = pendingTask.State,
-    //         Due = pendingTask.Due,
-    //     };
-    // }
-
-    public TaskItem WithIndex(int index)
-    {
-        this.RowId = index;
-        return this;
-    }
-
-    public override string ToString()
-    {
-        var json = JsonSerializer.Serialize(this, new JsonSerializerOptions() { WriteIndented = true });
-        return json;
     }
 }

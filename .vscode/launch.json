@@ -12,11 +12,17 @@
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/src/Cli/bin/Debug/net8.0/task.exe",
             "args": [
-                "list",
+                // "list",
                 // "-f",
-                "1,2,3,7,9",
+                // "1,2,3,7,9",
                 // "-w",
                 // "eom"
+                "add",
+                "i am a new task",
+                "--due",
+                "tomorrow",
+                "--until",
+                "eom"
             ],
             "cwd": "${workspaceFolder}/src/Cli",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console

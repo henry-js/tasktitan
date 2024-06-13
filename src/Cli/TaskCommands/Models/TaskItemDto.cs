@@ -1,6 +1,4 @@
-using System.Diagnostics;
-
-namespace TaskTitan.Cli.TaskCommands.Models;
+namespace TaskTitan.Lib.Dtos;
 
 public class TaskItemDto
 {
@@ -18,18 +16,29 @@ public class TaskItemDto
     public DateTime? End { get; set; }
     public DateTime? Start { get; set; }
     public DateTime? Scheduled { get; set; }
-    public IList<TaskItemDto>? Depends { get; set; }
 
-    public static TaskItemDto FromTaskItem(Core.TaskItem task)
+    public static TaskItemDto FromTaskItem(TaskItem task)
     {
         return new TaskItemDto
         {
             Id = task.Id.ToString(),
             RowId = task.RowId,
             Description = task.Description,
-            Created = task.Created,
-            State = task.State,
+            Created = task.Entry,
+            State = task.Status,
             Due = task.Due ?? null,
         };
     }
+}
+
+public class TaskItemModifyDto
+{
+    public string? Description { get; set; }
+    public TaskItemState? State { get; set; }
+    public string? DueText { get; set; }
+    public string? UntilText { get; set; }
+    public string? WaitText { get; set; }
+    public string? EndText { get; set; }
+    public string? StartText { get; set; }
+    public string? ScheduledText { get; set; }
 }

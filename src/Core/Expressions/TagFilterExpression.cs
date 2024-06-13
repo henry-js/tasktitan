@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace TaskTitan.Lib.Expressions;
+namespace TaskTitan.Core.Expressions;
 
 public record TagFilterExpression(char Sign, string Value) : Expression
 {

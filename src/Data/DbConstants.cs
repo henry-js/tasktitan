@@ -1,3 +1,5 @@
+using TaskTitan.Core.Enums;
+
 namespace TaskTitan.Data;
 
 public static class DbConstants
@@ -20,9 +22,16 @@ SELECT * FROM {Name}
 CREATE VIEW {TasksWithRowId} as
 SELECT
     *,
-    row_number() OVER ( ORDER BY {nameof(TaskItem.Created)}) RowId
+    row_number() OVER ( ORDER BY {nameof(TaskItem.Entry)}) RowId
 FROM tasks
 """;
         public const string DropViewTasksWithRowId = $"DROP VIEW {TasksWithRowId}";
+        public static readonly string ModifiedTrigger = $"""
+CREATE TRIGGER tasks_update_modified
+AFTER UPDATE ON tasks
+FOR EACH ROW
+BEGIN
+    UPDATE tasks SET {TaskItemAttribute.Modified}
+""";
     }
 }

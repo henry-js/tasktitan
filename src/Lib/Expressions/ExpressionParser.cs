@@ -1,3 +1,4 @@
+using TaskTitan.Core.Expressions;
 using TaskTitan.Core.Queries;
 
 namespace TaskTitan.Lib.Expressions;
@@ -81,7 +82,7 @@ public class ExpressionParser : IExpressionParser
         Advance();
         var colon = Consume(TokenType.COLON, "Attribute key should be followed by a colon");
         var attrValue = Consume(TokenType.ATTRIBUTE_VALUE, "Separator should be followed by a value").Value;
-        if (Enum.TryParse<TaskItemState>(attrValue, true, out TaskItemState state))
+        if (Enum.TryParse(attrValue, true, out TaskItemState state))
         {
             return new AttributeFilterExpression(attributeName, state.ToString());
         }

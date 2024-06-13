@@ -17,8 +17,8 @@ internal sealed class StartCommand(IAnsiConsole console, ITaskItemService servic
         logger.LogInformation("Found {foundTasks} task(s)", tasksToStart.Count());
         foreach (var task in tasksToStart)
         {
-            task.Start();
-            await service.Update(task);
+            task.Begin();
+            // await service.Update(task);
         }
 
         logger.LogInformation("Started {foundTasks} task(s)", tasksToStart.Count());

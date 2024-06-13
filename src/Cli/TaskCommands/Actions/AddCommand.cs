@@ -1,5 +1,7 @@
 using System.Threading.Tasks;
 
+using TaskTitan.Core.Enums;
+
 namespace TaskTitan.Cli.TaskCommands.Actions;
 
 internal sealed class AddCommand(IAnsiConsole console, ITaskItemService service, ILogger<AddCommand> logger) : AsyncCommand<AddSettings>
@@ -10,8 +12,18 @@ internal sealed class AddCommand(IAnsiConsole console, ITaskItemService service,
 
     public override async Task<int> ExecuteAsync(CommandContext context, AddSettings settings)
     {
-        var task = Core.TaskItem.CreateNew(string.Join(' ', settings.Description));
-        var rowid = await service.Add(task);
+        TaskItemCreateRequest request = new()
+        {
+            NewTask = new()
+            {
+                Description = string.Join(' ', settings.Description),
+                Due = settings.due,
+                Scheduled = settings.scheduled,
+                Wait = settings.wait,
+                Until = settings.until,
+            }
+        };
+        var rowid = await service.Add(request);
 
         console.WriteLine($"Created task {rowid}.");
         return 0;

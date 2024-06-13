@@ -14,5 +14,5 @@ public interface IExpressionConversionOptions
 }
 public interface IStringFilterConverter<T> where T : struct
 {
-    public T? ConvertFrom(string value);
+    public T? ConvertFrom(string? value);
 }

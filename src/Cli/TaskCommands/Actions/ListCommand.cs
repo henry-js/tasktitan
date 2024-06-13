@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
 
-using TaskTitan.Cli.TaskCommands.Models;
-using TaskTitan.Lib.Expressions;
+using TaskTitan.Lib.Dtos;
 
 namespace TaskTitan.Cli.TaskCommands;
 

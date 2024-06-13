@@ -6,6 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Serilog;
 
+using SqlKata.Compilers;
+using SqlKata.Execution;
+
 using TaskTitan.Data.Repositories;
 
 namespace TaskTitan.Data;
@@ -19,6 +22,13 @@ public static class DataExtensions
         //     options.UseSqlite(connectionString));
         services.AddTransient<IDbConnection>(sp => new SqliteConnection(connectionString));
         services.AddTransient<ITaskItemRepository, TaskItemRepository>();
+        services.AddTransient(_ =>
+        {
+            var connection = new SqliteConnection(connectionString);
+            var compiler = new SqliteCompiler();
+            return new QueryFactory(connection, compiler);
+        }
+        );
 
         return services;
     }

@@ -58,9 +58,9 @@ public class DateTimeConverter(TimeProvider _timeProvider) : IStringFilterConver
     private DayOfWeek ToDayOfWeek(string day) =>
         _daysOfWeek.Single(d => d.ToString().Equals(day, StringComparison.InvariantCultureIgnoreCase));
 
-    public DateTime? ConvertFrom(string value)
+    public DateTime? ConvertFrom(string? value)
     {
-        if (value == string.Empty) return null;
+        if (string.IsNullOrEmpty(value)) return null;
 
         if (IsExactDate(value, out DateTime? date)) return date;
         if (IsNextDate(value, out date)) return date;
