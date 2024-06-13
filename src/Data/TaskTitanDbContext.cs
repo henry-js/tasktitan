@@ -50,13 +50,13 @@ public class TaskTitanDbContext : DbContext
             .HasDefaultValueSql("CURRENT_TIMESTAMP")
             .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
-        modelBuilder.Entity<TaskItem>().OwnsOne(
-            task => task.Metadata, ownedNavigationBuilder =>
-            {
-                ownedNavigationBuilder
-                    .ToJson();
-            }
-        );
+        // modelBuilder.Entity<TaskItem>().OwnsOne(
+        //     task => task.Metadata, ownedNavigationBuilder =>
+        //     {
+        //         ownedNavigationBuilder
+        //             .ToJson();
+        //     }
+        // );
     }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

@@ -29,4 +29,6 @@ public record struct TaskItemAttribute(string Value)
     {
         return taskItemAttribute.ToString()!;
     }
+
+    public override readonly string ToString() => Value;
 }

@@ -11,8 +11,8 @@ using TaskTitan.Data;
 namespace Data.Migrations
 {
     [DbContext(typeof(TaskTitanDbContext))]
-    [Migration("20240530233003_initialCreate")]
-    partial class initialCreate
+    [Migration("20240613143020_TaskTriggersAndViews")]
+    partial class TaskTriggersAndViews
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,72 +23,64 @@ namespace Data.Migrations
             modelBuilder.Entity("TaskTitan.Core.TaskItem", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("Created")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasColumnName("id");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("description");
 
                     b.Property<DateTime?>("Due")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("due");
 
-                    b.Property<DateTime?>("Ended")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime?>("End")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("end");
+
+                    b.Property<DateTime>("Entry")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("entry")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<DateTime?>("Modified")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")
+                        .HasColumnName("modified")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("Project")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("project");
 
                     b.Property<DateTime?>("Scheduled")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("Started")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime?>("Start")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("start");
 
-                    b.Property<string>("State")
+                    b.Property<string>("Status")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")
-                        .HasDefaultValue("Pending");
+                        .HasDefaultValue("Pending")
+                        .HasColumnName("status");
 
                     b.Property<DateTime?>("Until")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("until");
 
                     b.Property<DateTime?>("Wait")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("wait");
 
                     b.HasKey("Id");
 
                     b.ToTable("tasks", (string)null);
-                });
-
-            modelBuilder.Entity("TaskTitan.Core.TaskItem", b =>
-                {
-                    b.OwnsOne("TaskTitan.Core.TaskItemMetadata", "Metadata", b1 =>
-                        {
-                            b1.Property<string>("TaskItemId")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<bool?>("Blocked")
-                                .HasColumnType("INTEGER");
-
-                            b1.HasKey("TaskItemId");
-
-                            b1.ToTable("tasks");
-
-                            b1.ToJson("Metadata");
-
-                            b1.WithOwner()
-                                .HasForeignKey("TaskItemId");
-                        });
-
-                    b.Navigation("Metadata");
                 });
 #pragma warning restore 612, 618
         }

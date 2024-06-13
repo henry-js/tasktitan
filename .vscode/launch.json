@@ -22,7 +22,9 @@
                 "--due",
                 "tomorrow",
                 "--until",
-                "eom"
+                "eom",
+                "--scheduled",
+                "now"
             ],
             "cwd": "${workspaceFolder}/src/Cli",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console

@@ -39,6 +39,7 @@ public class DueDateHelperTests
     {
         // Arrange
         var today = new DateTime(2024, 06, 06);
+        _timeProvider.SetLocalTimeZone(TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time"));
         _timeProvider.SetUtcNow(new DateTimeOffset(today));
         var sut = new DateTimeConverter(_timeProvider);
         var exact = DateTime.ParseExact(expected, "yyyy-MM-dd", provider);

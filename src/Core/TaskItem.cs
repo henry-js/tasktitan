@@ -12,6 +12,7 @@ public class TaskItem
     [NotMapped]
     public int RowId { get; private set; }
     public string Description { get; private set; } = string.Empty;
+    public string? Project { get; set; }
     public TaskItemState Status { get; private set; }
     public DateTime Entry { get; private set; }
     public DateTime? Modified { get; private set; }
@@ -21,9 +22,8 @@ public class TaskItem
     public DateTime? Start { get; set; }
     public DateTime? End { get; set; }
     public DateTime? Scheduled { get; set; }
-    public TaskItemMetadata? Metadata { get; set; }
-    public string Project { get; set; }
-    public DateTime Created { get; set; }
+    // [NotMapped]
+    // public TaskItemMetadata? Metadata { get; set; }
 
     public static TaskItem CreateNew(string description, TaskItemMetadata? metadata = null)
     {

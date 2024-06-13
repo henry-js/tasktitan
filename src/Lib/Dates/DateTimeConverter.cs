@@ -60,11 +60,13 @@ public class DateTimeConverter(TimeProvider _timeProvider) : IStringFilterConver
 
     public DateTime? ConvertFrom(string? value)
     {
+        DateTime? dt = null;
         if (string.IsNullOrEmpty(value)) return null;
 
-        if (IsExactDate(value, out DateTime? date)) return date;
-        if (IsNextDate(value, out date)) return date;
-        if (IsRelative(value, out date)) return date;
-        return null;
+        if (IsExactDate(value, out DateTime? date)) dt = date;
+        if (IsNextDate(value, out date)) dt = date;
+        if (IsRelative(value, out date)) dt = date;
+        if (dt is null) return null;
+        return dt.Value.ToUniversalTime();
     }
 }

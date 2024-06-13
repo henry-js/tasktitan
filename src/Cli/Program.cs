@@ -55,7 +55,7 @@ services.AddScoped<IExpressionParser, ExpressionParser>();
 services.AddSingleton(TimeProvider.System);
 
 using var registrar = new DependencyInjectionRegistrar(services);
-var app = new CommandApp<ListCommand>(registrar);
+var app = new CommandApp(registrar);
 
 app.Configure(config =>
 {
