@@ -1,5 +1,6 @@
 ﻿using static TaskTitan.Data.DbConstants;
 using Microsoft.EntityFrameworkCore.Metadata;
+using TaskTitan.Core.Enums;
 
 namespace TaskTitan.Data;
 
@@ -12,24 +13,36 @@ public class TaskTitanDbContext : DbContext
 
     public DbSet<TaskItem> Tasks => base.Set<TaskItem>();
 
-    // public void Commit() => this.SaveChanges();
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<TaskItem>()
             .ToTable(TasksTable.Name)
             .HasKey(t => t.Id);
+        modelBuilder.Entity<TaskItem>().Property(t => t.Id).HasColumnName(TaskItemAttribute.Id);
+        modelBuilder.Entity<TaskItem>().Property(t => t.Description).HasColumnName(TaskItemAttribute.Description);
+        modelBuilder.Entity<TaskItem>().Property(t => t.Status).HasColumnName(TaskItemAttribute.Status);
+        modelBuilder.Entity<TaskItem>().Property(t => t.Project).HasColumnName(TaskItemAttribute.Project);
+        modelBuilder.Entity<TaskItem>().Property(t => t.Due).HasColumnName(TaskItemAttribute.Due);
+        // modelBuilder.Entity<TaskItem>().Property(t => t.Recur).HasColumnName(TaskItemAttribute.Recur);
+        modelBuilder.Entity<TaskItem>().Property(t => t.Until).HasColumnName(TaskItemAttribute.Until);
+        modelBuilder.Entity<TaskItem>().Property(t => t.Wait).HasColumnName(TaskItemAttribute.Wait);
+        modelBuilder.Entity<TaskItem>().Property(t => t.Entry).HasColumnName(TaskItemAttribute.Entry);
+        modelBuilder.Entity<TaskItem>().Property(t => t.End).HasColumnName(TaskItemAttribute.End);
+        modelBuilder.Entity<TaskItem>().Property(t => t.Start).HasColumnName(TaskItemAttribute.Start);
+        modelBuilder.Entity<TaskItem>().Property(t => t.Modified).HasColumnName(TaskItemAttribute.Modified);
+        // modelBuilder.Entity<TaskItem>().Property(t => t.Depends).HasColumnName(TaskItemAttribute.Depends);
+        modelBuilder.Entity<TaskItem>().Property(t => t.Id).HasColumnName(TaskItemAttribute.Id);
         modelBuilder.Entity<TaskItem>()
             .Property(task => task.Id)
             .HasConversion(id => id.Value.ToString(), value => new TaskItemId(value));
         modelBuilder.Entity<TaskItem>()
-            .HasQueryFilter(t => t.State == TaskItemState.Pending);
+            .HasQueryFilter(t => t.Status == TaskItemState.Pending);
         modelBuilder.Entity<TaskItem>()
-            .Property(t => t.State)
+            .Property(t => t.Status)
             .HasConversion<string>()
             .HasDefaultValue(TaskItemState.Pending);
         modelBuilder.Entity<TaskItem>()
-            .Property(task => task.Created)
+            .Property(task => task.Entry)
             .HasDefaultValueSql("CURRENT_TIMESTAMP")
             .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
         modelBuilder.Entity<TaskItem>()
@@ -37,14 +50,13 @@ public class TaskTitanDbContext : DbContext
             .HasDefaultValueSql("CURRENT_TIMESTAMP")
             .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
-        modelBuilder.Entity<TaskItem>().OwnsOne(
-            task => task.Metadata, ownedNavigationBuilder =>
-            {
-                ownedNavigationBuilder
-                    .ToJson();
-            }
-        );
-
+        // modelBuilder.Entity<TaskItem>().OwnsOne(
+        //     task => task.Metadata, ownedNavigationBuilder =>
+        //     {
+        //         ownedNavigationBuilder
+        //             .ToJson();
+        //     }
+        // );
     }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

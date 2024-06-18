@@ -18,7 +18,7 @@ public class DueDateHelperTests
     public void GivenAStringDateShouldReturnAValidDateOnly(string input)
     {
         FakeTimeProvider fake = new();
-        var sut = new DateOnlyConverter(fake);
+        var sut = new DateTimeConverter(fake);
         var date = sut.ConvertFrom(input);
 
         date.Should().NotBeNull("the default format for date strings is 'yyyy-MM-dd'");
@@ -35,19 +35,24 @@ public class DueDateHelperTests
 
     [InlineData("eom", "2024-06-30")]
     [InlineData("eoy", "2024-12-31")]
+    [InlineData("eod", "2024-06-06 23:59:59")]
     public void GivenARelativeSynonymShouldReturnAValidDateOnly(string synonym, string expected)
     {
         // Arrange
         var today = new DateTime(2024, 06, 06);
-        _timeProvider.SetUtcNow(new DateTimeOffset(today));
-        var sut = new DateOnlyConverter(_timeProvider);
-        var exact = DateTime.ParseExact(expected, "yyyy-MM-dd", provider);
+        var gmt = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
+        _timeProvider.SetLocalTimeZone(gmt);
+        _timeProvider.SetUtcNow(today);
+        _timeProvider.GetLocalNow();
+        var sut = new DateTimeConverter(_timeProvider);
+        DateTime.TryParse(expected, provider, DateTimeStyles.AssumeLocal, out var exact);
 
         // Act
         var date = sut.ConvertFrom(synonym);
 
         // Assert
-        date.Should().Be(DateOnly.FromDateTime(exact), "a synoymn should correctly convert to a date");
+        date.Should().Be(exact, "a synoymn should correctly convert to a date");
+        date!.Value.Kind.Should().Be(DateTimeKind.Utc);
     }
 
     [Theory]
@@ -62,15 +67,13 @@ public class DueDateHelperTests
     {
         // Arrange
         var today = new DateTime(2024, 06, 06);
-        _timeProvider.SetUtcNow(new DateTimeOffset(today));
-        var sut = new DateOnlyConverter(_timeProvider);
+        _timeProvider.SetUtcNow(today);
+        var sut = new DateTimeConverter(_timeProvider);
         var exact = DateTime.ParseExact(expected, "yyyy-MM-dd", provider);
 
         // Act
         var date = sut.ConvertFrom(dayOfWeek);
-
         // Assert
-        date.Should().Be(DateOnly.FromDateTime(exact), "a synoymn should correctly convert to a date");
-
+        date.Should().Be(exact, "a synoymn should correctly convert to a date");
     }
 }

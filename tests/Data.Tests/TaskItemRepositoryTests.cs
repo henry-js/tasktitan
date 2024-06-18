@@ -2,9 +2,16 @@ using FluentAssertions;
 
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Abstractions;
+
+using SqlKata.Compilers;
+using SqlKata.Execution;
 
 using TaskTitan.Core;
+using TaskTitan.Core.Enums;
+using TaskTitan.Core.Expressions;
 using TaskTitan.Core.OperationResults;
+using TaskTitan.Core.Queries;
 using TaskTitan.Data.Repositories;
 using TaskTitan.Tests.Common.Data;
 
@@ -13,6 +20,7 @@ namespace TaskTitan.Data.Tests;
 public class TaskItemRepositoryTests : IClassFixture<TestDatabaseFixture>, IDisposable
 {
     private readonly TestDatabaseFixture _fixture;
+    private readonly NullLogger<TaskItemRepository> _nullLogger = new();
 
     public TaskItemRepositoryTests(TestDatabaseFixture fixture)
     {
@@ -41,7 +49,7 @@ public class TaskItemRepositoryTests : IClassFixture<TestDatabaseFixture>, IDisp
         // Arrange
         using var dbContext = _fixture.CreateContext();
         using var dbConnection = new SqliteConnection(_fixture.ConnectionString);
-        ITaskItemRepository sut = new TaskItemRepository(dbContext, dbConnection);
+        ITaskItemRepository sut = new TaskItemRepository(dbConnection, _nullLogger);
 
         var task = TaskItem.CreateNew("Test Task");
 
@@ -58,14 +66,14 @@ public class TaskItemRepositoryTests : IClassFixture<TestDatabaseFixture>, IDisp
         // Arrange
         using var dbContext = _fixture.CreateContext();
         using var dbConnection = new SqliteConnection(_fixture.ConnectionString);
-        ITaskItemRepository sut = new TaskItemRepository(dbContext, dbConnection);
+        ITaskItemRepository sut = new TaskItemRepository(dbConnection, _nullLogger);
 
         var tasks = FakeTaskItem.Generate(10);
         dbContext.Tasks.AddRange(tasks);
         dbContext.SaveChanges();
 
         // Act
-        var result = await sut.GetAllAsync();
+        var result = await sut.GetByFilterAsync([]);
 
         // Assert
         result.Should().HaveCount(10);
@@ -79,14 +87,14 @@ public class TaskItemRepositoryTests : IClassFixture<TestDatabaseFixture>, IDisp
         // Given
         using var dbContext = _fixture.CreateContext();
         using var dbConnection = new SqliteConnection(_fixture.ConnectionString);
-        ITaskItemRepository sut = new TaskItemRepository(dbContext, dbConnection);
+        ITaskItemRepository sut = new TaskItemRepository(dbConnection, _nullLogger);
         var newTask = TaskItem.CreateNew("Test Delete Task");
         var id = newTask.Id;
         dbContext.Tasks.Add(newTask);
         dbContext.SaveChanges();
 
         // When
-        var fetchedTask = sut.GetById(id);
+        var fetchedTask = sut.GetByFilterAsync([]);
         fetchedTask.Should().NotBeNull();
         await sut.DeleteAsync(newTask);
 
@@ -96,31 +104,31 @@ public class TaskItemRepositoryTests : IClassFixture<TestDatabaseFixture>, IDisp
     }
 
     [Fact]
-    public async Task UpdateShouldUpdateAndReturnSuccessResult()
+    public async Task UpdateShouldUpdateAndReturnSuccessResult2()
     {
         // Given
         using var dbContext = _fixture.CreateContext();
         using var dbConnection = new SqliteConnection(_fixture.ConnectionString);
-        ITaskItemRepository sut = new TaskItemRepository(dbContext, dbConnection);
-        var newTask = TaskItem.CreateNew("Task to update");
-        var id = newTask.Id;
+        ITaskItemRepository sut = new TaskItemRepository(dbConnection, _nullLogger);
+        var newTask = TaskItem.CreateNew("Task to update 2");
+        string queryFilter = $"Id = '{newTask.Id}'";
         dbContext.Tasks.Add(newTask);
         dbContext.SaveChanges();
-
+        List<Expression> expressions = [];
+        expressions.Add(new IdFilterExpression([new IdRange(1, 5), new IdRange(4, 7)], [9, 5, 99]));
         // When
-        TaskItem taskToUpdate = await sut.GetById(id) ?? throw new Exception();
         DateTime newDate = new(2025, 12, 12);
-        taskToUpdate.Due = newDate;
-        var result = await sut.UpdateAsync(taskToUpdate);
+        Dictionary<string, object> attributes = [];
+        attributes.Add(TaskItemAttribute.Due, newDate.ToString());
+        var result = await sut.UpdateByFilter(expressions, attributes);
 
         // Then
         result.Should().Be(1);
     }
-
     public void Dispose()
     {
-        using var dbContext = _fixture.CreateContext();
-        dbContext.Tasks.ExecuteDelete();
-        dbContext.SaveChanges();
+        var compiler = new SqliteCompiler();
+        var db = new QueryFactory(new SqliteConnection(_fixture.ConnectionString), compiler);
+        db.Query("tasks").Delete();
     }
 }
