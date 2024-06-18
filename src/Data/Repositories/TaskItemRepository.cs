@@ -39,7 +39,9 @@ public class TaskItemRepository : ITaskItemRepository
 
     public async Task<int> DeleteAsync(TaskItem task)
     {
-        throw new NotImplementedException();
+        var compiler = new SqliteCompiler();
+        var db = new QueryFactory(_connection, compiler);
+        return await db.Query("tasks").Where("id", task.Id).DeleteAsync();
         // return await _dbContext.Tasks.Where(t => t.Id == task.Id).ExecuteDeleteAsync();
     }
 
@@ -106,7 +108,7 @@ SELECT * FROM {TasksTable.TasksWithRowId}
         return tasks;
     }
 
-    public async Task<int> UpdateByFilter(IEnumerable<Expression> expressions, IEnumerable<KeyValuePair<TaskItemAttribute, string>> keyValues)
+    public async Task<int> UpdateByFilter(IEnumerable<Expression> expressions, IEnumerable<KeyValuePair<string, object>> keyValues)
     {
         var compiler = new SqliteCompiler();
         var db = new QueryFactory(_connection, compiler);

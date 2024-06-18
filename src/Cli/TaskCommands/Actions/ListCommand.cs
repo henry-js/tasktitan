@@ -2,6 +2,8 @@ using System.Threading.Tasks;
 
 using TaskTitan.Lib.Dtos;
 
+// using static TaskTitan.Cli.TaskCommands.TaskItemConsole;
+
 namespace TaskTitan.Cli.TaskCommands;
 
 internal sealed class ListCommand(IAnsiConsole console, ITaskItemService service, ILogger<ListCommand> logger) : AsyncCommand<ListSettings>
@@ -14,7 +16,15 @@ internal sealed class ListCommand(IAnsiConsole console, ITaskItemService service
     {
         logger.LogInformation("Received filter: {filters}", string.Join(", ", settings.filterText ?? []));
         var tasks = settings.filterText is null ? await service.GetTasks([]) : await service.GetTasks(settings.filterText);
-        console.ListTasks(tasks.Select(TaskItemDto.FromTaskItem));
+
+        if (tasks.Count() == 1)
+        {
+            console.DisplayTaskDetails(tasks.First());
+        }
+        else
+        {
+            console.ListTasks(tasks.Select(TaskItemDto.FromTaskItem));
+        }
 
         return 0;
     }

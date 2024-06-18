@@ -1,5 +1,8 @@
 using Microsoft.Data.Sqlite;
 
+using SqlKata.Compilers;
+using SqlKata.Execution;
+
 using TaskTitan.Data.Repositories;
 using TaskTitan.Lib.Expressions;
 using TaskTitan.Tests.Common.Data;
@@ -9,7 +12,7 @@ using Xunit.Categories;
 namespace TaskTitan.Lib.Tests;
 
 [UnitTest]
-public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>
+public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>, IDisposable
 {
     private readonly TestDatabaseFixture _fixture;
     private readonly NullLogger<TaskItemService> _serviceLogger;
@@ -106,5 +109,12 @@ public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>
 
         // Then
         result.Should().Be(1);
+    }
+
+    public void Dispose()
+    {
+        var compiler = new SqliteCompiler();
+        var db = new QueryFactory(new SqliteConnection(_fixture.ConnectionString), compiler);
+        db.Query("tasks").Delete();
     }
 }

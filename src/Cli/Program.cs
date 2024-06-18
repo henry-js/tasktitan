@@ -34,7 +34,7 @@ VelopackApp.Build()
 
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", false)
-    .SetBasePath(Directory.GetCurrentDirectory())
+    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
     .Build();
 
 var services = new ServiceCollection();
@@ -72,8 +72,10 @@ app.Configure(config =>
 
     config.AddCommand<ModifyCommand>("modify")
         .WithDescription("Modify an existing task");
+
     config.AddCommand<StartCommand>("start")
         .WithDescription("Start an existing task or create with description.");
+
     config.AddCommand<BogusCommand>("bogus")
         .WithDescription("Empty tasks table and fill with bogus data")
         .IsHidden();

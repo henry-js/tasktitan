@@ -126,6 +126,8 @@ partial class Build : NukeBuild
                 .SetOutput(PublishDirectory / Framework / Runtime)
                 .SetConfiguration(Configuration)
                 .SetPublishSingleFile(true)
+                .SetSelfContained(false)
+                .SetPublishReadyToRun(true)
             );
         });
 
