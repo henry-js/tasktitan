@@ -6,27 +6,42 @@ using TaskTitan.Core.Enums;
 
 namespace TaskTitan.Data.DapperSqliteTypeHandlers;
 
-internal class TaskItemAttributeHandler : SqliteTypeHandler<TaskItemAttribute>
+internal class TaskItemAttributeHandler : SqlMapper.TypeHandler<TaskItemAttribute>
 {
     public override TaskItemAttribute Parse(object value)
     {
         return Enum.TryParse<TaskItemAttribute>(value.ToString(), out var result) ? result : TaskItemAttribute.Empty;
     }
 
-    public void SetValue(IDbDataParameter parameter, object value)
+    public override void SetValue(IDbDataParameter parameter, TaskItemAttribute value)
     {
-
+        parameter.Value = value.ToString();
     }
 }
 
-internal class DateTimeHandler : SqliteTypeHandler<DateTime>
+internal class DateTimeHandler : SqlMapper.TypeHandler<DateTime>
 {
+    public override DateTime Parse(object value)
+    {
+        var parsedVal = DateTime.Parse((string)value);
+        return DateTime.SpecifyKind(parsedVal, DateTimeKind.Utc);
+    }
+
     public override void SetValue(IDbDataParameter parameter, DateTime value)
     {
         parameter.Value = DateTime.SpecifyKind(value, DateTimeKind.Utc);
     }
-    public override DateTime Parse(object value)
+}
+
+internal class TaskItemStateHandler : SqlMapper.TypeHandler<TaskItemState>
+{
+    public override TaskItemState Parse(object value)
     {
-        return DateTime.SpecifyKind((DateTime)value, DateTimeKind.Utc);
+        return Enum.Parse<TaskItemState>(value.ToString() ?? "");
+    }
+
+    public override void SetValue(IDbDataParameter parameter, TaskItemState value)
+    {
+        parameter.Value = Enum.GetName(typeof(TaskItemState), value);
     }
 }

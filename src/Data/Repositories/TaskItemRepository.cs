@@ -28,21 +28,40 @@ public class TaskItemRepository : ITaskItemRepository
         _log = log;
         SqlMapper.AddTypeHandler(new TaskItemIdHandler());
         SqlMapper.AddTypeHandler(typeof(TaskItemAttribute), new TaskItemAttributeHandler());
+        SqlMapper.AddTypeHandler(typeof(DateTime), new DateTimeHandler());
+        SqlMapper.AddTypeHandler(typeof(TaskItemState), new TaskItemStateHandler());
     }
 
     public async Task<int> AddAsync(TaskItem task)
     {
         var compiler = new SqliteCompiler();
         var db = new QueryFactory(_connection, compiler);
-        return await db.Query("tasks").InsertAsync(task);
+        return await db.Query("tasks").InsertAsync(new
+        {
+            task.Id,
+            task.Description,
+            task.Project,
+            task.Status,
+            task.Entry,
+            task.Modified,
+            task.Due,
+            task.Until,
+            task.Wait,
+            task.Start,
+            task.End,
+            task.Scheduled
+        });
     }
 
     public async Task<int> DeleteAsync(TaskItem task)
     {
         var compiler = new SqliteCompiler();
         var db = new QueryFactory(_connection, compiler);
-        return await db.Query("tasks").Where("id", task.Id).DeleteAsync();
-        // return await _dbContext.Tasks.Where(t => t.Id == task.Id).ExecuteDeleteAsync();
+        var query = db.Query("tasks").Where("id", task.Id);
+
+        _log.LogDebug("Generated sql: {sql}", compiler.Compile(query).ToString());
+
+        return await query.DeleteAsync();
     }
 
     public async Task<int> DeleteByFilter(IEnumerable<Expression> filterExpressions)
@@ -58,8 +77,8 @@ public class TaskItemRepository : ITaskItemRepository
                 AttributeFilterExpression attrExp => query.AddAttributeFilterExpression(attrExp),
             };
         }
-        var result = compiler.Compile(query);
-        Console.WriteLine(result.RawSql);
+        _log.LogDebug("Generated sql: {sql}", compiler.Compile(query).ToString());
+
         return await query.DeleteAsync();
     }
 
@@ -85,27 +104,8 @@ SELECT * FROM {TasksTable.TasksWithRowId}
                 AttributeFilterExpression attrExp => query.AddAttributeFilterExpression(attrExp),
             };
         }
+        _log.LogDebug("Generated sql: {sql}", compiler.Compile(query).ToString());
         return query.GetAsync<TaskItem>();
-    }
-
-    private Query BuildFromExpressions(IEnumerable<Expression> expressions)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task<IEnumerable<TaskItem>> GetByQueryFilter(string queryFilters)
-    {
-        string whereFilter = !string.IsNullOrWhiteSpace(queryFilters) ? $"WHERE\n\t{string.Join('\n', queryFilters)}" : "";
-        var query = $"""
-    SELECT * FROM {TasksTable.TasksWithRowId}
-    {whereFilter}
-    """;
-
-        _log.LogInformation("SQL:\n{sql}", query);
-
-        var tasks = await _connection.QueryAsync<TaskItem>(query);
-        _log.LogInformation("Fetched {0} tasks", tasks.Count());
-        return tasks;
     }
 
     public async Task<int> UpdateByFilter(IEnumerable<Expression> expressions, IEnumerable<KeyValuePair<string, object>> keyValues)
@@ -122,6 +122,8 @@ SELECT * FROM {TasksTable.TasksWithRowId}
             };
         }
 
+        _log.LogDebug("Generated sql: {sql}", compiler.Compile(query).ToString());
+
         return await query.UpdateAsync(keyValues);
     }
 }
@@ -134,7 +136,8 @@ public static class SqlKataQueryExtensions
         {
             query.OrWhereBetween("RowId", range.From, range.To);
         }
-        query.OrWhereIn("RowId", expression.Ids);
+        if (expression.Ids.Count > 0)
+            query.OrWhereIn("RowId", expression.Ids);
         return query;
     }
     internal static Query AddAttributeFilterExpression(this Query query, AttributeFilterExpression expression)

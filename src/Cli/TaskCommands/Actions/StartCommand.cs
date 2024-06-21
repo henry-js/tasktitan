@@ -1,31 +1,57 @@
+using System.CommandLine;
+using System.CommandLine.Invocation;
 using System.Threading.Tasks;
 
 using Humanizer;
 
-using TaskTitan.Core.Queries;
-using TaskTitan.Lib.Expressions;
-
 namespace TaskTitan.Cli.TaskCommands.Actions;
 
-internal sealed class StartCommand(IAnsiConsole console, ITaskItemService service, ILogger<AddCommand> logger) : AsyncCommand<StartCommandSettings>
+internal sealed class StartCommand : Command
 {
-    public override async Task<int> ExecuteAsync(CommandContext context, StartCommandSettings settings)
+    public StartCommand() : base("start", "Start an existing task")
     {
-        IEnumerable<Expression> filters = [];
-        var tasksToStart = await service.GetTasks(settings.filterText ?? []);
-        var tasktext = "task".ToQuantity(tasksToStart.Count());
-        logger.LogInformation("Found {foundTasks} task(s)", tasksToStart.Count());
-        foreach (var task in tasksToStart)
+        AddOptions(this);
+    }
+
+    public static void AddOptions(Command command)
+    {
+        var filterOption = new Option<string[]>(
+            aliases: ["-f", "--filter"]
+        )
         {
-            task.Begin();
-            // await service.Update(task);
+            AllowMultipleArgumentsPerToken = true,
+            Arity = ArgumentArity.ZeroOrMore
+        };
+        command.AddOption(filterOption);
+    }
+
+    new public class Handler(IAnsiConsole console, ITaskItemService service, ILogger<AddCommand> logger)
+    : ICommandHandler
+    {
+        public string[]? Filter { get; set; }
+        public int Invoke(InvocationContext context)
+        {
+            return InvokeAsync(context).Result;
         }
 
-        logger.LogInformation("Started {foundTasks} task(s)", tasksToStart.Count());
+        public async Task<int> InvokeAsync(InvocationContext context)
+        {
+            IEnumerable<Expression> filters = [];
+            var tasksToStart = await service.GetTasks(Filter ?? []);
+            var tasktext = "task".ToQuantity(tasksToStart.Count());
+            logger.LogInformation("Found {foundTasks} task(s)", tasksToStart.Count());
+            foreach (var task in tasksToStart)
+            {
+                task.Begin();
+                // await service.Update(task);
+            }
 
-        var text = $"Updated " + tasktext;
+            logger.LogInformation("Started {foundTasks} task(s)", tasksToStart.Count());
 
-        console.WriteLine(text);
-        return 0;
+            var text = $"Updated " + tasktext;
+
+            console.WriteLine(text);
+            return 0;
+        }
     }
 }

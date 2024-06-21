@@ -1,4 +1,5 @@
-using System.Diagnostics;
+using System.CommandLine;
+using System.CommandLine.Invocation;
 using System.Threading.Tasks;
 
 using TaskTitan.Core.Enums;
@@ -7,45 +8,86 @@ using TaskTitan.Lib.Dtos;
 namespace TaskTitan.Cli.TaskCommands;
 
 // TODO: Should use a filter to LIST commands first then perform modification
-internal sealed class ModifyCommand(IAnsiConsole console, IStringFilterConverter<DateTime> dateConverter, ITaskItemService service, ILogger<ModifyCommand> logger)
-: AsyncCommand<ModifySettings>
+internal sealed class ModifyCommand : Command
 {
-    public override async Task<int> ExecuteAsync(CommandContext context, ModifySettings settings)
+    public ModifyCommand() : base("modify", "Modify an existing task")
     {
-        Dictionary<TaskItemAttribute, string> modifiers = [];
 
-
-        TaskItemModifyRequest request = new()
+    }
+    public static void AddOptions(Command command)
+    {
+        var filterOption = new Option<string[]?>(
+            aliases: ["-f", "--filter"]
+        )
         {
-            Filters = settings.filterText ?? [],
+            AllowMultipleArgumentsPerToken = true,
+            Arity = ArgumentArity.ZeroOrMore
         };
-        if (settings.Description is not null)
-            request.Attributes.Add(TaskItemAttribute.Description, string.Join(" ", settings.Description));
-        if (settings.due is not null)
-            request.Attributes.Add(TaskItemAttribute.Due, settings.due);
-        if (settings.scheduled is not null)
-            request.Attributes.Add(TaskItemAttribute.Scheduled, settings.scheduled);
-        if (settings.until is not null)
-            request.Attributes.Add(TaskItemAttribute.Until, settings.until);
-        if (settings.wait is not null)
-            request.Attributes.Add(TaskItemAttribute.Wait, settings.wait);
+        command.AddOption(filterOption);
 
-        await service.Update(request);
-        return 0;
+        var descriptionOption = new Option<string?>(aliases: ["-d", "--desc"], ar => string.Join(' ', ar.Tokens))
+        {
+            Arity = ArgumentArity.OneOrMore
+        };
+        command.AddOption(descriptionOption);
+
+        var dueOption = new Option<string?>(
+            aliases: ["-d", "--due"]
+            );
+        command.AddOption(dueOption);
+
+        var scheduledOption = new Option<string?>(
+            aliases: ["-s", "--sched", "--scheduled"]
+            );
+        command.AddOption(scheduledOption);
+
+        var waitOption = new Option<string?>(
+            aliases: ["-w", "--wait"]
+            );
+        command.AddOption(waitOption);
+
+        var untilOption = new Option<string?>(
+            aliases: ["-u", "--until"]
+            );
+        command.AddOption(untilOption);
+
     }
 
-    private TaskItemModifyDto SettingsToDto(ModifySettings settings)
+    new public class Handler(IAnsiConsole console, IStringFilterConverter<DateTime> dateConverter, ITaskItemService service, ILogger<ModifyCommand> logger)
+    : ICommandHandler
     {
-        TaskItemModifyDto dto = new()
+        public string[]? Filter { get; set; }
+        public string[] Description { get; set; } = [];
+        public string? Due { get; set; }
+        public string? Scheduled { get; set; }
+        public string? Wait { get; internal set; }
+        public string? Until { get; internal set; }
+        public int Invoke(InvocationContext context)
         {
-            Description = string.Join(' ', settings.Description),
-            DueText = settings.due,
-            ScheduledText = settings.scheduled,
-            WaitText = settings.wait,
-            UntilText = settings.until,
-        };
+            return InvokeAsync(context).Result;
+        }
 
-        return dto;
+        public async Task<int> InvokeAsync(InvocationContext context)
+        {
+            Dictionary<TaskItemAttribute, string> modifiers = [];
 
+            TaskItemModifyRequest request = new()
+            {
+                Filters = Filter ?? [],
+            };
+            if (Description is not null)
+                request.Attributes.Add(TaskItemAttribute.Description, string.Join(" ", Description));
+            if (Due is not null)
+                request.Attributes.Add(TaskItemAttribute.Due, Due);
+            if (Scheduled is not null)
+                request.Attributes.Add(TaskItemAttribute.Scheduled, Scheduled);
+            if (Until is not null)
+                request.Attributes.Add(TaskItemAttribute.Until, Until);
+            if (Wait is not null)
+                request.Attributes.Add(TaskItemAttribute.Wait, Wait);
+
+            await service.Update(request);
+            return 0;
+        }
     }
 }

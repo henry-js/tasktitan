@@ -1,57 +1,82 @@
+using System.CommandLine;
+using System.CommandLine.Invocation;
 using System.Threading.Tasks;
-
-using TaskTitan.Core.Enums;
 
 namespace TaskTitan.Cli.TaskCommands.Actions;
 
-internal sealed class AddCommand(IAnsiConsole console, ITaskItemService service, ILogger<AddCommand> logger) : AsyncCommand<AddSettings>
+internal sealed class AddCommand : Command
 {
-    private readonly IAnsiConsole console = console;
-    private readonly ITaskItemService service = service;
-    private readonly ILogger logger = logger;
 
-    public override async Task<int> ExecuteAsync(CommandContext context, AddSettings settings)
+    public AddCommand() : base("add", "Add a task to the list")
     {
-        TaskItemCreateRequest request = new()
-        {
-            NewTask = new()
-            {
-                Description = string.Join(' ', settings.Description),
-                Due = settings.due,
-                Scheduled = settings.scheduled,
-                Wait = settings.wait,
-                Until = settings.until,
-            }
-        };
-        var rowid = await service.Add(request);
-
-        console.WriteLine($"Created task {rowid}.");
-        return 0;
+        AddOptions(this);
     }
 
-    internal sealed class Settings : CommandSettings
+    public static void AddOptions(Command command)
     {
-        [CommandArgument(0, "<description>")]
-        public string Description { get; set; } = string.Empty;
-
-        [CommandArgument(1, "[due]")]
-        public string? Due { get; set; }
-
-
-        [CommandArgument(2, "[scheduled]")]
-        public string Scheduled { get; set; } = string.Empty;
-
-        public override ValidationResult Validate()
+        var descriptionArgument = new Argument<string>("description"
+        , parse: ar => string.Join(' ', ar.Tokens)
+        )
         {
-            if (string.IsNullOrWhiteSpace(Description))
-                return ValidationResult.Error("Description cannot be empty.");
+            Arity = ArgumentArity.OneOrMore,
+        };
+        command.AddArgument(descriptionArgument);
+        var dueOption = new Option<string?>(
+            aliases: ["-d", "--due"],
+            description: "When task is due"
+        );
+        command.AddOption(dueOption);
 
-            if (!string.IsNullOrWhiteSpace(Scheduled) && Scheduled.StartsWith("scheduled:", StringComparison.Ordinal))
+        var scheduledOption = new Option<string?>(
+            aliases: ["-s", "--scheduled"],
+            description: "When to schedule"
+
+        );
+        command.AddOption(scheduledOption);
+
+        var waitOption = new Option<string?>(
+            aliases: ["-w", "--wait"],
+            description: "how long until task is shown"
+        );
+        command.AddOption(waitOption);
+
+        var untilOption = new Option<string?>(
+            aliases: ["-u", "--until"],
+            description: "When to hide task"
+        );
+        command.AddOption(untilOption);
+    }
+
+    new public class Handler(IAnsiConsole console, ITaskItemService service, ILogger<AddCommand> logger) : ICommandHandler
+    {
+        public required string Description { get; set; }
+        public string? Due { get; set; }
+        public string? Scheduled { get; set; }
+        public string? Wait { get; set; }
+        public string? Until { get; set; }
+
+        public int Invoke(InvocationContext context)
+        {
+            return InvokeAsync(context).Result;
+        }
+
+        public async Task<int> InvokeAsync(InvocationContext context)
+        {
+            TaskItemCreateRequest request = new()
             {
-                return ValidationResult.Error("Incorrect syntax for scheduled.");
-            }
+                NewTask = new()
+                {
+                    Description = Description,
+                    Due = Due,
+                    Scheduled = Scheduled,
+                    Wait = Wait,
+                    Until = Until,
+                }
+            };
+            var rowid = await service.Add(request);
 
-            return base.Validate();
+            console.WriteLine($"Created task {rowid}.");
+            return 0;
         }
     }
 }

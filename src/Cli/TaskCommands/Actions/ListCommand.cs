@@ -1,37 +1,51 @@
-using System.Threading.Tasks;
+using System.CommandLine;
+using System.CommandLine.Invocation;
 
 using TaskTitan.Lib.Dtos;
 
-// using static TaskTitan.Cli.TaskCommands.TaskItemConsole;
-
 namespace TaskTitan.Cli.TaskCommands;
 
-internal sealed class ListCommand(IAnsiConsole console, ITaskItemService service, ILogger<ListCommand> logger) : AsyncCommand<ListSettings>
+internal sealed class ListCommand : Command
 {
-    private readonly IAnsiConsole console = console;
-    private readonly ITaskItemService service = service;
-    private readonly ILogger<ListCommand> logger = logger;
-
-    public override async Task<int> ExecuteAsync(CommandContext context, ListSettings settings)
+    public ListCommand() : base("list", "List tasks in default collection")
     {
-        logger.LogInformation("Received filter: {filters}", string.Join(", ", settings.filterText ?? []));
-        var tasks = settings.filterText is null ? await service.GetTasks([]) : await service.GetTasks(settings.filterText);
-
-        if (tasks.Count() == 1)
-        {
-            console.DisplayTaskDetails(tasks.First());
-        }
-        else
-        {
-            console.ListTasks(tasks.Select(TaskItemDto.FromTaskItem));
-        }
-
-        return 0;
+        AddOptions(this);
     }
-}
 
-internal class ListSettings : CommandSettings
-{
-    [CommandOption("-f|--filter")]
-    public string[]? filterText { get; set; }
+    public static void AddOptions(Command command)
+    {
+        var filterOption = new Option<string[]?>(
+            aliases: ["-f", "--filter"],
+            description: "Filter the query"
+        );
+
+        command.AddOption(filterOption);
+    }
+
+    new public class Handler(IAnsiConsole console, ITaskItemService service, ILogger<ListCommand> logger) : ICommandHandler
+    {
+        public string[]? Filter { get; set; }
+
+        public int Invoke(InvocationContext context)
+        {
+            return InvokeAsync(context).Result;
+        }
+
+        public async Task<int> InvokeAsync(InvocationContext context)
+        {
+            logger.LogInformation("Received filter: {filters}", string.Join(", ", Filter ?? []));
+            var tasks = Filter is null ? await service.GetTasks([]) : await service.GetTasks(Filter);
+
+            if (tasks.Count() == 1)
+            {
+                console.DisplayTaskDetails(tasks.First());
+            }
+            else
+            {
+                console.ListTasks(tasks.Select(TaskItemDto.FromTaskItem));
+            }
+
+            return 0;
+        }
+    }
 }
