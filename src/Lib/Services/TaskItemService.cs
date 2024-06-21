@@ -69,7 +69,6 @@ public class TaskItemService(ITaskItemRepository repository, IExpressionParser p
 
         var filterExpressions = deleteRequest.Filters.Count() > 0 ? deleteRequest.Filters.Select(_parser.ParseFilter) : [];
         return await _repository.DeleteByFilter(filterExpressions);
-        return 0;
     }
 
     public async Task<IEnumerable<TaskItem>> GetTasks(IEnumerable<string> filters)

@@ -1,7 +1,5 @@
 using Humanizer;
 
-using Spectre.Console.Extensions;
-
 using TaskTitan.Lib.Dtos;
 
 namespace TaskTitan.Cli.TaskCommands;

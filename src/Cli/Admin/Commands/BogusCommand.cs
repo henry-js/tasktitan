@@ -1,41 +1,56 @@
-// using System.ComponentModel;
-// using System.Threading.Tasks;
+using System.CommandLine;
+using System.CommandLine.Invocation;
 
-// using Bogus;
+using Bogus;
 
-// using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
-// namespace TaskTitan.Cli.AdminCommands;
+namespace TaskTitan.Cli.AdminCommands;
 
-// public class BogusCommand(TaskTitanDbContext dbcontext) : AsyncCommand<BogusCommand.Settings>
-// {
-//     public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
-//     {
-//         var deleteTask = dbcontext.Database.ExecuteSqlRawAsync("DELETE FROM tasks");
+public class BogusCommand : Command
+{
+    public BogusCommand() : base("bogus", "Add dummy tasks")
+    {
+        AddOptions(this);
+    }
 
-//         var tasks = Generate(settings.Quantity);
-//         await deleteTask;
-//         await dbcontext.Tasks.AddRangeAsync(tasks);
-//         await dbcontext.SaveChangesAsync();
-//         return 0;
-//     }
+    private void AddOptions(Command command)
+    {
+        var quantityOption = new Option<int>(
+            aliases: ["-q", "--quantity"]
+        );
+        command.AddOption(quantityOption);
+    }
 
-//     public class Settings : CommandSettings
-//     {
-//         [CommandOption("-q|--quantity")]
-//         [DefaultValue(10)]
-//         public int Quantity { get; set; }
-//     }
+    new public class Handler(TaskTitanDbContext dbcontext)
+    : ICommandHandler
+    {
+        public int Quantity { get; set; }
+        public int Invoke(InvocationContext context)
+        {
+            throw new NotImplementedException();
+        }
 
-//     public static IEnumerable<TaskItem> Generate(int quantity)
-//     {
-//         Randomizer.Seed = new Random(123456);
-//         var faker = new Faker<TaskItem>()
-//         .CustomInstantiator(f => TaskItem.CreateNew(f.Hacker.Verb() + " " + f.Hacker.Noun()))
-//         .RuleFor(t => t.Entry, f => f.Date.Recent(30))
-//         .RuleFor(t => t.Due, (f, t) => f.Date.Future(1));
+        public async Task<int> InvokeAsync(InvocationContext context)
+        {
+            var deleteTask = dbcontext.Database.ExecuteSqlRawAsync("DELETE FROM tasks");
 
-//         return faker.Generate(quantity);
-//     }
+            var tasks = Generate(Quantity);
+            await deleteTask;
+            await dbcontext.Tasks.AddRangeAsync(tasks);
+            await dbcontext.SaveChangesAsync();
+            return 0;
+        }
+    }
 
-// }
+    public static IEnumerable<TaskItem> Generate(int quantity)
+    {
+        Randomizer.Seed = new Random(123456);
+        var faker = new Faker<TaskItem>()
+        .CustomInstantiator(f => TaskItem.CreateNew(f.Hacker.Verb() + " " + f.Hacker.Noun()))
+        .RuleFor(t => t.Entry, f => f.Date.Recent(30))
+        .RuleFor(t => t.Due, (f, t) => f.Date.Future(1));
+
+        return faker.Generate(quantity);
+    }
+}

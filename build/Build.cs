@@ -128,6 +128,7 @@ partial class Build : NukeBuild
                 .SetPublishSingleFile(true)
                 .SetSelfContained(false)
                 .SetPublishReadyToRun(true)
+                .SetPublishTrimmed(true)
             );
         });
 

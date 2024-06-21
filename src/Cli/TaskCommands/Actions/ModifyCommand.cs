@@ -1,9 +1,7 @@
 using System.CommandLine;
 using System.CommandLine.Invocation;
-using System.Threading.Tasks;
 
 using TaskTitan.Core.Enums;
-using TaskTitan.Lib.Dtos;
 
 namespace TaskTitan.Cli.TaskCommands;
 
@@ -12,7 +10,7 @@ internal sealed class ModifyCommand : Command
 {
     public ModifyCommand() : base("modify", "Modify an existing task")
     {
-
+        AddOptions(this);
     }
     public static void AddOptions(Command command)
     {
@@ -50,7 +48,6 @@ internal sealed class ModifyCommand : Command
             aliases: ["-u", "--until"]
             );
         command.AddOption(untilOption);
-
     }
 
     new public class Handler(IAnsiConsole console, IStringFilterConverter<DateTime> dateConverter, ITaskItemService service, ILogger<ModifyCommand> logger)
