@@ -13,7 +13,6 @@ namespace Data.Migrations
             migrationBuilder.Sql(DbConstants.TasksTable.CreateViewTasksWithRowId);
             migrationBuilder.Sql(DbConstants.TasksTable.CreateTaskModifiedTrigger);
             migrationBuilder.Sql(DbConstants.TasksTable.CreateTaskCreatedTrigger);
-
         }
 
         /// <inheritdoc />
@@ -22,7 +21,6 @@ namespace Data.Migrations
             migrationBuilder.Sql(DbConstants.TasksTable.DropViewTasksWithRowId);
             migrationBuilder.Sql(DbConstants.TasksTable.DropTaskModifiedTrigger);
             migrationBuilder.Sql(DbConstants.TasksTable.DropTaskCreatedTrigger);
-
         }
     }
 }

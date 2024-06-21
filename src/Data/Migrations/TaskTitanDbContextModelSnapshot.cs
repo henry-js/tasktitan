@@ -49,7 +49,6 @@ namespace Data.Migrations
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Project")
-                        .IsRequired()
                         .HasColumnType("TEXT")
                         .HasColumnName("project");
 

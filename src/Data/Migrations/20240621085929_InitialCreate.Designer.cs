@@ -11,8 +11,8 @@ using TaskTitan.Data;
 namespace Data.Migrations
 {
     [DbContext(typeof(TaskTitanDbContext))]
-    [Migration("20240613143020_TaskTriggersAndViews")]
-    partial class TaskTriggersAndViews
+    [Migration("20240621085929_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -52,7 +52,6 @@ namespace Data.Migrations
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Project")
-                        .IsRequired()
                         .HasColumnType("TEXT")
                         .HasColumnName("project");
 
