@@ -42,14 +42,14 @@ public class TaskItemRepositoryTests : IClassFixture<TestDatabaseFixture>, IDisp
     //     result.IsSuccess.Should().BeTrue();
     // }
 
-
     [Fact]
     public async Task AddShouldAddTaskAndReturnCount()
     {
         // Arrange
         using var dbContext = _fixture.CreateContext();
         using var dbConnection = new SqliteConnection(_fixture.ConnectionString);
-        ITaskItemRepository sut = new TaskItemRepository(dbConnection, _nullLogger);
+        using var db = new QueryFactory(dbConnection, new SqliteCompiler());
+        ITaskItemRepository sut = new TaskItemRepository(db, _nullLogger);
 
         var task = TaskItem.CreateNew("Test Task");
 
@@ -66,7 +66,9 @@ public class TaskItemRepositoryTests : IClassFixture<TestDatabaseFixture>, IDisp
         // Arrange
         using var dbContext = _fixture.CreateContext();
         using var dbConnection = new SqliteConnection(_fixture.ConnectionString);
-        ITaskItemRepository sut = new TaskItemRepository(dbConnection, _nullLogger);
+        var db = new QueryFactory(dbConnection, new SqliteCompiler());
+
+        ITaskItemRepository sut = new TaskItemRepository(db, _nullLogger);
 
         var tasks = FakeTaskItem.Generate(10);
         dbContext.Tasks.AddRange(tasks);
@@ -87,7 +89,8 @@ public class TaskItemRepositoryTests : IClassFixture<TestDatabaseFixture>, IDisp
         // Given
         using var dbContext = _fixture.CreateContext();
         using var dbConnection = new SqliteConnection(_fixture.ConnectionString);
-        ITaskItemRepository sut = new TaskItemRepository(dbConnection, _nullLogger);
+        var db = new QueryFactory(dbConnection, new SqliteCompiler());
+        ITaskItemRepository sut = new TaskItemRepository(db, _nullLogger);
         var newTask = TaskItem.CreateNew("Test Delete Task");
         var id = newTask.Id;
         dbContext.Tasks.Add(newTask);
@@ -109,7 +112,8 @@ public class TaskItemRepositoryTests : IClassFixture<TestDatabaseFixture>, IDisp
         // Given
         using var dbContext = _fixture.CreateContext();
         using var dbConnection = new SqliteConnection(_fixture.ConnectionString);
-        ITaskItemRepository sut = new TaskItemRepository(dbConnection, _nullLogger);
+        var db = new QueryFactory(dbConnection, new SqliteCompiler());
+        ITaskItemRepository sut = new TaskItemRepository(db, _nullLogger);
         var newTask = TaskItem.CreateNew("Task to update 2");
         string queryFilter = $"Id = '{newTask.Id}'";
         dbContext.Tasks.Add(newTask);

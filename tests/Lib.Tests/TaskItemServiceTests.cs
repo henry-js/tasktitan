@@ -19,6 +19,7 @@ public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>, IDisposa
     private readonly NullLogger<TaskItemRepository> _repoLogger;
     private readonly IExpressionParser _parser;
     private readonly DateTimeConverter _stringConverter;
+    private readonly QueryFactory _db;
 
     public TaskItemServiceTests(TestDatabaseFixture fixture)
     {
@@ -27,6 +28,7 @@ public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>, IDisposa
         _repoLogger = new();
         _parser = new ExpressionParser();
         _stringConverter = new DateTimeConverter(TimeProvider.System);
+        _db = new QueryFactory(new SqliteConnection(_fixture.ConnectionString), new SqliteCompiler());
     }
 
     [Fact]
@@ -34,8 +36,7 @@ public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>, IDisposa
     {
         // Arrange
         using var dbContext = _fixture.CreateContext();
-        using var dbConnection = new SqliteConnection(_fixture.ConnectionString);
-        ITaskItemRepository repository = new TaskItemRepository(dbConnection, _repoLogger);
+        ITaskItemRepository repository = new TaskItemRepository(_db, _repoLogger);
         var request = new TaskItemCreateRequest() { NewTask = new() { Description = "Test Task" } };
         var sut = new TaskItemService(repository, _parser, _stringConverter, _serviceLogger);
 
@@ -51,8 +52,7 @@ public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>, IDisposa
     {
         // Given
         using var dbContext = _fixture.CreateContext();
-        using var dbConnection = new SqliteConnection(_fixture.ConnectionString);
-        ITaskItemRepository repository = new TaskItemRepository(dbConnection, _repoLogger);
+        ITaskItemRepository repository = new TaskItemRepository(_db, _repoLogger);
         ITaskItemService sut = new TaskItemService(repository, _parser, _stringConverter, _serviceLogger);
         var newTask = TaskItem.CreateNew("Test Delete Task");
         var id = newTask.Id;
@@ -74,8 +74,7 @@ public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>, IDisposa
     {
         // Arrange
         using var dbContext = _fixture.CreateContext();
-        using var dbConnection = new SqliteConnection(_fixture.ConnectionString);
-        ITaskItemRepository repository = new TaskItemRepository(dbConnection, _repoLogger);
+        ITaskItemRepository repository = new TaskItemRepository(_db, _repoLogger);
         dbContext.Tasks.AddRange(FakeTaskItem.Generate(2));
         dbContext.SaveChanges();
         ITaskItemService sut = new TaskItemService(repository, _parser, _stringConverter, _serviceLogger);
@@ -93,8 +92,7 @@ public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>, IDisposa
     {
         // Given
         using var dbContext = _fixture.CreateContext();
-        using var dbConnection = new SqliteConnection(_fixture.ConnectionString);
-        ITaskItemRepository repository = new TaskItemRepository(dbConnection, _repoLogger);
+        ITaskItemRepository repository = new TaskItemRepository(_db, _repoLogger);
         var newTask = TaskItem.CreateNew("Task to update");
         var id = newTask.Id;
         dbContext.Tasks.Add(newTask);
@@ -113,8 +111,7 @@ public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>, IDisposa
 
     public void Dispose()
     {
-        var compiler = new SqliteCompiler();
-        var db = new QueryFactory(new SqliteConnection(_fixture.ConnectionString), compiler);
-        db.Query("tasks").Delete();
+        _db.Query("tasks").Delete();
+        _db.Dispose();
     }
 }
