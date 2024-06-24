@@ -53,6 +53,7 @@ internal sealed class ModifyCommand : Command
     new public class Handler(IAnsiConsole console, IStringFilterConverter<DateTime> dateConverter, ITaskItemService service, ILogger<ModifyCommand> logger)
     : ICommandHandler
     {
+        private readonly ILogger<ModifyCommand> _logger = logger;
         public string[]? Filter { get; set; }
         public string[] Description { get; set; } = [];
         public string? Due { get; set; }
@@ -66,6 +67,8 @@ internal sealed class ModifyCommand : Command
 
         public async Task<int> InvokeAsync(InvocationContext context)
         {
+            logger.LogInformation("Handling {Request}", nameof(TaskItemModifyRequest));
+
             Dictionary<TaskItemAttribute, string> modifiers = [];
 
             TaskItemModifyRequest request = new()

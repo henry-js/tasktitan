@@ -1,8 +1,9 @@
 using System.CommandLine;
 using System.CommandLine.Invocation;
-using System.Threading.Tasks;
 
 using Humanizer;
+
+using TaskTitan.Core.Enums;
 
 namespace TaskTitan.Cli.TaskCommands.Actions;
 
@@ -36,9 +37,15 @@ internal sealed class StartCommand : Command
 
         public async Task<int> InvokeAsync(InvocationContext context)
         {
-            IEnumerable<Expression> filters = [];
+            var request = new TaskItemModifyRequest()
+            {
+                Filters = Filter ?? []
+            };
+            request.Attributes.Add(TaskItemAttribute.Start, DateTime.Now);
+            logger.LogInformation("Handling {Request}", nameof(TaskItemModifyRequest));
+
+            await service.Update(request);
             var tasksToStart = await service.GetTasks(Filter ?? []);
-            var tasktext = "task".ToQuantity(tasksToStart.Count());
             logger.LogInformation("Found {foundTasks} task(s)", tasksToStart.Count());
             foreach (var task in tasksToStart)
             {
@@ -48,6 +55,7 @@ internal sealed class StartCommand : Command
 
             logger.LogInformation("Started {foundTasks} task(s)", tasksToStart.Count());
 
+            var tasktext = "task".ToQuantity(tasksToStart.Count());
             var text = $"Updated " + tasktext;
 
             console.WriteLine(text);

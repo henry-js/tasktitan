@@ -62,6 +62,7 @@ internal sealed class AddCommand : Command
 
         public async Task<int> InvokeAsync(InvocationContext context)
         {
+            logger.LogInformation("Handling {Request}", nameof(TaskItemCreateRequest));
             TaskItemCreateRequest request = new()
             {
                 NewTask = new()

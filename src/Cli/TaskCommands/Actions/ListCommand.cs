@@ -33,6 +33,7 @@ internal sealed class ListCommand : Command
 
         public async Task<int> InvokeAsync(InvocationContext context)
         {
+            logger.LogInformation("Handling {Request}", nameof(TaskItemCreateRequest));
             logger.LogInformation("Received filter: {filters}", string.Join(", ", Filter ?? []));
             var tasks = Filter is null ? await service.GetTasks([]) : await service.GetTasks(Filter);
 
