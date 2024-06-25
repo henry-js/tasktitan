@@ -39,7 +39,10 @@ public class TaskTitanDbContext : DbContext
             .HasQueryFilter(t => t.Status == TaskItemState.Pending);
         modelBuilder.Entity<TaskItem>()
             .Property(t => t.Status)
-            .HasConversion<string>()
+            .HasConversion(
+                v => v.ToString(),
+                v => (TaskItemState)v
+            )
             .HasDefaultValue(TaskItemState.Pending);
         modelBuilder.Entity<TaskItem>()
             .Property(task => task.Entry)

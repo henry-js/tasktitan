@@ -37,11 +37,13 @@ internal class TaskItemStateHandler : SqlMapper.TypeHandler<TaskItemState>
 {
     public override TaskItemState Parse(object value)
     {
-        return Enum.Parse<TaskItemState>(value.ToString() ?? "");
+        string val = value.ToString()!;
+        ArgumentException.ThrowIfNullOrWhiteSpace(val);
+        return (TaskItemState)val!;
     }
 
     public override void SetValue(IDbDataParameter parameter, TaskItemState value)
     {
-        parameter.Value = Enum.GetName(typeof(TaskItemState), value);
+        parameter.Value = value.Value;
     }
 }

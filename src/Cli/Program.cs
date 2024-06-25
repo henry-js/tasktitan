@@ -34,6 +34,7 @@ var rootCommand = new RootCommand("task");
 rootCommand.AddCommand(new ListCommand());
 rootCommand.AddCommand(new AddCommand());
 rootCommand.AddCommand(new StartCommand());
+rootCommand.AddCommand(new ModifyCommand());
 rootCommand.AddCommand(new BogusCommand());
 
 var cmdLineBuilder = new CommandLineBuilder(rootCommand);

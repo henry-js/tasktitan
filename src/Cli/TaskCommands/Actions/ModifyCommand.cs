@@ -1,6 +1,8 @@
 using System.CommandLine;
 using System.CommandLine.Invocation;
 
+using Humanizer;
+
 using TaskTitan.Core.Enums;
 
 namespace TaskTitan.Cli.TaskCommands;
@@ -23,7 +25,7 @@ internal sealed class ModifyCommand : Command
         };
         command.AddOption(filterOption);
 
-        var descriptionOption = new Option<string?>(aliases: ["-d", "--desc"], ar => string.Join(' ', ar.Tokens))
+        var descriptionOption = new Option<string?>(aliases: ["--desc"], ar => string.Join(' ', ar.Tokens))
         {
             Arity = ArgumentArity.OneOrMore
         };
@@ -50,16 +52,16 @@ internal sealed class ModifyCommand : Command
         command.AddOption(untilOption);
     }
 
-    new public class Handler(IAnsiConsole console, IStringFilterConverter<DateTime> dateConverter, ITaskItemService service, ILogger<ModifyCommand> logger)
+    new public class Handler(IAnsiConsole console, ITaskItemService service, ILogger<ModifyCommand> logger)
     : ICommandHandler
     {
         private readonly ILogger<ModifyCommand> _logger = logger;
         public string[]? Filter { get; set; }
-        public string[] Description { get; set; } = [];
+        public string[]? Description { get; set; }
         public string? Due { get; set; }
         public string? Scheduled { get; set; }
-        public string? Wait { get; internal set; }
-        public string? Until { get; internal set; }
+        public string? Wait { get; set; }
+        public string? Until { get; set; }
         public int Invoke(InvocationContext context)
         {
             return InvokeAsync(context).Result;
@@ -67,7 +69,7 @@ internal sealed class ModifyCommand : Command
 
         public async Task<int> InvokeAsync(InvocationContext context)
         {
-            logger.LogInformation("Handling {Request}", nameof(TaskItemModifyRequest));
+            _logger.LogInformation("Handling {Request}", nameof(TaskItemModifyRequest));
 
             Dictionary<TaskItemAttribute, string> modifiers = [];
 
@@ -86,7 +88,9 @@ internal sealed class ModifyCommand : Command
             if (Wait is not null)
                 request.Attributes.Add(TaskItemAttribute.Wait, Wait);
 
-            await service.Update(request);
+            int rowsUpdated = await service.Update(request);
+
+            console.WriteLine("tasks".ToQuantity(rowsUpdated) + " updated.");
             return 0;
         }
     }

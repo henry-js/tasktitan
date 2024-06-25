@@ -52,7 +52,7 @@ public class DueDateHelperTests
 
         // Assert
         date.Should().Be(exact, "a synoymn should correctly convert to a date");
-        date!.Value.Kind.Should().Be(DateTimeKind.Utc);
+        date!.Value.Kind.Should().Be(DateTimeKind.Local);
     }
 
     [Theory]
