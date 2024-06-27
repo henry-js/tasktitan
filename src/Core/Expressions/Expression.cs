@@ -2,7 +2,7 @@ namespace TaskTitan.Core;
 
 public abstract record Expression
 {
-    public abstract string ToQueryString(IExpressionConversionOptions? options = null);
+    // public abstract string ToQueryString(IExpressionConversionOptions? options = null);
 }
 
 public interface IExpressionConversionOptions

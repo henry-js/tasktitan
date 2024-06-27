@@ -69,7 +69,6 @@ public class TaskItemService(ITaskItemRepository repository, IExpressionParser p
 
         var filterExpressions = deleteRequest.Filters.Count() > 0 ? deleteRequest.Filters.Select(_parser.ParseFilter) : [];
         return await _repository.DeleteByFilter(filterExpressions);
-        return 0;
     }
 
     public async Task<IEnumerable<TaskItem>> GetTasks(IEnumerable<string> filters)
@@ -82,6 +81,15 @@ public class TaskItemService(ITaskItemRepository repository, IExpressionParser p
     {
         if (request is not TaskItemModifyRequest updateRequest) throw new Exception();
         var filterExpressions = updateRequest.Filters.Select(_parser.ParseFilter);
+        string[] dateAttrs = [TaskItemAttribute.Due, TaskItemAttribute.Scheduled, TaskItemAttribute.Wait, TaskItemAttribute.Until];
+        foreach (var attr in updateRequest.Attributes)
+        {
+            if (dateAttrs.Contains(attr.Key))
+            {
+                var convertedVal = stringConverter.ConvertFrom(attr.Value.ToString());
+                updateRequest.Attributes[attr.Key] = convertedVal is null ? "" : new DateTimeOffset(convertedVal.Value);
+            }
+        }
         return await _repository.UpdateByFilter(filterExpressions, updateRequest.Attributes);
     }
 }

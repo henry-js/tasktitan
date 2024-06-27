@@ -1,5 +1,5 @@
-using System.ComponentModel;
-using System.Threading.Tasks;
+using System.CommandLine;
+using System.CommandLine.Invocation;
 
 using Bogus;
 
@@ -7,24 +7,40 @@ using Microsoft.EntityFrameworkCore;
 
 namespace TaskTitan.Cli.AdminCommands;
 
-public class BogusCommand(TaskTitanDbContext dbcontext) : AsyncCommand<BogusCommand.Settings>
+public class BogusCommand : Command
 {
-    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    public BogusCommand() : base("bogus", "Add dummy tasks")
     {
-        var deleteTask = dbcontext.Database.ExecuteSqlRawAsync("DELETE FROM tasks");
-
-        var tasks = Generate(settings.Quantity);
-        await deleteTask;
-        await dbcontext.Tasks.AddRangeAsync(tasks);
-        await dbcontext.SaveChangesAsync();
-        return 0;
+        AddOptions(this);
     }
 
-    public class Settings : CommandSettings
+    private void AddOptions(Command command)
     {
-        [CommandOption("-q|--quantity")]
-        [DefaultValue(10)]
+        var quantityOption = new Option<int>(
+            aliases: ["-q", "--quantity"]
+        );
+        command.AddOption(quantityOption);
+    }
+
+    new public class Handler(TaskTitanDbContext dbcontext)
+    : ICommandHandler
+    {
         public int Quantity { get; set; }
+        public int Invoke(InvocationContext context)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<int> InvokeAsync(InvocationContext context)
+        {
+            var deleteTask = dbcontext.Database.ExecuteSqlRawAsync("DELETE FROM tasks");
+
+            var tasks = Generate(Quantity);
+            await deleteTask;
+            await dbcontext.Tasks.AddRangeAsync(tasks);
+            await dbcontext.SaveChangesAsync();
+            return 0;
+        }
     }
 
     public static IEnumerable<TaskItem> Generate(int quantity)
@@ -37,5 +53,4 @@ public class BogusCommand(TaskTitanDbContext dbcontext) : AsyncCommand<BogusComm
 
         return faker.Generate(quantity);
     }
-
 }

@@ -5,51 +5,61 @@ using Dapper;
 using static TaskTitan.Data.DbConstants;
 using TaskTitan.Data.DapperSqliteTypeHandlers;
 using Microsoft.Extensions.Logging;
-using Microsoft.Data.Sqlite;
 using TaskTitan.Core.Enums;
-using SqlKata.Compilers;
 using SqlKata.Execution;
 using TaskTitan.Core.Expressions;
-using SqlKata.Extensions;
 using SqlKata;
 
 namespace TaskTitan.Data.Repositories;
 
 public class TaskItemRepository : ITaskItemRepository
 {
-    // private readonly TaskTitanDbContext _dbContext;
-    private readonly IDbConnection _connection;
-    private readonly ILogger<TaskItemRepository> _log;
+    private readonly QueryFactory _db;
+    private readonly ILogger<TaskItemRepository> _logger;
 
-    public TaskItemRepository(IDbConnection dbConnection, ILogger<TaskItemRepository> log)
+    public TaskItemRepository(QueryFactory db, ILogger<TaskItemRepository> log)
     {
-        // _dbContext = dbContext;
-        _connection = dbConnection;
-        _log = log;
         SqlMapper.AddTypeHandler(new TaskItemIdHandler());
         SqlMapper.AddTypeHandler(typeof(TaskItemAttribute), new TaskItemAttributeHandler());
+        SqlMapper.AddTypeHandler(typeof(DateTime), new DateTimeHandler());
+        SqlMapper.AddTypeHandler(typeof(TaskItemState), new TaskItemStateHandler());
+
+        _db = db;
+        _logger = log;
+        _db.Logger = compiled => _logger.LogInformation("Compiled: {Sql}", compiled.ToString());
     }
 
     public async Task<int> AddAsync(TaskItem task)
     {
-        var compiler = new SqliteCompiler();
-        var db = new QueryFactory(_connection, compiler);
-        return await db.Query("tasks").InsertAsync(task);
+        string[] excludeCols = [nameof(task.Entry), nameof(task.RowId), nameof(task.Modified)];
+        Dictionary<string, object> dict = [];
+        foreach (var prop in task.GetType().GetProperties())
+        {
+            if (excludeCols.Contains(prop.Name)) continue;
+            var val = prop.GetValue(task);
+            if (val is null) continue;
+            dict.Add(prop.Name, val);
+        }
+
+        _ = await _db.Query("tasks").InsertAsync(dict);
+        return await CountPending();
+    }
+
+    private async Task<int> CountPending()
+    {
+        return await _db.Connection.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM tasks WHERE tasks.status = @Status", new { Status = TaskItemState.Pending });
     }
 
     public async Task<int> DeleteAsync(TaskItem task)
     {
-        var compiler = new SqliteCompiler();
-        var db = new QueryFactory(_connection, compiler);
-        return await db.Query("tasks").Where("id", task.Id).DeleteAsync();
-        // return await _dbContext.Tasks.Where(t => t.Id == task.Id).ExecuteDeleteAsync();
+        var query = _db.Query("tasks").Where(TaskItemAttribute.Id, task.Id);
+
+        return await query.DeleteAsync();
     }
 
     public async Task<int> DeleteByFilter(IEnumerable<Expression> filterExpressions)
     {
-        var compiler = new SqliteCompiler();
-        var db = new QueryFactory(_connection, compiler);
-        var query = db.Query(TasksTable.TasksWithRowId).Select();
+        var query = _db.Query(TasksTable.TasksWithRowId).Select();
         foreach (var exp in filterExpressions)
         {
             query = exp switch
@@ -58,25 +68,19 @@ public class TaskItemRepository : ITaskItemRepository
                 AttributeFilterExpression attrExp => query.AddAttributeFilterExpression(attrExp),
             };
         }
-        var result = compiler.Compile(query);
-        Console.WriteLine(result.RawSql);
+
         return await query.DeleteAsync();
     }
 
     public async Task<IEnumerable<TaskItem>> GetAllAsync()
     {
-        var sql = $"""
-SELECT * FROM {TasksTable.TasksWithRowId}
-""";
-        var tasks = await _connection.QueryAsync<TaskItem>(sql);
+        var tasks = await _db.Query(TasksTable.TasksWithRowId).GetAsync<TaskItem>();
         return tasks;
     }
 
     public Task<IEnumerable<TaskItem>> GetByFilterAsync(IEnumerable<Expression> expressions)
     {
-        var compiler = new SqliteCompiler();
-        var db = new QueryFactory(_connection, compiler);
-        var query = db.Query(TasksTable.TasksWithRowId).Select("*");
+        var query = _db.Query(TasksTable.TasksWithRowId).Select("*");
         foreach (var exp in expressions)
         {
             query = exp switch
@@ -88,31 +92,9 @@ SELECT * FROM {TasksTable.TasksWithRowId}
         return query.GetAsync<TaskItem>();
     }
 
-    private Query BuildFromExpressions(IEnumerable<Expression> expressions)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task<IEnumerable<TaskItem>> GetByQueryFilter(string queryFilters)
-    {
-        string whereFilter = !string.IsNullOrWhiteSpace(queryFilters) ? $"WHERE\n\t{string.Join('\n', queryFilters)}" : "";
-        var query = $"""
-    SELECT * FROM {TasksTable.TasksWithRowId}
-    {whereFilter}
-    """;
-
-        _log.LogInformation("SQL:\n{sql}", query);
-
-        var tasks = await _connection.QueryAsync<TaskItem>(query);
-        _log.LogInformation("Fetched {0} tasks", tasks.Count());
-        return tasks;
-    }
-
     public async Task<int> UpdateByFilter(IEnumerable<Expression> expressions, IEnumerable<KeyValuePair<string, object>> keyValues)
     {
-        var compiler = new SqliteCompiler();
-        var db = new QueryFactory(_connection, compiler);
-        var query = db.Query("tasks");
+        var query = _db.Query("tasks_with_rowId");
         foreach (var exp in expressions)
         {
             query = exp switch
@@ -121,8 +103,9 @@ SELECT * FROM {TasksTable.TasksWithRowId}
                 OperatorExpression opExp when opExp.Value == "Or" => query.Or(),
             };
         }
+        var taskIds = query.Select(TaskItemAttribute.Id).Get<string>();
 
-        return await query.UpdateAsync(keyValues);
+        return await _db.Query("tasks").WhereIn("Id", taskIds).UpdateAsync(keyValues);
     }
 }
 
@@ -134,9 +117,11 @@ public static class SqlKataQueryExtensions
         {
             query.OrWhereBetween("RowId", range.From, range.To);
         }
-        query.OrWhereIn("RowId", expression.Ids);
+        if (expression.Ids.Count > 0)
+            query.OrWhereIn("RowId", expression.Ids);
         return query;
     }
+
     internal static Query AddAttributeFilterExpression(this Query query, AttributeFilterExpression expression)
     {
         return query.Where(expression.attribute, expression.Value);

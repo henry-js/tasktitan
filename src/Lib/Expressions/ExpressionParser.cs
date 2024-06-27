@@ -82,10 +82,11 @@ public class ExpressionParser : IExpressionParser
         Advance();
         var colon = Consume(TokenType.COLON, "Attribute key should be followed by a colon");
         var attrValue = Consume(TokenType.ATTRIBUTE_VALUE, "Separator should be followed by a value").Value;
-        if (Enum.TryParse(attrValue, true, out TaskItemState state))
+        if (TaskItemState.Values.Contains(attrValue))
         {
-            return new AttributeFilterExpression(attributeName, state.ToString());
+            return new AttributeFilterExpression(attributeName, attrValue);
         }
+        // throw new Exception($"Invalid attribute {attrValue}");
         return new AttributeFilterExpression(attributeName, attrValue);
     }
 

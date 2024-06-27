@@ -2,7 +2,7 @@ namespace TaskTitan.Lib.Dates;
 
 public class DateTimeConverter(TimeProvider _timeProvider) : IStringFilterConverter<DateTime>
 {
-    public DateTimeOffset Now { get; } = _timeProvider.GetUtcNow();
+    public DateTimeOffset Now { get; } = _timeProvider.GetLocalNow();
     private readonly DayOfWeek[] _daysOfWeek = Enum.GetValues<DayOfWeek>();
 
     private DateTime NextDayOfWeek(string day)
@@ -37,6 +37,6 @@ public class DateTimeConverter(TimeProvider _timeProvider) : IStringFilterConver
             _ => null,
         };
 
-        return dt is not null ? DateTime.SpecifyKind(dt.Value, DateTimeKind.Utc) : null;
+        return dt is not null ? DateTime.SpecifyKind(dt.Value, DateTimeKind.Local) : null;
     }
 }

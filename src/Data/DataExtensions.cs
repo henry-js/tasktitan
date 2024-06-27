@@ -28,8 +28,7 @@ public static class DataExtensions
             var connection = new SqliteConnection(connectionString);
             var compiler = new SqliteCompiler();
             return new QueryFactory(connection, compiler);
-        }
-        );
+        });
 
         return services;
     }
