@@ -8,8 +8,9 @@ using Microsoft.Extensions.Hosting;
 
 using Serilog;
 
-using TaskTitan.Cli.AdminCommands;
-using TaskTitan.Cli.TaskCommands.Actions;
+using TaskTitan.Cli.Commands.Actions;
+using TaskTitan.Cli.Commands.Admin;
+using TaskTitan.Cli.Commands.Backup;
 using TaskTitan.Lib.Dates;
 using TaskTitan.Lib.Expressions;
 
@@ -36,6 +37,7 @@ rootCommand.AddCommand(new AddCommand());
 rootCommand.AddCommand(new StartCommand());
 rootCommand.AddCommand(new ModifyCommand());
 rootCommand.AddCommand(new BogusCommand());
+rootCommand.AddCommand(new ImportCommand());
 
 var cmdLineBuilder = new CommandLineBuilder(rootCommand);
 int result = 0;
@@ -48,7 +50,8 @@ var parser = cmdLineBuilder
         .UseCommandHandler<AddCommand, AddCommand.Handler>()
         .UseCommandHandler<ModifyCommand, ModifyCommand.Handler>()
         .UseCommandHandler<StartCommand, StartCommand.Handler>()
-        .UseCommandHandler<BogusCommand, BogusCommand.Handler>();
+        .UseCommandHandler<BogusCommand, BogusCommand.Handler>()
+        .UseCommandHandler<ImportCommand, ImportCommand.Handler>();
 
         builder.UseSerilog((context, services, configuration) =>
         configuration.ReadFrom.Configuration(context.Configuration));

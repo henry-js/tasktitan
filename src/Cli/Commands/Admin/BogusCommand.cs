@@ -5,7 +5,7 @@ using Bogus;
 
 using Microsoft.EntityFrameworkCore;
 
-namespace TaskTitan.Cli.AdminCommands;
+namespace TaskTitan.Cli.Commands.Admin;
 
 public class BogusCommand : Command
 {
@@ -28,7 +28,7 @@ public class BogusCommand : Command
         public int Quantity { get; set; }
         public int Invoke(InvocationContext context)
         {
-            throw new NotImplementedException();
+            return InvokeAsync(context).Result;
         }
 
         public async Task<int> InvokeAsync(InvocationContext context)

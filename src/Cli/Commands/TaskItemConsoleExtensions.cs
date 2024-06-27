@@ -2,7 +2,7 @@ using Humanizer;
 
 using TaskTitan.Lib.Dtos;
 
-namespace TaskTitan.Cli.TaskCommands;
+namespace TaskTitan.Cli.Commands;
 
 internal static class TaskItemConsoleExtensions
 {

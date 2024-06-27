@@ -2,11 +2,10 @@ using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.Threading.Tasks;
 
-namespace TaskTitan.Cli.TaskCommands.Actions;
+namespace TaskTitan.Cli.Commands.Actions;
 
 internal sealed class AddCommand : Command
 {
-
     public AddCommand() : base("add", "Add a task to the list")
     {
         AddOptions(this);
