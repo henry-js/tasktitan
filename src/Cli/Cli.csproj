@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\Lib\Lib.csproj" />
+    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Data\Data.csproj" />
   </ItemGroup>
@@ -59,9 +59,8 @@
     <Using Include="Spectre.Console.AnsiConsole" Alias="Console" />
     <Using Include="System.Collections.Generic" />
     <Using Include="TaskTitan.Cli" />
-    <Using Include="TaskTitan.Cli.TaskCommands" />
     <Using Include="TaskTitan.Core" />
     <Using Include="TaskTitan.Data" />
-    <Using Include="TaskTitan.Lib.Services" />
+    <Using Include="TaskTitan.Infrastructure.Services" />
   </ItemGroup>
 </Project>

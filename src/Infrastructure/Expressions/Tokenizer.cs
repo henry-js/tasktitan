@@ -1,6 +1,6 @@
-using static TaskTitan.Lib.Expressions.TokenType;
+using static TaskTitan.Infrastructure.Expressions.TokenType;
 
-namespace TaskTitan.Lib.Expressions;
+namespace TaskTitan.Infrastructure.Expressions;
 
 public class Tokenizer
 {

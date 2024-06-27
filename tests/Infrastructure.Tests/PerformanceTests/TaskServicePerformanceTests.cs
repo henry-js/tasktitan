@@ -2,7 +2,7 @@
 
 // using Xunit.Categories;
 
-// namespace TaskTitan.Lib.Tests;
+// namespace TaskTitan.Infrastructure.Tests;
 
 // [Category("Performance")]
 // public class TaskItemServicePerformanceTests : IClassFixture<TestDatabaseFixture>

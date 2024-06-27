@@ -1,4 +1,4 @@
-namespace TaskTitan.Lib.Tests;
+namespace TaskTitan.Infrastructure.Tests;
 
 public class DueDateHelperTests
 {

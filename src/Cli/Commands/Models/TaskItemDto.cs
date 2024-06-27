@@ -1,4 +1,4 @@
-namespace TaskTitan.Lib.Dtos;
+namespace TaskTitan.Infrastructure.Dtos;
 
 public class TaskItemDto
 {

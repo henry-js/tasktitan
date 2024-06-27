@@ -3,7 +3,6 @@ using System.CommandLine.Invocation;
 
 namespace TaskTitan.Cli.Commands.Backup;
 
-// TODO: Should use a filter to LIST commands first then perform modification
 internal sealed class ImportCommand : Command
 {
     public ImportCommand() : base("import", "Import existing commands from supported service")
@@ -12,7 +11,7 @@ internal sealed class ImportCommand : Command
     }
     private static void AddOptions(Command command)
     {
-        var fromOption = new Option<TaskManagementService>(
+        var fromOption = new Option<ExternalTaskManager>(
             aliases: ["-f", "--from"]
         );
         command.AddOption(fromOption);
@@ -21,10 +20,7 @@ internal sealed class ImportCommand : Command
     new public class Handler(IAnsiConsole console, ITaskItemService service, ILogger<ImportCommand> logger)
     : ICommandHandler
     {
-        public int Invoke(InvocationContext context)
-        {
-            return InvokeAsync(context).Result;
-        }
+        public int Invoke(InvocationContext context) => InvokeAsync(context).Result;
 
         public Task<int> InvokeAsync(InvocationContext context)
         {
@@ -33,7 +29,7 @@ internal sealed class ImportCommand : Command
     }
 }
 
-internal enum TaskManagementService
+internal enum ExternalTaskManager
 {
     ToDo
 }

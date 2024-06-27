@@ -1,9 +1,9 @@
 using System.Data;
 
 using TaskTitan.Core.Enums;
-using TaskTitan.Lib.Expressions;
+using TaskTitan.Infrastructure.Expressions;
 
-namespace TaskTitan.Lib.Services;
+namespace TaskTitan.Infrastructure.Services;
 
 public class TaskItemService(ITaskItemRepository repository, IExpressionParser parser, IStringFilterConverter<DateTime> stringConverter, ILogger<TaskItemService> logger) : ITaskItemService
 {
@@ -86,7 +86,7 @@ public class TaskItemService(ITaskItemRepository repository, IExpressionParser p
         {
             if (dateAttrs.Contains(attr.Key))
             {
-                var convertedVal = stringConverter.ConvertFrom(attr.Value.ToString());
+                var convertedVal = stringConverter.ConvertFrom(attr.Value?.ToString());
                 updateRequest.Attributes[attr.Key] = convertedVal is null ? "" : new DateTimeOffset(convertedVal.Value);
             }
         }

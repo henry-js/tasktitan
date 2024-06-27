@@ -1,6 +1,6 @@
 using TaskTitan.Core.Enums;
 
-namespace TaskTitan.Lib.Services;
+namespace TaskTitan.Infrastructure.Services;
 
 public record TaskItemModifyRequest : ITaskRequest
 {

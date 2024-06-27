@@ -1,4 +1,4 @@
-namespace TaskTitan.Lib.Dates;
+namespace TaskTitan.Infrastructure.Dates;
 
 public class DateTimeConverter(TimeProvider _timeProvider) : IStringFilterConverter<DateTime>
 {

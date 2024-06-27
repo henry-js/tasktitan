@@ -1,6 +1,6 @@
 using Humanizer;
 
-using TaskTitan.Lib.Dtos;
+using TaskTitan.Infrastructure.Dtos;
 
 namespace TaskTitan.Cli.Commands;
 

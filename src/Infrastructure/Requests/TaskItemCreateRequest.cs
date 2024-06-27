@@ -1,10 +1,10 @@
 using TaskTitan.Core.Enums;
 
-namespace TaskTitan.Lib.Services;
+namespace TaskTitan.Infrastructure.Services;
 
 public record TaskItemCreateRequest : ITaskRequest
 {
-    public string[] Filters { get; init; }
+    public string[] Filters { get; init; } = [];
     public Action Operation { get; } = Action.Create;
     // public Dictionary<TaskItemAttribute, string> Attributes { get; } = [];
 

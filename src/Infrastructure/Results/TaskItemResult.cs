@@ -1,4 +1,4 @@
-namespace TaskTitan.Lib.Services;
+namespace TaskTitan.Infrastructure.Services;
 
 public record TaskItemResult(bool IsSuccess, TaskItem? task, params string[] ErrorMessages)
 {

@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <DebugType>embedded</DebugType>
-    <RootNamespace>TaskTitan.Lib</RootNamespace>
+    <RootNamespace>TaskTitan.Infrastructure</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

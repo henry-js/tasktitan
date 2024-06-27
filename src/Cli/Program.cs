@@ -11,8 +11,8 @@ using Serilog;
 using TaskTitan.Cli.Commands.Actions;
 using TaskTitan.Cli.Commands.Admin;
 using TaskTitan.Cli.Commands.Backup;
-using TaskTitan.Lib.Dates;
-using TaskTitan.Lib.Expressions;
+using TaskTitan.Infrastructure.Dates;
+using TaskTitan.Infrastructure.Expressions;
 
 using Velopack;
 
@@ -66,10 +66,10 @@ var parser = cmdLineBuilder
 static void ConfigureServices(HostBuilderContext context, IServiceCollection services)
 {
     services.AddSingleton(_ => AnsiConsole.Console);
+    services.AddSingleton(TimeProvider.System);
     services.AddScoped<ITaskItemService, TaskItemService>();
     services.AddScoped<IStringFilterConverter<DateTime>, DateTimeConverter>();
     services.AddScoped<IExpressionParser, ExpressionParser>();
-    services.AddSingleton(TimeProvider.System);
     services.RegisterDb($"Data Source={ConfigHelper.UserProfileDbPath}", Log.Logger);
 }
 result = await parser.InvokeAsync(args);

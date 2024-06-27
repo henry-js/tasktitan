@@ -1,6 +1,6 @@
 // using System.Text.RegularExpressions;
 
-// namespace TaskTitan.Lib.Expressions;
+// namespace TaskTitan.Infrastructure.Expressions;
 
 // public static partial class RegexPatterns
 // {

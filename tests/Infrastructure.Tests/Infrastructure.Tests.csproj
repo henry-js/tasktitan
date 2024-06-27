@@ -28,17 +28,17 @@
     <Using Include="Microsoft.Extensions.Logging.Abstractions" />
     <Using Include="Microsoft.Extensions.Time.Testing" />
     <Using Include="System.Diagnostics" />
-    <Using Include="TaskTitan.Lib.Services" />
+    <Using Include="TaskTitan.Infrastructure.Services" />
     <Using Include="TaskTitan.Tests.Common" />
     <Using Include="System.Globalization" />
-    <Using Include="TaskTitan.Lib.Dates" />
+    <Using Include="TaskTitan.Infrastructure.Dates" />
     <Using Include="Microsoft.EntityFrameworkCore" />
     <Using Include="TaskTitan.Core" />
     <Using Include="TaskTitan.Data" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Lib\Lib.csproj" />
+    <ProjectReference Include="..\..\src\Infrastructure\Infrastructure.csproj" />
     <ProjectReference Include="..\Tests.Common\Tests.Common.csproj" />
   </ItemGroup>
 

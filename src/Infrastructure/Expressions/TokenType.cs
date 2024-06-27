@@ -1,4 +1,4 @@
-namespace TaskTitan.Lib.Expressions;
+namespace TaskTitan.Infrastructure.Expressions;
 
 public enum TokenType
 {

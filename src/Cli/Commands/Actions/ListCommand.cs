@@ -1,7 +1,7 @@
 using System.CommandLine;
 using System.CommandLine.Invocation;
 
-using TaskTitan.Lib.Dtos;
+using TaskTitan.Infrastructure.Dtos;
 
 namespace TaskTitan.Cli.Commands.Actions;
 
