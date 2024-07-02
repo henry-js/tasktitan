@@ -2,11 +2,13 @@
 using System.CommandLine.Builder;
 using System.CommandLine.Hosting;
 using System.CommandLine.Parsing;
+using System.Runtime.Serialization;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using Serilog;
+using Serilog.Templates;
 
 using TaskTitan.Cli.Commands.Actions;
 using TaskTitan.Cli.Commands.Admin;
@@ -17,7 +19,10 @@ using Velopack;
 
 var loggerConfiguration = new LoggerConfiguration()
     .MinimumLevel.Debug()
-            .WriteTo.File("logs/startup_.log", outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u}] {SourceContext}: {Message:lj}{NewLine}{Exception}", rollingInterval: RollingInterval.Day)
+            .WriteTo.File("logs/startup_.log",
+            outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u}] {SourceContext}: {Message:lj}{NewLine}{Exception}",
+            rollingInterval: RollingInterval.Day
+            )
             .Enrich.WithProperty("Application Name", "TaskTitan");
 Log.Logger = loggerConfiguration.CreateBootstrapLogger();
 

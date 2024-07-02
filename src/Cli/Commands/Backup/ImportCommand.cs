@@ -8,9 +8,9 @@ namespace TaskTitan.Cli.Commands.Backup;
 
 internal sealed class ImportCommand : Command
 {
-    public ImportCommand(Option<SupportedService> fromOption) : base("import", "Import existing tasks from supported service")
+    public ImportCommand(Option<SupportedService> serviceOption) : base("import", "Import existing tasks from supported service")
     {
-        AddOption(fromOption);
+        AddOption(serviceOption);
         AddOptions(this);
     }
     private static void AddOptions(Command command)
@@ -20,15 +20,15 @@ internal sealed class ImportCommand : Command
     new public class Handler(IAnsiConsole console, ILogger<ImportCommand> logger, IExternalTaskService service)
     : ICommandHandler
     {
-        public SupportedService ExternalTaskManager { get; set; }
+        public SupportedService Service { get; set; }
         public int Invoke(InvocationContext context) => InvokeAsync(context).Result;
 
         public async Task<int> InvokeAsync(InvocationContext context)
         {
-            logger.LogInformation("Fetching tasks from {Service}", ExternalTaskManager);
+            logger.LogInformation("Fetching tasks from {Service}", Service);
 
             await console.Status()
-                .StartAsync("Fetching...", async ctx =>
+                .StartAsync("Fetching...", (Func<StatusContext, Task>)(async ctx =>
                 {
                     var lists = await service.GetListsAsync();
                     console.WriteLine($"Retrieved {lists.Count()} lists");
@@ -38,9 +38,11 @@ internal sealed class ImportCommand : Command
                     foreach (var list in lists)
                     {
                         console.WriteLine($"Retrieving {list.DisplayName} tasks");
-                        list.Tasks = (await service.GetTasks(list.Id)).ToList();
+                        var result = await service.FetchExistingExportedAsync(list.Id);
+                        if (result.IsSuccess)
+                            list.Tasks = result.Value?.ToList();
                     }
-                });
+                }));
             return 0;
         }
     }

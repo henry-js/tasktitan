@@ -22,13 +22,11 @@ internal static class TaskItemConsoleExtensions
         grid.AddRow(["Id", nameof(TaskItem.Description), nameof(TaskItem.Due)]);
         foreach (var task in tasks)
         {
-            var humanizedDate = task.Due?.Humanize() ?? "";
+            var humanizedDate = task.Due?.Date.Humanize() ?? "";
             grid.AddRow([$"{task.RowId}", $"{task.Description}", $"{humanizedDate}"]);
         }
 
         console.Write(grid);
-        // string taskSummary = "task".ToQuantity(tasks.Count());
-        // console.Write($"{taskSummary}.");
     }
 
     internal static void DisplayTaskDetails(this IAnsiConsole console, TaskItem task)

@@ -11,11 +11,12 @@ internal static class BackupExtensions
 {
     public static RootCommand AddBackupCommands(this RootCommand root)
     {
-        var fromOption = new Option<SupportedService>(
-    aliases: ["-f", "--from"], () => SupportedService.ToDo, "Service to use. Defaults to Microsoft To Do"
+        var serviceOption = new Option<SupportedService>(
+    aliases: ["-s", "--service"], () => SupportedService.ToDo, "Service to use. Defaults to Microsoft To Do"
 );
-        root.AddCommand(new ImportCommand(fromOption));
-        root.AddCommand(new ExportCommand(fromOption));
+        root.AddCommand(new ImportCommand(serviceOption));
+
+        root.AddCommand(new ExportCommand());
 
         return root;
     }
