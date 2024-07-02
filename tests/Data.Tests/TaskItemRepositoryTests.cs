@@ -122,7 +122,7 @@ public class TaskItemRepositoryTests : IClassFixture<TestDatabaseFixture>, IDisp
         expressions.Add(new IdFilterExpression([new IdRange(1, 5), new IdRange(4, 7)], [9, 5, 99]));
         // When
         DateTime newDate = new(2025, 12, 12);
-        Dictionary<string, object> attributes = [];
+        Dictionary<string, object?> attributes = [];
         attributes.Add(TaskItemAttribute.Due, newDate.ToString());
         var result = await sut.UpdateByFilter(expressions, attributes);
 

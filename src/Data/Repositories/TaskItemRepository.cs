@@ -66,6 +66,7 @@ public class TaskItemRepository : ITaskItemRepository
             {
                 IdFilterExpression idExp => query.AddIdFilter(idExp),
                 AttributeFilterExpression attrExp => query.AddAttributeFilterExpression(attrExp),
+                _ => throw new NotImplementedException(),
             };
         }
 
@@ -87,12 +88,13 @@ public class TaskItemRepository : ITaskItemRepository
             {
                 IdFilterExpression idExp => query.AddIdFilter(idExp),
                 AttributeFilterExpression attrExp => query.AddAttributeFilterExpression(attrExp),
+                _ => throw new NotImplementedException(),
             };
         }
         return query.GetAsync<TaskItem>();
     }
 
-    public async Task<int> UpdateByFilter(IEnumerable<Expression> expressions, IEnumerable<KeyValuePair<string, object>> keyValues)
+    public async Task<int> UpdateByFilter(IEnumerable<Expression> expressions, IEnumerable<KeyValuePair<string, object?>> keyValues)
     {
         var query = _db.Query("tasks_with_rowId");
         foreach (var exp in expressions)
@@ -101,6 +103,7 @@ public class TaskItemRepository : ITaskItemRepository
             {
                 IdFilterExpression idExp => query.AddIdFilter(idExp),
                 OperatorExpression opExp when opExp.Value == "Or" => query.Or(),
+                _ => throw new NotImplementedException(),
             };
         }
         var taskIds = query.Select(TaskItemAttribute.Id).Get<string>();

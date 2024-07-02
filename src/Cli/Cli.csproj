@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\Lib\Lib.csproj" />
+    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Data\Data.csproj" />
   </ItemGroup>
@@ -19,7 +19,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Serilog" Version="3.1.1" />
+    <PackageReference Include="Serilog" Version="4.0.0" />
+    <PackageReference Include="Serilog.Expressions" Version="5.0.0" />
     <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
@@ -59,9 +60,8 @@
     <Using Include="Spectre.Console.AnsiConsole" Alias="Console" />
     <Using Include="System.Collections.Generic" />
     <Using Include="TaskTitan.Cli" />
-    <Using Include="TaskTitan.Cli.TaskCommands" />
     <Using Include="TaskTitan.Core" />
     <Using Include="TaskTitan.Data" />
-    <Using Include="TaskTitan.Lib.Services" />
+    <Using Include="TaskTitan.Infrastructure.Services" />
   </ItemGroup>
 </Project>
