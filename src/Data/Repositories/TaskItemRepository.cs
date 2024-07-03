@@ -69,7 +69,6 @@ public class TaskItemRepository : ITaskItemRepository
                 _ => throw new NotImplementedException(),
             };
         }
-
         return await query.DeleteAsync();
     }
 
