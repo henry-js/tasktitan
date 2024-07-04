@@ -32,7 +32,7 @@ public class MicrosoftTodoService : IExternalTaskService
 
         var result = await _client.Me.Todo.Lists.PostAsync(requestBody);
 
-        if (result is null)
+        if (result is null || result.Id is null)
         {
             _logger.LogError("Failed to create list");
             return Result<string>.Failure(new Error(404, "Microsoft Graph failed to create tasklist"));
@@ -98,7 +98,7 @@ public class MicrosoftTodoService : IExternalTaskService
     {
         _logger.LogInformation("Searching Microsoft To Do for valid TaskTitan list");
         var lists = await _client.Me.Todo.Lists.GetAsync();
-        var taskTitanList = lists?.Value?.SingleOrDefault(l => l.DisplayName == DisplayName || l.DisplayName.Contains("tasktitan"));
+        var taskTitanList = lists?.Value?.SingleOrDefault(l => l.DisplayName == DisplayName || l.DisplayName?.Contains("tasktitan") == true);
 
         if (taskTitanList is not null) return taskTitanList.Id;
 

@@ -3,8 +3,6 @@ using System.CommandLine.Invocation;
 
 using Humanizer;
 
-using TaskTitan.Core.OperationResults;
-
 namespace TaskTitan.Cli.Commands.Actions;
 
 internal sealed class DeleteCommand : Command
@@ -52,7 +50,7 @@ internal sealed class DeleteCommand : Command
             {
                 if (!all)
                 {
-                    var delete = ConfirmDelete(task, out all);
+                    var delete = console.ConfirmDelete(task, out all);
                     if (!delete)
                     {
                         skippedCount++;
@@ -79,21 +77,6 @@ internal sealed class DeleteCommand : Command
             var failedQuantity = "task".ToQuantity(failedCount);
             console.MarkupLineInterpolated($"[red]failed to delete {failedQuantity}[/]");
             return 0;
-        }
-
-        private bool ConfirmDelete(TaskItem task, out bool all)
-        {
-            var choice = console.Prompt(
-                new TextPrompt<string>($"Delete task {task.RowId}, '{task.Description}'?")
-                    .InvalidChoiceMessage("[red]Invalid option[/]")
-                    .DefaultValue("yes")
-                    .AddChoice("yes")
-                    .AddChoice("no")
-                    .AddChoice("all")
-            );
-            all = choice == "all";
-
-            return choice == "yes";
         }
     }
 }
