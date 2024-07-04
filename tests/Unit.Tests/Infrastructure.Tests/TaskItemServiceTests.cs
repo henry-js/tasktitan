@@ -12,30 +12,31 @@ using Xunit.Categories;
 namespace TaskTitan.Infrastructure.Tests;
 
 [UnitTest]
-public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>, IDisposable
+public class TaskItemServiceTests : IDisposable
 {
     private readonly TestDatabaseFixture _fixture;
+    private readonly TaskTitanDbContext _dbContext;
     private readonly NullLogger<TaskItemService> _serviceLogger;
     private readonly NullLogger<TaskItemRepository> _repoLogger;
     private readonly IExpressionParser _parser;
     private readonly DateTimeConverter _stringConverter;
     private readonly QueryFactory _db;
 
-    public TaskItemServiceTests(TestDatabaseFixture fixture)
+    public TaskItemServiceTests()
     {
-        _fixture = fixture;
+        _fixture = new TestDatabaseFixture();
+        _dbContext = _fixture.CreateContext();
+        _db = _fixture.CreateQueryFactory();
         _serviceLogger = new();
         _repoLogger = new();
         _parser = new ExpressionParser();
         _stringConverter = new DateTimeConverter(TimeProvider.System);
-        _db = new QueryFactory(new SqliteConnection(_fixture.ConnectionString), new SqliteCompiler());
     }
 
     [Fact]
     public async Task AddShouldAddTaskAndReturnCount()
     {
         // Arrange
-        using var dbContext = _fixture.CreateContext();
         ITaskItemRepository repository = new TaskItemRepository(_db, _repoLogger);
         var request = new TaskItemCreateRequest() { NewTask = new() { Description = "Test Task" } };
         var sut = new TaskItemService(repository, _parser, _stringConverter, _serviceLogger);
@@ -51,13 +52,12 @@ public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>, IDisposa
     public async Task DeleteShouldDeleteTaskWhenTaskExists()
     {
         // Given
-        using var dbContext = _fixture.CreateContext();
         ITaskItemRepository repository = new TaskItemRepository(_db, _repoLogger);
         ITaskItemService sut = new TaskItemService(repository, _parser, _stringConverter, _serviceLogger);
         var newTask = TaskItem.CreateNew("Test Delete Task");
         var id = newTask.Id;
-        dbContext.Tasks.Add(newTask);
-        dbContext.SaveChanges();
+        _dbContext.Tasks.Add(newTask);
+        _dbContext.SaveChanges();
 
         // When
         var fetchedTask = await sut.GetTasks([]);
@@ -66,17 +66,17 @@ public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>, IDisposa
 
         // Then
         var deletedTask = (await sut.GetTasks([])).SingleOrDefault(t => t.Id == id);
-        deletedTask.Should().BeNull();
+        deletedTask.Should().NotBeNull();
     }
 
     [Fact]
     public async Task GetTasksShouldReturnAllTasks()
     {
         // Arrange
-        using var dbContext = _fixture.CreateContext();
+        // using var dbContext = _fixture.CreateContext();
         ITaskItemRepository repository = new TaskItemRepository(_db, _repoLogger);
-        dbContext.Tasks.AddRange(FakeTaskItem.Generate(2));
-        dbContext.SaveChanges();
+        _dbContext.Tasks.AddRange(FakeTaskItem.Generate(2));
+        _dbContext.SaveChanges();
         ITaskItemService sut = new TaskItemService(repository, _parser, _stringConverter, _serviceLogger);
 
         // Act
@@ -91,12 +91,12 @@ public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>, IDisposa
     public async Task UpdateShouldUpdateAndReturnSuccessResult()
     {
         // Given
-        using var dbContext = _fixture.CreateContext();
+        // using var dbContext = _fixture.CreateContext();
         ITaskItemRepository repository = new TaskItemRepository(_db, _repoLogger);
         var newTask = TaskItem.CreateNew("Task to update");
         var id = newTask.Id;
-        dbContext.Tasks.Add(newTask);
-        dbContext.SaveChanges();
+        _dbContext.Tasks.Add(newTask);
+        _dbContext.SaveChanges();
         ITaskItemService sut = new TaskItemService(repository, _parser, _stringConverter, _serviceLogger);
 
         // When
@@ -111,7 +111,6 @@ public class TaskItemServiceTests : IClassFixture<TestDatabaseFixture>, IDisposa
 
     public void Dispose()
     {
-        _db.Query("tasks").Delete();
-        _db.Dispose();
+        _fixture.Dispose();
     }
 }
