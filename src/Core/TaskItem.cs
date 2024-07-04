@@ -56,29 +56,3 @@ public class TaskItem : INotifyPropertyChanged
         return this;
     }
 }
-
-public readonly record struct TaskDateTime
-{
-    private readonly DateTime Value { get; init; }
-    private bool IsDateOnly => Value.TimeOfDay == TimeSpan.MinValue;
-
-    public TaskDateTime(DateTime dateTime)
-    {
-        if (dateTime == DateTime.MinValue) throw new ArgumentOutOfRangeException(nameof(dateTime), dateTime, "dateTime cannot be MinValue");
-        if (dateTime == DateTime.MaxValue) throw new ArgumentOutOfRangeException(nameof(dateTime), dateTime, "dateTime cannot be MaxValue");
-        if (dateTime.Kind != DateTimeKind.Utc) throw new ArgumentException("dateTime.Kind should be Utc", nameof(dateTime));
-
-        Value = dateTime;
-    }
-
-    public TaskDateTime(DateOnly dateOnly) : this(dateOnly.ToDateTime(TimeOnly.MinValue)) { }
-
-    public string ToString(string? format = null) => format is null ? ToString() : Value.ToString(format);
-
-    public override string ToString() => IsDateOnly
-        ? Value.ToString("yyyy-MM-dd")
-        : Value.ToString("yyyy-MM-dd HH:mm:ss");
-
-    public static implicit operator TaskDateTime(DateTime dateTime) => new(dateTime);
-    public static implicit operator TaskDateTime(DateOnly dateOnly) => new(dateOnly);
-}
