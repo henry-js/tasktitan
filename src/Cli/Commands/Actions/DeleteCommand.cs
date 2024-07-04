@@ -43,18 +43,57 @@ internal sealed class DeleteCommand : Command
                 Filters = Filter ?? [],
             };
 
-            var result = await service.Delete(request);
-
-            if (result.IsFailure)
+            var fetchedTasks = await service.GetTasks(Filter ?? []);
+            int deletedCount = 0;
+            int failedCount = 0;
+            int skippedCount = 0;
+            bool all = false;
+            foreach (var task in fetchedTasks)
             {
-                console.WriteLine("Delete tasks failed");
-                return result.Error.Code;
+                if (!all)
+                {
+                    var delete = ConfirmDelete(task, out all);
+                    if (!delete)
+                    {
+                        skippedCount++;
+                        continue;
+                    }
+                }
+
+                var result = await service.Delete(task);
+
+                if (result.IsFailure)
+                {
+                    logger.LogError("Failed to delete task {TaskId}", task.Id);
+                    failedCount++;
+                    continue;
+                }
+                deletedCount++;
+                logger.LogInformation("Deleted task {TaskId}", task.Id);
             }
 
-            var quantity = "task".ToQuantity(result.Value);
-            console.MarkupLineInterpolated($"[green]Deleted {quantity}[/]");
-
+            var deletedQuantity = "task".ToQuantity(deletedCount);
+            console.MarkupLineInterpolated($"[green]deleted {deletedQuantity}[/]");
+            var skippedQuantity = "task".ToQuantity(skippedCount);
+            console.MarkupLineInterpolated($"[yellow]skipped {skippedQuantity}[/]");
+            var failedQuantity = "task".ToQuantity(failedCount);
+            console.MarkupLineInterpolated($"[red]failed to delete {failedQuantity}[/]");
             return 0;
+        }
+
+        private bool ConfirmDelete(TaskItem task, out bool all)
+        {
+            var choice = console.Prompt(
+                new TextPrompt<string>($"Delete task {task.RowId}, '{task.Description}'?")
+                    .InvalidChoiceMessage("[red]Invalid option[/]")
+                    .DefaultValue("yes")
+                    .AddChoice("yes")
+                    .AddChoice("no")
+                    .AddChoice("all")
+            );
+            all = choice == "all";
+
+            return choice == "yes";
         }
     }
 }

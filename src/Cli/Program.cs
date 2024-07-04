@@ -40,6 +40,7 @@ rootCommand.AddCommand(new ListCommand());
 rootCommand.AddCommand(new AddCommand());
 rootCommand.AddCommand(new StartCommand());
 rootCommand.AddCommand(new ModifyCommand());
+rootCommand.AddCommand(new DeleteCommand());
 rootCommand.AddAdminCommands();
 rootCommand.AddBackupCommands();
 
@@ -52,8 +53,9 @@ var parser = cmdLineBuilder
         builder.ConfigureServices(ConfigureServices)
         .UseCommandHandler<ListCommand, ListCommand.Handler>()
         .UseCommandHandler<AddCommand, AddCommand.Handler>()
-        .UseCommandHandler<ModifyCommand, ModifyCommand.Handler>()
         .UseCommandHandler<StartCommand, StartCommand.Handler>()
+        .UseCommandHandler<ModifyCommand, ModifyCommand.Handler>()
+        .UseCommandHandler<DeleteCommand, DeleteCommand.Handler>()
         .UseAdminCommandHandlers()
         .UseBackupCommandHandlers();
 

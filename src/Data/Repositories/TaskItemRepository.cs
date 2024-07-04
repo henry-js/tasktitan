@@ -54,7 +54,10 @@ public class TaskItemRepository : ITaskItemRepository
     {
         var query = _db.Query("tasks").Where(TaskItemAttribute.Id, task.Id);
 
-        return await query.DeleteAsync();
+        return await query.UpdateAsync(new Dictionary<string, object>
+        {
+            {nameof(TaskItem.Status), TaskItemState.Deleted}
+        });
     }
 
     public async Task<int> DeleteByFilter(IEnumerable<Expression> filterExpressions)
@@ -69,7 +72,11 @@ public class TaskItemRepository : ITaskItemRepository
                 _ => throw new NotImplementedException(),
             };
         }
-        return await query.DeleteAsync();
+
+        return await query.UpdateAsync(new Dictionary<string, object>
+        {
+            {nameof(TaskItem.Status), TaskItemState.Deleted}
+        });
     }
 
     public async Task<IEnumerable<TaskItem>> GetAllAsync()

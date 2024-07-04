@@ -43,24 +43,19 @@ public class TaskItemService(ITaskItemRepository repository, IExpressionParser p
         }
     }
 
-    public async Task Delete(int rowId)
+    public async Task<Result> Delete(TaskItem taskToDelete)
     {
-        _logger.LogInformation("deleting Task {rowid}", rowId);
-        var task = (await GetTasks([])).SingleOrDefault(t => t.RowId == rowId);
-
-        if (task is null)
+        try
         {
-            _logger.LogWarning("Task not found");
-            return;
+            await _repository.DeleteAsync(taskToDelete);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Delete task {TaskID} failed", taskToDelete.Id);
+            return Result.Failure(new Error(1, ex.Message));
         }
 
-        // dbContext.Tasks.Remove(task);
-        _logger.LogInformation("Task deleted");
-    }
-
-    public async Task Delete(TaskItem taskToDelete)
-    {
-        await _repository.DeleteAsync(taskToDelete);
+        return Result.Success();
     }
 
     public async Task<Result<int>> Delete(ITaskRequest request)
