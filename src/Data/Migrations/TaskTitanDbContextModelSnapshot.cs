@@ -40,13 +40,13 @@ namespace Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")
                         .HasColumnName("entry")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasDefaultValueSql("strftime('%Y-%m-%dT%H:%M:%fZ', 'now')");
 
                     b.Property<DateTime?>("Modified")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")
                         .HasColumnName("modified")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasDefaultValueSql("strftime('%Y-%m-%dT%H:%M:%fZ', 'now')");
 
                     b.Property<string>("Project")
                         .HasColumnType("TEXT")
@@ -63,7 +63,7 @@ namespace Data.Migrations
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")
-                        .HasDefaultValue("Pending")
+                        .HasDefaultValue("pending")
                         .HasColumnName("status");
 
                     b.Property<DateTime?>("Until")

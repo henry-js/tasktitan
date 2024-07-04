@@ -46,11 +46,11 @@ public class TaskTitanDbContext : DbContext
             .HasDefaultValue(TaskItemState.Pending);
         modelBuilder.Entity<TaskItem>()
             .Property(task => task.Entry)
-            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .HasDefaultValueSql("strftime('%Y-%m-%dT%H:%M:%fZ', 'now')")
             .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
         modelBuilder.Entity<TaskItem>()
             .Property(task => task.Modified)
-            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .HasDefaultValueSql("strftime('%Y-%m-%dT%H:%M:%fZ', 'now')")
             .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
         // modelBuilder.Entity<TaskItem>().OwnsOne(
