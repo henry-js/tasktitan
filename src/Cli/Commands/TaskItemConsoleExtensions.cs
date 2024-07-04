@@ -57,4 +57,20 @@ internal static class TaskItemConsoleExtensions
         console.Write(grid);
         console.Write(table);
     }
+
+    internal static bool ConfirmDelete(this IAnsiConsole console, TaskItem task, out bool deleteAll)
+    {
+        const string yes = "yes";
+        const string no = "no";
+        const string all = "all";
+        var choice = console.Prompt(
+            new TextPrompt<string>($"Delete task {task.RowId}, '{task.Description}'?")
+                .InvalidChoiceMessage("[red]Invalid option[/]")
+                .DefaultValue(yes)
+                .AddChoices([yes, no, all])
+        );
+        deleteAll = choice == all;
+
+        return choice == yes;
+    }
 }

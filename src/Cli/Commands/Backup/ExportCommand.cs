@@ -73,11 +73,11 @@ internal class ExportCommand : Command
                 }
             }
 
-            var exportedTasksResult = await service.FetchExistingExportedAsync(listId);
+            var exportedTasksResult = await service.FetchExistingExportedAsync(listId!);
 
             return exportedTasksResult.IsSuccess
-                ? await PostTasksAsync(listId, localTasks, exportedTasksResult.Value)
-                : await PostTasksAsync(listId, localTasks);
+                ? await PostTasksAsync(listId!, localTasks, exportedTasksResult.Value)
+                : await PostTasksAsync(listId!, localTasks);
         }
 
         private async Task<int> PostTasksAsync(string listId, IEnumerable<TaskItemDto> tasksToExport, IEnumerable<Microsoft.Graph.Models.TodoTask>? fetchedTasks = null)
