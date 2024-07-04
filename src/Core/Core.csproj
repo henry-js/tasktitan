@@ -14,7 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="shortid" />
-    <Using Include="shortid.Configuration" />
+    <Using Include="NanoidDotNet" />
   </ItemGroup>
 </Project>
