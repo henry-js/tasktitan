@@ -1,6 +1,7 @@
 using System.Data;
 
 using TaskTitan.Core.Enums;
+using TaskTitan.Core.OperationResults;
 using TaskTitan.Infrastructure.Expressions;
 
 namespace TaskTitan.Infrastructure.Services;
@@ -39,36 +40,41 @@ public class TaskItemService(ITaskItemRepository repository, IExpressionParser p
             {
                 continue;
             }
-
         }
     }
 
-    public async Task Delete(int rowId)
+    public async Task<Result> Delete(TaskItem taskToDelete)
     {
-        _logger.LogInformation("deleting Task {rowid}", rowId);
-        var task = (await GetTasks([])).SingleOrDefault(t => t.RowId == rowId);
-
-        if (task is null)
+        try
         {
-            _logger.LogWarning("Task not found");
-            return;
+            await _repository.DeleteAsync(taskToDelete);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Delete task {TaskID} failed", taskToDelete.Id);
+            return Result.Failure(new Error(1, ex.Message));
         }
 
-        // dbContext.Tasks.Remove(task);
-        _logger.LogInformation("Task deleted");
+        return Result.Success();
     }
 
-    public async Task Delete(TaskItem taskToDelete)
-    {
-        await _repository.DeleteAsync(taskToDelete);
-    }
-
-    public async Task<int> Delete(ITaskRequest request)
+    public async Task<Result<int>> Delete(ITaskRequest request)
     {
         if (request is not TaskItemDeleteRequest deleteRequest) throw new Exception();
 
         var filterExpressions = deleteRequest.Filters.Count() > 0 ? deleteRequest.Filters.Select(_parser.ParseFilter) : [];
-        return await _repository.DeleteByFilter(filterExpressions);
+
+        int rowsUpdated = 0;
+        try
+        {
+            rowsUpdated = await _repository.DeleteByFilter(filterExpressions);
+        }
+        catch (Exception ex)
+        {
+            return Result<int>.Failure(new Error(500, ex.Message));
+        }
+
+        return Result<int>.Success(rowsUpdated);
     }
 
     public async Task<IEnumerable<TaskItem>> GetTasks(IEnumerable<string> filters)

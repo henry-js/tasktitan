@@ -10,11 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="shortid" Version="4.0.0" />
+    <PackageReference Include="Nanoid" Version="3.1.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="shortid" />
-    <Using Include="shortid.Configuration" />
+    <Using Include="NanoidDotNet" />
   </ItemGroup>
 </Project>

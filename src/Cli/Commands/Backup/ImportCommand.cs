@@ -37,6 +37,11 @@ internal sealed class ImportCommand : Command
 
                     foreach (var list in lists)
                     {
+                        if (list.Id is null)
+                        {
+                            logger.LogWarning("Received a list with null ID, ignoring.");
+                            continue;
+                        }
                         console.WriteLine($"Retrieving {list.DisplayName} tasks");
                         var result = await service.FetchExistingExportedAsync(list.Id);
                         if (result.IsSuccess)

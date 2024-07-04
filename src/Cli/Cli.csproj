@@ -46,6 +46,7 @@
     <MinverTagPrefix>v</MinverTagPrefix>
     <MinverDefaultPreReleaseIdentifiers>preview</MinverDefaultPreReleaseIdentifiers>
     <RootNamespace>TaskTitan.Cli</RootNamespace>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
