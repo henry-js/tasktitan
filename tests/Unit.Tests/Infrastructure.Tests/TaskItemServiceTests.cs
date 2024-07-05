@@ -19,7 +19,6 @@ public class TaskItemServiceTests : IDisposable
     private readonly NullLogger<TaskItemService> _serviceLogger;
     private readonly NullLogger<TaskItemRepository> _repoLogger;
     private readonly IExpressionParser _parser;
-    private readonly DateTimeConverter _stringConverter;
     private readonly QueryFactory _db;
 
     public TaskItemServiceTests()
@@ -30,7 +29,6 @@ public class TaskItemServiceTests : IDisposable
         _serviceLogger = new();
         _repoLogger = new();
         _parser = new ExpressionParser();
-        _stringConverter = new DateTimeConverter(TimeProvider.System);
     }
 
     [Fact]
@@ -38,8 +36,9 @@ public class TaskItemServiceTests : IDisposable
     {
         // Arrange
         ITaskItemRepository repository = new TaskItemRepository(_db, _repoLogger);
-        var request = new TaskItemCreateRequest() { NewTask = new() { Description = "Test Task" } };
-        var sut = new TaskItemService(repository, _parser, _stringConverter, _serviceLogger);
+        var task = TaskItem.CreateNew("Test task");
+        var request = new TaskItemCreateRequest() { Task = task };
+        var sut = new TaskItemService(repository, _parser, _serviceLogger);
 
         // Act
         var result = await sut.Add(request);
@@ -53,7 +52,7 @@ public class TaskItemServiceTests : IDisposable
     {
         // Given
         ITaskItemRepository repository = new TaskItemRepository(_db, _repoLogger);
-        ITaskItemService sut = new TaskItemService(repository, _parser, _stringConverter, _serviceLogger);
+        ITaskItemService sut = new TaskItemService(repository, _parser, _serviceLogger);
         var newTask = TaskItem.CreateNew("Test Delete Task");
         var id = newTask.Id;
         _dbContext.Tasks.Add(newTask);
@@ -77,7 +76,7 @@ public class TaskItemServiceTests : IDisposable
         ITaskItemRepository repository = new TaskItemRepository(_db, _repoLogger);
         _dbContext.Tasks.AddRange(FakeTaskItem.Generate(2));
         _dbContext.SaveChanges();
-        ITaskItemService sut = new TaskItemService(repository, _parser, _stringConverter, _serviceLogger);
+        ITaskItemService sut = new TaskItemService(repository, _parser, _serviceLogger);
 
         // Act
         var tasks = await sut.GetTasks([]);
@@ -97,12 +96,12 @@ public class TaskItemServiceTests : IDisposable
         var id = newTask.Id;
         _dbContext.Tasks.Add(newTask);
         _dbContext.SaveChanges();
-        ITaskItemService sut = new TaskItemService(repository, _parser, _stringConverter, _serviceLogger);
+        ITaskItemService sut = new TaskItemService(repository, _parser, _serviceLogger);
 
         // When
-        DateTime newDate = new(2025, 12, 12);
+        TaskDate newDate = new DateTime(2025, 12, 12).ToUniversalTime();
         TaskItemModifyRequest modifyRequest = new();
-        modifyRequest.Attributes.Add(Core.Enums.TaskItemAttribute.Due, newDate.ToString("yyyy-MM-dd"));
+        modifyRequest.Attributes.Add(Core.Enums.TaskItemAttribute.Due, newDate);
         var result = await sut.Update(modifyRequest);
 
         // Then

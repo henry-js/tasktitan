@@ -6,7 +6,9 @@ public class DueDateHelperTests
     private readonly FakeTimeProvider _timeProvider = new();
     public DueDateHelperTests()
     {
-
+        var gmt = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
+        _timeProvider.SetLocalTimeZone(gmt);
+        _timeProvider.SetUtcNow(new DateTime(2024, 06, 06, 12, 0, 0));
     }
     [Theory]
     [InlineData("2024-01-01")]
@@ -17,9 +19,10 @@ public class DueDateHelperTests
     [InlineData("2024-11-04")]
     public void GivenAStringDateShouldReturnAValidDateOnly(string input)
     {
-        FakeTimeProvider fake = new();
-        var sut = new DateTimeConverter(fake);
-        var date = sut.ConvertFrom(input);
+        var sut = new TaskDateConverter(_timeProvider);
+        var taskDate = sut.ConvertFrom(input);
+
+        var date = (DateTime?)taskDate;
 
         date.Should().NotBeNull("the default format for date strings is 'yyyy-MM-dd'");
         var dateParts = input.Split("-").Select(s => Convert.ToInt32(s)).ToList();
@@ -39,12 +42,7 @@ public class DueDateHelperTests
     public void GivenARelativeSynonymShouldReturnAValidDateOnly(string synonym, string expected)
     {
         // Arrange
-        var today = new DateTime(2024, 06, 06);
-        var gmt = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
-        _timeProvider.SetLocalTimeZone(gmt);
-        _timeProvider.SetUtcNow(today);
-        _timeProvider.GetLocalNow();
-        var sut = new DateTimeConverter(_timeProvider);
+        var sut = new TaskDateConverter(_timeProvider);
         DateTime.TryParse(expected, provider, DateTimeStyles.AssumeLocal, out var exact);
 
         // Act
@@ -52,7 +50,7 @@ public class DueDateHelperTests
 
         // Assert
         date.Should().Be(exact, "a synoymn should correctly convert to a date");
-        date!.Value.Kind.Should().Be(DateTimeKind.Local);
+        date!.Value.Kind.Should().Be(DateTimeKind.Utc);
     }
 
     [Theory]
@@ -68,7 +66,7 @@ public class DueDateHelperTests
         // Arrange
         var today = new DateTime(2024, 06, 06);
         _timeProvider.SetUtcNow(today);
-        var sut = new DateTimeConverter(_timeProvider);
+        var sut = new TaskDateConverter(_timeProvider);
         var exact = DateTime.ParseExact(expected, "yyyy-MM-dd", provider);
 
         // Act

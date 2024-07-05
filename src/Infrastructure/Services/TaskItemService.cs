@@ -6,7 +6,7 @@ using TaskTitan.Infrastructure.Expressions;
 
 namespace TaskTitan.Infrastructure.Services;
 
-public class TaskItemService(ITaskItemRepository repository, IExpressionParser parser, IStringFilterConverter<DateTime> stringConverter, ILogger<TaskItemService> logger) : ITaskItemService
+public class TaskItemService(ITaskItemRepository repository, IExpressionParser parser, ILogger<TaskItemService> logger) : ITaskItemService
 {
     private readonly ITaskItemRepository _repository = repository;
     private readonly IExpressionParser _parser = parser;
@@ -15,14 +15,10 @@ public class TaskItemService(ITaskItemRepository repository, IExpressionParser p
     public async Task<int> Add(ITaskRequest request)
     {
         if (request is not TaskItemCreateRequest createRequest) throw new Exception();
-        var task = TaskItem.CreateNew(createRequest.NewTask.Description);
-        task.Due = stringConverter.ConvertFrom(createRequest.NewTask.Due);
-        task.Scheduled = stringConverter.ConvertFrom(createRequest.NewTask.Scheduled);
-        task.Wait = stringConverter.ConvertFrom(createRequest.NewTask.Wait);
-        task.Until = stringConverter.ConvertFrom(createRequest.NewTask.Until);
+
         try
         {
-            var result = await _repository.AddAsync(task);
+            var result = await _repository.AddAsync(createRequest.Task);
             return result;
         }
         catch (Exception ex)
@@ -87,15 +83,7 @@ public class TaskItemService(ITaskItemRepository repository, IExpressionParser p
     {
         if (request is not TaskItemModifyRequest updateRequest) throw new Exception();
         var filterExpressions = updateRequest.Filters.Select(_parser.ParseFilter);
-        string[] dateAttrs = [TaskItemAttribute.Due, TaskItemAttribute.Scheduled, TaskItemAttribute.Wait, TaskItemAttribute.Until];
-        foreach (var attr in updateRequest.Attributes)
-        {
-            if (dateAttrs.Contains(attr.Key))
-            {
-                var convertedVal = stringConverter.ConvertFrom(attr.Value?.ToString());
-                updateRequest.Attributes[attr.Key] = convertedVal is null ? "" : new DateTimeOffset(convertedVal.Value);
-            }
-        }
+
         return await _repository.UpdateByFilter(filterExpressions, updateRequest.Attributes);
     }
 }

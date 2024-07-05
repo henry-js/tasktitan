@@ -17,14 +17,14 @@ public class TaskItem : INotifyPropertyChanged
     public string Description { get => _description; private set => _description = value; }
     public string? Project { get; set; }
     public TaskItemState Status { get; private set; }
-    public DateTime Entry { get; private set; }
-    public DateTime? Modified { get; private set; }
-    public DateTime? Due { get; set; }
-    public DateTime? Until { get; set; }
-    public DateTime? Wait { get; set; }
-    public DateTime? Start { get; set; }
-    public DateTime? End { get; set; }
-    public DateTime? Scheduled { get; set; }
+    public TaskDate Entry { get; private set; }
+    public TaskDate? Modified { get; private set; }
+    public TaskDate? Due { get; set; }
+    public TaskDate? Until { get; set; }
+    public TaskDate? Wait { get; set; }
+    public TaskDate? Start { get; set; }
+    public TaskDate? End { get; set; }
+    public TaskDate? Scheduled { get; set; }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

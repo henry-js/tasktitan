@@ -8,7 +8,7 @@ public record TaskItemCreateRequest : ITaskRequest
     public Action Operation { get; } = Action.Create;
     // public Dictionary<TaskItemAttribute, string> Attributes { get; } = [];
 
-    public required CreateTaskItemDto NewTask { get; set; }
+    public required TaskItem Task { get; set; }
 }
 
 public record CreateTaskItemDto

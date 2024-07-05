@@ -13,7 +13,7 @@ public static class DependencyInjection
     {
         services.AddScoped<ITaskItemService, TaskItemService>();
         services.AddScoped<IExpressionParser, ExpressionParser>();
-        services.AddScoped<IStringFilterConverter<DateTime>, Dates.DateTimeConverter>();
+        services.AddScoped<IStringFilterConverter<TaskDate>, Dates.TaskDateConverter>();
         services.AddMicrosoftTodoInfrastructure();
 
         return services;

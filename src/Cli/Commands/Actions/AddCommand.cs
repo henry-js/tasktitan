@@ -46,7 +46,7 @@ internal sealed class AddCommand : Command
         command.AddOption(untilOption);
     }
 
-    new public class Handler(IAnsiConsole console, ITaskItemService service, ILogger<AddCommand> logger) : ICommandHandler
+    new public class Handler(IAnsiConsole console, ITaskItemService service, IStringFilterConverter<DateTime> stringConverter, ILogger<AddCommand> logger) : ICommandHandler
     {
         public required string Description { get; set; }
         public string? Due { get; set; }
@@ -62,16 +62,14 @@ internal sealed class AddCommand : Command
         public async Task<int> InvokeAsync(InvocationContext context)
         {
             logger.LogInformation("Handling {Request}", nameof(TaskItemCreateRequest));
+            var task = TaskItem.CreateNew(Description);
+            task.Due = stringConverter.ConvertFrom(Due);
+            task.Scheduled = stringConverter.ConvertFrom(Scheduled);
+            task.Wait = stringConverter.ConvertFrom(Wait);
+            task.Until = stringConverter.ConvertFrom(Until);
             TaskItemCreateRequest request = new()
             {
-                NewTask = new()
-                {
-                    Description = Description,
-                    Due = Due,
-                    Scheduled = Scheduled,
-                    Wait = Wait,
-                    Until = Until,
-                }
+                Task = task
             };
             var rowid = await service.Add(request);
 
