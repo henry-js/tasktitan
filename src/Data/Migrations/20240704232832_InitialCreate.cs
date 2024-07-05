@@ -1,4 +1,5 @@
 ﻿using System;
+
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -18,7 +19,7 @@ namespace Data.Migrations
                     id = table.Column<string>(type: "TEXT", nullable: false),
                     description = table.Column<string>(type: "TEXT", nullable: false),
                     project = table.Column<string>(type: "TEXT", nullable: true),
-                    status = table.Column<string>(type: "TEXT", nullable: false, defaultValue: "Pending"),
+                    status = table.Column<string>(type: "TEXT", nullable: false, defaultValue: "pending"),
                     entry = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
                     modified = table.Column<DateTime>(type: "TEXT", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP"),
                     due = table.Column<DateTime>(type: "TEXT", nullable: true),

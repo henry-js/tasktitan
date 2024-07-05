@@ -1,4 +1,5 @@
 using System.Data;
+using System.Globalization;
 
 using Dapper;
 
@@ -12,6 +13,19 @@ internal class TaskItemIdHandler : SqlMapper.TypeHandler<TaskItemId>
     }
 
     public override void SetValue(IDbDataParameter parameter, TaskItemId value)
+    {
+        parameter.Value = value.ToString();
+    }
+}
+
+internal class TaskDateHandler : SqlMapper.TypeHandler<TaskDate>
+{
+    public override TaskDate Parse(object value)
+    {
+        return DateTime.Parse((string)value, CultureInfo.CurrentCulture, DateTimeStyles.AssumeUniversal);
+    }
+
+    public override void SetValue(IDbDataParameter parameter, TaskDate value)
     {
         parameter.Value = value.ToString();
     }

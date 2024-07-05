@@ -1,7 +1,4 @@
-using System.Data;
-
 using Dapper;
-
 using static TaskTitan.Data.DbConstants;
 using TaskTitan.Data.DapperSqliteTypeHandlers;
 using Microsoft.Extensions.Logging;
@@ -20,6 +17,7 @@ public class TaskItemRepository : ITaskItemRepository
     public TaskItemRepository(QueryFactory db, ILogger<TaskItemRepository> log)
     {
         SqlMapper.AddTypeHandler(new TaskItemIdHandler());
+        SqlMapper.AddTypeHandler(new TaskDateHandler());
         SqlMapper.AddTypeHandler(typeof(TaskItemAttribute), new TaskItemAttributeHandler());
         SqlMapper.AddTypeHandler(typeof(DateTime), new DateTimeHandler());
         SqlMapper.AddTypeHandler(typeof(TaskItemState), new TaskItemStateHandler());

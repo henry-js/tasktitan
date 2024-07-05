@@ -1,6 +1,7 @@
 ﻿using static TaskTitan.Data.DbConstants;
 using Microsoft.EntityFrameworkCore.Metadata;
 using TaskTitan.Core.Enums;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace TaskTitan.Data;
 
@@ -46,11 +47,11 @@ public class TaskTitanDbContext : DbContext
             .HasDefaultValue(TaskItemState.Pending);
         modelBuilder.Entity<TaskItem>()
             .Property(task => task.Entry)
-            .HasDefaultValueSql("strftime('%Y-%m-%dT%H:%M:%fZ', 'now')")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
             .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
         modelBuilder.Entity<TaskItem>()
             .Property(task => task.Modified)
-            .HasDefaultValueSql("strftime('%Y-%m-%dT%H:%M:%fZ', 'now')")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
             .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
         // modelBuilder.Entity<TaskItem>().OwnsOne(
@@ -66,4 +67,20 @@ public class TaskTitanDbContext : DbContext
 
         // Database.EnsureCreated();
     }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder
+    .Properties<TaskDate>()
+    .HaveConversion<TaskDateConverter>();
+    }
+}
+
+internal class TaskDateConverter : ValueConverter<TaskDate, DateTime>
+{
+    public TaskDateConverter() : base(
+        v => (DateTime)v,
+        v => (TaskDate)v
+    )
+    { }
 }
