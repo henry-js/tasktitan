@@ -33,23 +33,23 @@ public class DueDateHelperTests
     }
 
     [Theory]
-    [InlineData("today", "2024-06-06", true)]
-    [InlineData("yesterday", "2024-06-05", true)]
-    [InlineData("tomorrow", "2024-06-07", true)]
-    [InlineData("eom", "2024-06-30", true)]
-    [InlineData("eoy", "2024-12-31", true)]
-    public void GivenARelativeSynonymShouldReturnAValidDateOnly(string synonym, string expected, bool asDateOnly)
+    [InlineData("today", "2024-06-06")]
+    [InlineData("yesterday", "2024-06-05")]
+    [InlineData("tomorrow", "2024-06-07")]
+    [InlineData("eom", "2024-06-30")]
+    [InlineData("eoy", "2024-12-31")]
+    public void GivenARelativeSynonymShouldReturnAValidDateOnly(string synonym, string expected)
     {
         // Arrange
         var sut = new TaskDateConverter(_timeProvider);
         DateTime.TryParse(expected, provider, DateTimeStyles.AssumeUniversal, out var exact);
-        var exactTaskDate = new TaskDate(exact, asDateOnly);
+        var exactTaskDate = new TaskDate(DateOnly.FromDateTime(exact));
         // Act
         var date = sut.ConvertFrom(synonym);
 
         // Assert
         date.Should().Be(exactTaskDate, "a synoymn should correctly convert to a date");
-        date!.Value.IsDateOnly.Should().Be(asDateOnly);
+        date!.Value.IsDateOnly.Should().Be(true);
         date.Value.Kind.Should().Be(DateTimeKind.Utc);
     }
 

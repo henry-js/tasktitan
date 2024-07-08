@@ -14,7 +14,7 @@ public class TaskDateConverter(TimeProvider _timeProvider) : IStringFilterConver
         {
             newNow = newNow.AddDays(1);
         }
-        return new TaskDate(newNow.Date, true);
+        return new TaskDate(DateOnly.FromDateTime(newNow.Date));
     }
 
     private bool IsDayOfWeek(string input) =>
@@ -28,10 +28,10 @@ public class TaskDateConverter(TimeProvider _timeProvider) : IStringFilterConver
         TaskDate? dt = value switch
         {
             "eom" => new TaskDate(new DateOnly(Now.Year, Now.Month, DateTime.DaysInMonth(Now.Year, Now.Month))),
-            "today" => new TaskDate(Now.Date, true),
-            "tomorrow" => new TaskDate(Now.Date.AddDays(1), true),
-            "yesterday" => new TaskDate(Now.Date.AddDays(-1), true),
-            "eoy" => new TaskDate(new DateTime(Now.Year, 12, 31), true),
+            "today" => new TaskDate(DateOnly.FromDateTime(Now.Date)),
+            "tomorrow" => new TaskDate(DateOnly.FromDateTime(Now.Date.AddDays(1))),
+            "yesterday" => new TaskDate(DateOnly.FromDateTime(Now.Date.AddDays(-1))),
+            "eoy" => new TaskDate(DateOnly.FromDateTime(new DateTime(Now.Year, 12, 31))),
             "eod" => Now.Date.AddHours(23).AddMinutes(59).AddSeconds(59),
             string day when IsDayOfWeek(day) => NextDayOfWeek(day),
             string date when DateTime.TryParseExact(date, "yyyy-MM-dd", CultureInfo.CurrentCulture, DateTimeStyles.AssumeUniversal, out var parsedDate) => parsedDate,
