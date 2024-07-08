@@ -80,7 +80,7 @@ internal class ExportCommand : Command
                 : await PostTasksAsync(listId!, localTasks);
         }
 
-        private async Task<int> PostTasksAsync(string listId, IEnumerable<TaskItemDto> tasksToExport, IEnumerable<Microsoft.Graph.Models.TodoTask>? fetchedTasks = null)
+        private async Task<int> PostTasksAsync(string listId, IEnumerable<TaskItem> tasksToExport, IEnumerable<Microsoft.Graph.Models.TodoTask>? fetchedTasks = null)
         {
             if (fetchedTasks is null || fetchedTasks.Count() == 0) Force = true;
             if (!Force)

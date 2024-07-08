@@ -3,6 +3,7 @@ namespace TaskTitan.Infrastructure.Dates;
 public class TaskDateConverter(TimeProvider _timeProvider) : IStringFilterConverter<TaskDate>
 {
     public DateTimeOffset Now { get; } = _timeProvider.GetUtcNow();
+    private (int Year, int Month) YearAndMonth => (Now.Year, Now.Month);
     private readonly DayOfWeek[] _daysOfWeek = Enum.GetValues<DayOfWeek>();
 
     private TaskDate NextDayOfWeek(string day)
@@ -13,7 +14,7 @@ public class TaskDateConverter(TimeProvider _timeProvider) : IStringFilterConver
         {
             newNow = newNow.AddDays(1);
         }
-        return DateOnly.FromDateTime(newNow.Date);
+        return new TaskDate(newNow.Date, true);
     }
 
     private bool IsDayOfWeek(string input) =>
@@ -26,17 +27,17 @@ public class TaskDateConverter(TimeProvider _timeProvider) : IStringFilterConver
     {
         TaskDate? dt = value switch
         {
-            "eom" => DateOnly.FromDateTime(new DateTime(Now.Year, Now.Month, DateTime.DaysInMonth(Now.Year, Now.Month))),
-            "today" => DateOnly.FromDateTime(Now.Date),
-            "tomorrow" => DateOnly.FromDateTime(Now.Date.AddDays(1)),
-            "yesterday" => DateOnly.FromDateTime(Now.Date.AddDays(-1)),
-            "eoy" => DateOnly.FromDateTime(new DateTime(Now.Year, 12, 31)),
+            "eom" => new TaskDate(new DateOnly(Now.Year, Now.Month, DateTime.DaysInMonth(Now.Year, Now.Month))),
+            "today" => new TaskDate(Now.Date, true),
+            "tomorrow" => new TaskDate(Now.Date.AddDays(1), true),
+            "yesterday" => new TaskDate(Now.Date.AddDays(-1), true),
+            "eoy" => new TaskDate(new DateTime(Now.Year, 12, 31), true),
             "eod" => Now.Date.AddHours(23).AddMinutes(59).AddSeconds(59),
             string day when IsDayOfWeek(day) => NextDayOfWeek(day),
             string date when DateTime.TryParseExact(date, "yyyy-MM-dd", CultureInfo.CurrentCulture, DateTimeStyles.AssumeUniversal, out var parsedDate) => parsedDate,
             _ => null,
         };
 
-        return dt is not null ? DateTime.SpecifyKind(dt.Value, DateTimeKind.Utc) : null;
+        return dt is not null ? dt : null;
     }
 }

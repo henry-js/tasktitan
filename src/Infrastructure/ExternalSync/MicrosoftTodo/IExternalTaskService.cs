@@ -8,10 +8,10 @@ namespace TaskTitan.Infrastructure.ExternalSync.MicrosoftTodo;
 public interface IExternalTaskService
 {
     Task<Result<string>> CreateNewListAsync();
-    Task<Result> ExportTaskAsync(string listId, TaskItemDto task);
+    Task<Result> ExportTaskAsync(string listId, TaskItem task);
     Task<Result<IEnumerable<TodoTask>>> FetchExistingExportedAsync(string listId);
     Task<IEnumerable<TodoTaskList>> GetAsync();
     Task<string?> GetListIdAsync();
     Task<IEnumerable<TodoTaskList>> GetListsAsync();
-    Task<List<TaskItemDto>> GetTasksToExportAsync(bool all);
+    Task<List<TaskItem>> GetTasksToExportAsync(bool all);
 }

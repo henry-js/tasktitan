@@ -43,7 +43,7 @@ internal sealed class ListCommand : Command
             }
             else
             {
-                console.ListTasks(tasks.Select(TaskItemDto.FromTaskItem));
+                console.ListTasks(tasks);
             }
 
             return 0;

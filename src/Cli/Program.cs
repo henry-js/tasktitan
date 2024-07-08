@@ -2,13 +2,11 @@
 using System.CommandLine.Builder;
 using System.CommandLine.Hosting;
 using System.CommandLine.Parsing;
-using System.Runtime.Serialization;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using Serilog;
-using Serilog.Templates;
 
 using TaskTitan.Cli.Commands.Actions;
 using TaskTitan.Cli.Commands.Admin;
@@ -45,9 +43,9 @@ rootCommand.AddAdminCommands();
 rootCommand.AddBackupCommands();
 
 var cmdLineBuilder = new CommandLineBuilder(rootCommand);
-int result = 0;
+Parser parser;
 
-var parser = cmdLineBuilder
+parser = cmdLineBuilder
     .UseHost(_ => Host.CreateDefaultBuilder(args), builder =>
     {
         builder.ConfigureServices(ConfigureServices)
@@ -69,6 +67,16 @@ var parser = cmdLineBuilder
         Log.Fatal(ex, "Application terminated unexpectedly");
     }).Build();
 
+int result = await parser.InvokeAsync(args);
+
+#if DEBUG
+Console.WriteLine($"Program terminated with code {result}");
+Console.WriteLine("Press any key to exit.");
+System.Console.ReadKey(intercept: true);
+#endif
+
+return result;
+
 static void ConfigureServices(HostBuilderContext context, IServiceCollection services)
 {
     services.AddSingleton(_ => AnsiConsole.Console);
@@ -76,12 +84,3 @@ static void ConfigureServices(HostBuilderContext context, IServiceCollection ser
     services.AddInfrastructure();
     services.RegisterDb($"Data Source={ConfigHelper.UserProfileDbPath}", Log.Logger);
 }
-result = await parser.InvokeAsync(args);
-
-#if DEBUG
-Console.WriteLine();
-Console.WriteLine("Press any key to exit.");
-System.Console.ReadKey(intercept: true);
-#endif
-
-return result;

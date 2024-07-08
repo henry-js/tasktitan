@@ -37,8 +37,9 @@ internal class TaskItemStateHandler : SqlMapper.TypeHandler<TaskItemState>
 {
     public override TaskItemState Parse(object value)
     {
-        string val = value.ToString()!;
+        string? val = value?.ToString();
         ArgumentException.ThrowIfNullOrWhiteSpace(val);
+
         return (TaskItemState)val!;
     }
 

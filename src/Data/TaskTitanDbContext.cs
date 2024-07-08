@@ -72,13 +72,13 @@ public class TaskTitanDbContext : DbContext
     {
         configurationBuilder
     .Properties<TaskDate>()
-    .HaveConversion<TaskDateConverter>();
+    .HaveConversion<TaskDateEFConverter>();
     }
 }
 
-internal class TaskDateConverter : ValueConverter<TaskDate, DateTime>
+internal class TaskDateEFConverter : ValueConverter<TaskDate, DateTime>
 {
-    public TaskDateConverter() : base(
+    public TaskDateEFConverter() : base(
         v => (DateTime)v,
         v => (TaskDate)v
     )

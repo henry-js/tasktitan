@@ -41,14 +41,14 @@ public class MicrosoftTodoService : IExternalTaskService
             return Result<string>.Success(result.Id);
     }
 
-    public async Task<Result> ExportTaskAsync(string listId, TaskItemDto task)
+    public async Task<Result> ExportTaskAsync(string listId, TaskItem task)
     {
         _logger.LogInformation("Exporting task {TaskItemId} to list {TodoListId}", task.Id, listId);
         var requestBody = new TodoTask
         {
             Title = task.Description,
-            DueDateTime = task.Due?.ToDateTimeTimeZone(),
-            CompletedDateTime = task.End?.ToDateTimeTimeZone(),
+            DueDateTime = task.Due?.Value.ToDateTimeTimeZone(),
+            CompletedDateTime = task.End?.Value.ToDateTimeTimeZone(),
             // TODO: Add TaskItem.Notes property
             // Body = task?.Notes,
             LinkedResources = [
@@ -56,7 +56,7 @@ public class MicrosoftTodoService : IExternalTaskService
                 {
                     ApplicationName = "TaskTitan",
                     DisplayName = $"TaskItemId : {task.Id}",
-                    ExternalId = task.Id,
+                    ExternalId = task.Id.ToString(),
                 }
             ]
         };
@@ -125,10 +125,9 @@ public class MicrosoftTodoService : IExternalTaskService
         }
     }
 
-    public async Task<List<TaskItemDto>> GetTasksToExportAsync(bool all = false)
+    public async Task<List<TaskItem>> GetTasksToExportAsync(bool all = false)
     {
-
-        var tasks = (await _repository.GetAllAsync()).Select(t => TaskItemDto.FromTaskItem(t));
-        return all ? tasks.ToList() : tasks.Where(t => t.State != TaskItemState.Pending || t.State != TaskItemState.Deleted).ToList();
+        var tasks = (await _repository.GetAllAsync());
+        return all ? tasks.ToList() : tasks.Where(t => t.Status != TaskItemState.Pending || t.Status != TaskItemState.Deleted).ToList();
     }
 }

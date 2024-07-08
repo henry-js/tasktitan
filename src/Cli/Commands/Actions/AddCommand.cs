@@ -46,7 +46,7 @@ internal sealed class AddCommand : Command
         command.AddOption(untilOption);
     }
 
-    new public class Handler(IAnsiConsole console, ITaskItemService service, IStringFilterConverter<DateTime> stringConverter, ILogger<AddCommand> logger) : ICommandHandler
+    new public class Handler(IAnsiConsole console, ITaskItemService service, IStringFilterConverter<TaskDate> stringConverter, ILogger<AddCommand> logger) : ICommandHandler
     {
         public required string Description { get; set; }
         public string? Due { get; set; }

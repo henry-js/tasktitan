@@ -6,7 +6,7 @@ namespace TaskTitan.Cli.Commands;
 
 internal static class TaskItemConsoleExtensions
 {
-    internal static void ListTasks(this IAnsiConsole console, IEnumerable<TaskItemDto> tasks)
+    internal static void ListTasks(this IAnsiConsole console, IEnumerable<TaskItem> tasks)
     {
         if (!tasks.Any())
         {
@@ -22,7 +22,7 @@ internal static class TaskItemConsoleExtensions
         grid.AddRow(["Id", nameof(TaskItem.Description), nameof(TaskItem.Due)]);
         foreach (var task in tasks)
         {
-            var humanizedDate = task.Due?.Date.Humanize() ?? "";
+            var humanizedDate = task.Due?.Value.Humanize() ?? "";
             grid.AddRow([$"{task.RowId}", $"{task.Description}", $"{humanizedDate}"]);
         }
 

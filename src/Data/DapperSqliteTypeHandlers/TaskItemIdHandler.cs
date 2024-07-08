@@ -22,6 +22,10 @@ internal class TaskDateHandler : SqlMapper.TypeHandler<TaskDate>
 {
     public override TaskDate Parse(object value)
     {
+        var stringValue = (string)value;
+
+        if (DateOnly.TryParseExact(stringValue, TaskDate.DateFormat, out DateOnly dateOnly))
+            return new TaskDate(dateOnly);
         return DateTime.Parse((string)value, CultureInfo.CurrentCulture, DateTimeStyles.AssumeUniversal);
     }
 
