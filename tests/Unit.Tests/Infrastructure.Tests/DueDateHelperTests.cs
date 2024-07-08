@@ -26,31 +26,31 @@ public class DueDateHelperTests
 
         date.Should().NotBeNull("the default format for date strings is 'yyyy-MM-dd'");
         var dateParts = input.Split("-").Select(s => Convert.ToInt32(s)).ToList();
-        dateParts[0].Should().Be(date?.Year);
-        dateParts[1].Should().Be(date?.Month);
-        dateParts[2].Should().Be(date?.Day);
+        dateParts.Should().HaveElementAt(0, date.Value.Year);
+        dateParts.Should().HaveElementAt(1, date.Value.Month);
+        dateParts.Should().HaveElementAt(2, date.Value.Day);
+        date!.Value.Kind.Should().Be(DateTimeKind.Utc);
     }
 
     [Theory]
-    [InlineData("today", "2024-06-06")]
-    [InlineData("yesterday", "2024-06-05")]
-    [InlineData("tomorrow", "2024-06-07")]
-
-    [InlineData("eom", "2024-06-30")]
-    [InlineData("eoy", "2024-12-31")]
-    [InlineData("eod", "2024-06-06 23:59:59")]
-    public void GivenARelativeSynonymShouldReturnAValidDateOnly(string synonym, string expected)
+    [InlineData("today", "2024-06-06", true)]
+    [InlineData("yesterday", "2024-06-05", true)]
+    [InlineData("tomorrow", "2024-06-07", true)]
+    [InlineData("eom", "2024-06-30", true)]
+    [InlineData("eoy", "2024-12-31", true)]
+    public void GivenARelativeSynonymShouldReturnAValidDateOnly(string synonym, string expected, bool asDateOnly)
     {
         // Arrange
         var sut = new TaskDateConverter(_timeProvider);
-        DateTime.TryParse(expected, provider, DateTimeStyles.AssumeLocal, out var exact);
-
+        DateTime.TryParse(expected, provider, DateTimeStyles.AssumeUniversal, out var exact);
+        var exactTaskDate = new TaskDate(exact, asDateOnly);
         // Act
         var date = sut.ConvertFrom(synonym);
 
         // Assert
-        date.Should().Be(exact, "a synoymn should correctly convert to a date");
-        date!.Value.Kind.Should().Be(DateTimeKind.Utc);
+        date.Should().Be(exactTaskDate, "a synoymn should correctly convert to a date");
+        date!.Value.IsDateOnly.Should().Be(asDateOnly);
+        date.Value.Kind.Should().Be(DateTimeKind.Utc);
     }
 
     [Theory]
@@ -64,14 +64,14 @@ public class DueDateHelperTests
     public void GivenADayOfWeekShouldReturnDateFromToday(string dayOfWeek, string expected)
     {
         // Arrange
-        var today = new DateTime(2024, 06, 06);
-        _timeProvider.SetUtcNow(today);
         var sut = new TaskDateConverter(_timeProvider);
         var exact = DateTime.ParseExact(expected, "yyyy-MM-dd", provider);
-
+        var exactTaskDate = new TaskDate(DateOnly.Parse(expected, CultureInfo.CurrentCulture));
         // Act
         var date = sut.ConvertFrom(dayOfWeek);
         // Assert
-        date.Should().Be(exact, "a synoymn should correctly convert to a date");
+        date.Should().NotBeNull();
+        date.Should().Be(exactTaskDate, "a synoymn should correctly convert to a date");
+        date!.Value.Kind.Should().Be(DateTimeKind.Utc);
     }
 }

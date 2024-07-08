@@ -91,7 +91,7 @@ public class TaskDateTests
     public void ImplicitConversion_FromDateOnly_ShouldCreateTaskDate()
     {
         DateOnly dateOnly = DateOnly.FromDateTime(localMidSummerDay);
-        TaskDate taskDate = dateOnly;
+        TaskDate taskDate = new TaskDate(dateOnly);
 
         taskDate.ToString().Should().Be("2024-06-06");
     }
