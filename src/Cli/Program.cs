@@ -1,21 +1,6 @@
-﻿using System.CommandLine;
-using System.CommandLine.Builder;
-using System.CommandLine.Hosting;
-using System.CommandLine.Parsing;
-
-using Bogus;
-
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-
-using Serilog;
-
-using TaskTitan.Cli.Commands.Actions;
+﻿using TaskTitan.Cli.Commands.Actions;
 using TaskTitan.Cli.Commands.Admin;
 using TaskTitan.Cli.Commands.Backup;
-using TaskTitan.Infrastructure;
-
-using Velopack;
 
 var loggerConfiguration = new LoggerConfiguration()
     .MinimumLevel.Debug()
@@ -29,20 +14,19 @@ Log.Logger = loggerConfiguration.CreateBootstrapLogger();
 VelopackApp.Build()
 .WithFirstRun(v =>
 {
-    ConfigHelper.FirstRun();
-    ConfigHelper.AddToPath();
+    // ConfigHelper.FirstRun();
+    // ConfigHelper.AddToPath();
 })
-#if WINDOWS // TODO: Make this cross-platform
-.WithAfterUpdateFastCallback(v =>
-{
-    var initializer = new DatabaseInitializer($"Data Source={ConfigHelper.UserProfileDbPath}");
-    initializer.InitializeAsync();
-})
-#endif
 .Run();
 
-// services.AddScoped<BogusCommand>();
+var configuration = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json", false)
+    .AddTomlFile(ConfigHelper.UserConfigPath, false)
+    .Build();
+var config = configuration.RemoveUnderscores();
+var userOpts = new UserOpts();
 
+config.Bind(userOpts);
 var rootCommand = new RootCommand("task");
 rootCommand.AddCommand(new ListCommand());
 rootCommand.AddCommand(new AddCommand());
@@ -57,18 +41,19 @@ Parser parser;
 parser = cmdLineBuilder
     .UseHost(_ => Host.CreateDefaultBuilder(args), builder =>
     {
+        builder.ConfigureHostConfiguration(c => c.AddTomlFile(ConfigHelper.UserConfigPath, true));
         builder.ConfigureServices(ConfigureServices)
-        .UseCommandHandler<ListCommand, ListCommand.Handler>()
-        .UseCommandHandler<AddCommand, AddCommand.Handler>()
-        .UseCommandHandler<StartCommand, StartCommand.Handler>()
-        .UseCommandHandler<ModifyCommand, ModifyCommand.Handler>()
-        .UseCommandHandler<DeleteCommand, DeleteCommand.Handler>()
-        .UseAdminCommandHandlers()
-        .UseBackupCommandHandlers()
-        .UseSerilog((context, services, configuration) =>
-        {
-            configuration.ReadFrom.Configuration(context.Configuration);
-        });
+            .UseCommandHandler<ListCommand, ListCommand.Handler>()
+            .UseCommandHandler<AddCommand, AddCommand.Handler>()
+            .UseCommandHandler<StartCommand, StartCommand.Handler>()
+            .UseCommandHandler<ModifyCommand, ModifyCommand.Handler>()
+            .UseCommandHandler<DeleteCommand, DeleteCommand.Handler>()
+            .UseAdminCommandHandlers()
+            .UseBackupCommandHandlers()
+            .UseSerilog((context, services, configuration) =>
+            {
+                configuration.ReadFrom.Configuration(context.Configuration);
+            });
     })
     .UseDefaults()
     .UseExceptionHandler((ex, context) =>
@@ -94,4 +79,9 @@ static void ConfigureServices(HostBuilderContext context, IServiceCollection ser
     services.AddInfrastructure();
     services.RegisterDb($"Data Source={ConfigHelper.UserProfileDbPath}", Log.Logger);
 
+}
+
+internal class UserOpts
+{
+    public string TasksDb { get; set; } = string.Empty;
 }

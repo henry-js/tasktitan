@@ -2,6 +2,8 @@ using System.Diagnostics;
 
 using Serilog;
 
+using Tomlyn.Extensions.Configuration;
+
 namespace TaskTitan.Cli;
 
 public static class ConfigHelper
@@ -10,6 +12,7 @@ public static class ConfigHelper
     private static string UserProfileDirectory => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
     private static string UserProfileDirectoryDataFolder => Path.Combine(UserProfileDirectory, ".tasktitan");
     public static string UserProfileDbPath => Path.Combine(UserProfileDirectoryDataFolder, DbName);
+    internal static string UserConfigPath => Path.Combine(UserProfileDirectory, ".config", "tasktitan", "tasktitan.toml");
 
     internal static void FirstRun()
     {
@@ -46,4 +49,5 @@ public static class ConfigHelper
             Log.Information("tasktitan path has been added to the PATH environment variable.");
         }
     }
+
 }
