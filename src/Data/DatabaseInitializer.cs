@@ -1,10 +1,6 @@
 using DbUp;
-using DbUp.Engine.Output;
-using DbUp.SQLite;
+using DbUp.Helpers;
 
-using Microsoft.Extensions.Logging;
-
-using SqlKata.Execution;
 
 namespace TaskTitan.Data;
 
@@ -30,5 +26,12 @@ public class DatabaseInitializer
         {
             var result = upgrader.PerformUpgrade();
         }
+        var idempotentUpgrader = DeployChanges.To
+            .SQLiteDatabase(_connectionString)
+            .WithScriptsEmbeddedInAssembly(typeof(DatabaseInitializer).Assembly, s => s.Contains("idempotent"))
+            .JournalTo(new NullJournal())
+            .Build();
+
+        idempotentUpgrader.PerformUpgrade();
     }
 }
