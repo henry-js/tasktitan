@@ -3,6 +3,8 @@ using System.CommandLine.Builder;
 using System.CommandLine.Hosting;
 using System.CommandLine.Parsing;
 
+using Bogus;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -29,7 +31,15 @@ VelopackApp.Build()
 {
     ConfigHelper.FirstRun();
     ConfigHelper.AddToPath();
-}).Run();
+})
+#if WINDOWS // TODO: Make this cross-platform
+.WithAfterUpdateFastCallback(v =>
+{
+    var initializer = new DatabaseInitializer($"Data Source={ConfigHelper.UserProfileDbPath}");
+    initializer.InitializeAsync();
+})
+#endif
+.Run();
 
 // services.AddScoped<BogusCommand>();
 
@@ -44,7 +54,6 @@ rootCommand.AddBackupCommands();
 
 var cmdLineBuilder = new CommandLineBuilder(rootCommand);
 Parser parser;
-
 parser = cmdLineBuilder
     .UseHost(_ => Host.CreateDefaultBuilder(args), builder =>
     {
@@ -55,10 +64,11 @@ parser = cmdLineBuilder
         .UseCommandHandler<ModifyCommand, ModifyCommand.Handler>()
         .UseCommandHandler<DeleteCommand, DeleteCommand.Handler>()
         .UseAdminCommandHandlers()
-        .UseBackupCommandHandlers();
-
-        builder.UseSerilog((context, services, configuration) =>
-        configuration.ReadFrom.Configuration(context.Configuration));
+        .UseBackupCommandHandlers()
+        .UseSerilog((context, services, configuration) =>
+        {
+            configuration.ReadFrom.Configuration(context.Configuration);
+        });
     })
     .UseDefaults()
     .UseExceptionHandler((ex, context) =>
@@ -83,4 +93,5 @@ static void ConfigureServices(HostBuilderContext context, IServiceCollection ser
     services.AddSingleton(TimeProvider.System);
     services.AddInfrastructure();
     services.RegisterDb($"Data Source={ConfigHelper.UserProfileDbPath}", Log.Logger);
+
 }

@@ -23,8 +23,8 @@ public static class ConfigHelper
 
         if (!AnsiConsole.Confirm("Would you like a new database created, so tasktitan can proceed?")) return;
 
-        var dbbundle = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "efbundle.exe");
-        Process.Start(dbbundle);
+        var db = new DatabaseInitializer($"Data Source={UserProfileDbPath}");
+        db.InitializeAsync();
     }
 
     internal static void AddToPath()
