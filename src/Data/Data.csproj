@@ -9,7 +9,6 @@
     <PackageReference Include="dbup-sqlite" Version="5.0.40" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.4" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
-    <PackageReference Include="Serilog" Version="3.1.1" />
     <PackageReference Include="SqlKata" Version="2.4.0" />
     <PackageReference Include="SqlKata.Execution" Version="2.4.0" />
   </ItemGroup>
@@ -41,5 +40,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <DebugType>embedded</DebugType>
+    <RootNamespace>TaskTitan.Data</RootNamespace>
   </PropertyGroup>
 </Project>

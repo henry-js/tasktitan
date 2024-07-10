@@ -1,4 +1,6 @@
-﻿var loggerConfiguration = new LoggerConfiguration()
+﻿using Constants = TaskTitan.Data.Constants;
+
+var loggerConfiguration = new LoggerConfiguration()
     .MinimumLevel.Debug()
             .WriteTo.File("logs/startup_.log",
             outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u}] {SourceContext}: {Message:lj}{NewLine}{Exception}",
@@ -8,16 +10,19 @@
 Log.Logger = loggerConfiguration.CreateBootstrapLogger();
 
 VelopackApp.Build()
+    .WithFirstRun(v =>
+    {
+        ConfigHelper.EnsureTaskEnvVarExists();
+        ConfigHelper.EnsureDirectoryExists();
+        ConfigHelper.UpdateDatabase();
+    })
     .Run();
 
-var configuration = new ConfigurationBuilder()
-    .AddJsonFile("appsettings.json", false)
-    .AddTomlFile(ConfigHelper.UserConfigPath, false)
+var userConfig = new ConfigurationBuilder()
+    .AddTomlFile(ConfigHelper.UserConfigFile, true)
     .Build();
-var config = configuration.RemoveUnderscores();
-var userOpts = new UserOpts();
 
-config.Bind(userOpts);
+
 var rootCommand = new RootCommand("task");
 rootCommand.AddCommand(new ListCommand());
 rootCommand.AddCommand(new AddCommand());
@@ -32,8 +37,8 @@ Parser parser;
 parser = cmdLineBuilder
     .UseHost(_ => Host.CreateDefaultBuilder(args), builder =>
     {
-        builder.ConfigureHostConfiguration(c => c.AddTomlFile(ConfigHelper.UserConfigPath, true));
         builder.ConfigureServices(ConfigureServices)
+        // builder.ConfigureHostConfiguration(c => c.AddTomlFile(ConfigHelper.UserConfigPath, true));
             .UseCommandHandler<ListCommand, ListCommand.Handler>()
             .UseCommandHandler<AddCommand, AddCommand.Handler>()
             .UseCommandHandler<StartCommand, StartCommand.Handler>()
@@ -42,23 +47,22 @@ parser = cmdLineBuilder
             .UseAdminCommandHandlers()
             .UseBackupCommandHandlers()
             .UseSerilog((context, services, configuration) =>
-            {
-                configuration.ReadFrom.Configuration(context.Configuration);
-            });
+                configuration.ReadFrom.Configuration(context.Configuration));
     })
     .UseDefaults()
-    .UseExceptionHandler((ex, context) =>
-    {
-        AnsiConsole.WriteException(ex, ExceptionFormats.ShortenTypes | ExceptionFormats.NoStackTrace);
-        Log.Fatal(ex, "Application terminated unexpectedly");
-    }).Build();
+    // .UseExceptionHandler((ex, context) =>
+    // {
+    //     AnsiConsole.WriteException(ex, ExceptionFormats.Default);
+    //     Log.Fatal(ex, "Application terminated unexpectedly");
+    // })
+    .Build();
 
 int result = await parser.InvokeAsync(args);
 
 #if DEBUG
-Console.WriteLine($"Program terminated with code {result}");
-Console.WriteLine("Press any key to exit.");
-System.Console.ReadKey(intercept: true);
+AnsiConsole.WriteLine($"Program terminated with code {result}");
+AnsiConsole.WriteLine("Press any key to exit.");
+Console.ReadKey(intercept: true);
 #endif
 
 return result;
@@ -68,11 +72,5 @@ static void ConfigureServices(HostBuilderContext context, IServiceCollection ser
     services.AddSingleton(_ => AnsiConsole.Console);
     services.AddSingleton(TimeProvider.System);
     services.AddInfrastructure();
-    services.RegisterDb($"Data Source={ConfigHelper.UserProfileDbPath}", Log.Logger);
-
-}
-
-internal class UserOpts
-{
-    public string TasksDb { get; set; } = string.Empty;
+    services.RegisterDb(ConfigHelper.ConnectionString);
 }

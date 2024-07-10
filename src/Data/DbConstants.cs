@@ -2,14 +2,10 @@ using TaskTitan.Core.Enums;
 
 namespace TaskTitan.Data;
 
-public static class DbConstants
+public static class Constants
 {
-    public static class KeyWords
-    {
-        public const string Between = "BETWEEN";
-        public const string In = "IN";
-        public const string And = "AND";
-    }
+    public const string TasksDbConnectionString = "TasksDb";
+
     public static class TasksTable
     {
         public const string Name = "tasks";

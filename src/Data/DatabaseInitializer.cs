@@ -1,7 +1,6 @@
 using DbUp;
 using DbUp.Helpers;
 
-
 namespace TaskTitan.Data;
 
 public class DatabaseInitializer
@@ -13,7 +12,7 @@ public class DatabaseInitializer
         _connectionString = connectionString;
     }
 
-    public async Task InitializeAsync()
+    public void Initialize()
     {
         var upgrader = DeployChanges.To
             .SQLiteDatabase(_connectionString)

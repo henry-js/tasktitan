@@ -1,30 +1,22 @@
+using Microsoft.Extensions.Logging.Abstractions;
+
+using Constants = TaskTitan.Data.Constants;
+
 namespace TaskTitan.Cli;
 
 public static class ConfigHelper
 {
-    private static string DbName => "tasks.db";
-    private static string UserProfileDirectory => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-    private static string UserProfileDirectoryDataFolder => Path.Combine(UserProfileDirectory, ".tasktitan");
-    public static string UserProfileDbPath => Path.Combine(UserProfileDirectoryDataFolder, DbName);
-    internal static string UserConfigPath => Path.Combine(UserProfileDirectory, ".config", "tasktitan", "tasktitan.toml");
+    internal static string UserProfileDirectory => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+    internal static string TaskTitanDirectory => Path.Combine(UserProfileDirectory, ".config", "tasktitan");
+    internal static string UserConfigFile => Path.Combine(TaskTitanDirectory, "tasktitan.toml");
+    internal static string ConnectionString => "Data Source=" + Path.Combine(TaskTitanDirectory, "tasks.db");
 
-    internal static void FirstRun()
+    internal static void EnsureDirectoryExists()
     {
-        Directory.CreateDirectory(UserProfileDirectoryDataFolder);
-        if (File.Exists(UserProfileDbPath)) return;
-
-        var path = new TextPath(UserProfileDbPath.Replace(UserProfileDirectory, @"~\"));
-        AnsiConsole.Markup("A task database could [bold]not[/] be found in: ");
-        AnsiConsole.Write(path);
-        AnsiConsole.WriteLine();
-
-        if (!AnsiConsole.Confirm("Would you like a new database created, so tasktitan can proceed?")) return;
-
-        var db = new DatabaseInitializer($"Data Source={UserProfileDbPath}");
-        db.InitializeAsync();
+        Directory.CreateDirectory(TaskTitanDirectory);
     }
 
-    internal static void AddToPath()
+    internal static void EnsureTaskEnvVarExists()
     {
         var expectedPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "tasktitan", "current");
 
@@ -44,4 +36,9 @@ public static class ConfigHelper
         }
     }
 
+    internal static void UpdateDatabase()
+    {
+        var initializer = new DatabaseInitializer(ConnectionString);
+        initializer.Initialize();
+    }
 }

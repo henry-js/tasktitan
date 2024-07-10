@@ -20,6 +20,7 @@ internal class ExportCommand : Command
         command.AddOption(serviceOption);
 
         var forceOption = new Option<bool>(aliases: ["-f", "--force"], () => true, "Force export without checking for updates");
+        command.AddOption(forceOption);
     }
     new public class Handler(ILogger<ExportCommand> logger, IAnsiConsole console, IExternalTaskService service) : ICommandHandler
     {

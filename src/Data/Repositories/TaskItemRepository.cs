@@ -1,5 +1,5 @@
 using Dapper;
-using static TaskTitan.Data.DbConstants;
+using static TaskTitan.Data.Constants;
 using TaskTitan.Data.DapperSqliteTypeHandlers;
 using Microsoft.Extensions.Logging;
 using TaskTitan.Core.Enums;

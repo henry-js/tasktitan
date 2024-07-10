@@ -1,4 +1,4 @@
-﻿using static TaskTitan.Data.DbConstants;
+﻿using static TaskTitan.Data.Constants;
 using Microsoft.EntityFrameworkCore.Metadata;
 using TaskTitan.Core.Enums;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
