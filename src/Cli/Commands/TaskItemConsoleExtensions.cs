@@ -1,7 +1,5 @@
 using Humanizer;
 
-using TaskTitan.Infrastructure.Dtos;
-
 namespace TaskTitan.Cli.Commands;
 
 internal static class TaskItemConsoleExtensions

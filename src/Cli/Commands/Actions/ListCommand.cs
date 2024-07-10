@@ -1,8 +1,3 @@
-using System.CommandLine;
-using System.CommandLine.Invocation;
-
-using TaskTitan.Infrastructure.Dtos;
-
 namespace TaskTitan.Cli.Commands.Actions;
 
 internal sealed class ListCommand : Command

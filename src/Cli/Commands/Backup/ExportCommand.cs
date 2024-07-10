@@ -1,7 +1,3 @@
-using System.CommandLine;
-using System.CommandLine.Invocation;
-
-using TaskTitan.Infrastructure.Dtos;
 using TaskTitan.Infrastructure.ExternalSync;
 using TaskTitan.Infrastructure.ExternalSync.MicrosoftTodo;
 

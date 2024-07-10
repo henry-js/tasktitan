@@ -1,8 +1,3 @@
-using System.CommandLine;
-using System.CommandLine.Hosting;
-
-using Microsoft.Extensions.Hosting;
-
 using TaskTitan.Infrastructure.ExternalSync;
 
 namespace TaskTitan.Cli.Commands.Backup;

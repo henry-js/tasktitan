@@ -1,11 +1,4 @@
-using System.CommandLine;
-using System.CommandLine.Invocation;
-
 using Bogus;
-
-using Microsoft.EntityFrameworkCore;
-
-using TaskTitan.Infrastructure.Dtos;
 
 namespace TaskTitan.Cli.Commands.Admin;
 

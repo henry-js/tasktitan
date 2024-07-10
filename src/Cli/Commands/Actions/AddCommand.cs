@@ -1,7 +1,3 @@
-using System.CommandLine;
-using System.CommandLine.Invocation;
-using System.Threading.Tasks;
-
 namespace TaskTitan.Cli.Commands.Actions;
 
 internal sealed class AddCommand : Command

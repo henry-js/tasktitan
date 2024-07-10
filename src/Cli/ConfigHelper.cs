@@ -1,9 +1,3 @@
-using System.Diagnostics;
-
-using Serilog;
-
-using Tomlyn.Extensions.Configuration;
-
 namespace TaskTitan.Cli;
 
 public static class ConfigHelper

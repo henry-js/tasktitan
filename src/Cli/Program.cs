@@ -1,8 +1,4 @@
-﻿using TaskTitan.Cli.Commands.Actions;
-using TaskTitan.Cli.Commands.Admin;
-using TaskTitan.Cli.Commands.Backup;
-
-var loggerConfiguration = new LoggerConfiguration()
+﻿var loggerConfiguration = new LoggerConfiguration()
     .MinimumLevel.Debug()
             .WriteTo.File("logs/startup_.log",
             outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u}] {SourceContext}: {Message:lj}{NewLine}{Exception}",
@@ -12,12 +8,7 @@ var loggerConfiguration = new LoggerConfiguration()
 Log.Logger = loggerConfiguration.CreateBootstrapLogger();
 
 VelopackApp.Build()
-.WithFirstRun(v =>
-{
-    // ConfigHelper.FirstRun();
-    // ConfigHelper.AddToPath();
-})
-.Run();
+    .Run();
 
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", false)

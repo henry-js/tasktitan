@@ -1,9 +1,4 @@
-using System.CommandLine;
-using System.CommandLine.Invocation;
-
 using Humanizer;
-
-using TaskTitan.Core.Enums;
 
 namespace TaskTitan.Cli.Commands.Actions;
 

@@ -57,13 +57,29 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Using Include="Microsoft.Extensions.Configuration"/>
+    <Using Include="Microsoft.Extensions.DependencyInjection"/>
+    <Using Include="Microsoft.Extensions.Hosting"/>
     <Using Include="Microsoft.Extensions.Logging" />
+    <Using Include="Serilog"/>
+    <Using Include="System.CommandLine"/>
+    <Using Include="System.CommandLine.Builder"/>
+    <Using Include="System.CommandLine.Hosting"/>
+    <Using Include="System.CommandLine.Invocation"/>
+    <Using Include="System.CommandLine.Parsing"/>
     <Using Include="Spectre.Console" />
     <Using Include="Spectre.Console.AnsiConsole" Alias="Console" />
     <Using Include="System.Collections.Generic" />
     <Using Include="TaskTitan.Cli" />
+    <Using Include="TaskTitan.Cli.Commands.Actions" />
+    <Using Include="TaskTitan.Cli.Commands.Admin" />
+    <Using Include="TaskTitan.Cli.Commands.Backup" />
     <Using Include="TaskTitan.Core" />
+    <Using Include="TaskTitan.Core.Enums" />
     <Using Include="TaskTitan.Data" />
     <Using Include="TaskTitan.Infrastructure.Services" />
+    <Using Include="TaskTitan.Infrastructure" />
+    <Using Include="Tomlyn.Extensions.Configuration"/>
+    <Using Include="Velopack" />
   </ItemGroup>
 </Project>

@@ -1,8 +1,3 @@
-using System.CommandLine;
-using System.CommandLine.Hosting;
-
-using Microsoft.Extensions.Hosting;
-
 namespace TaskTitan.Cli.Commands.Admin;
 
 internal static class AdminExtensions
