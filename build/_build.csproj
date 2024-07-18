@@ -19,17 +19,17 @@
   <ItemGroup>
     <PackageDownload Include="minver-cli" Version="[5.0.0]" />
     <PackageDownload Include="ReportGenerator" Version="[5.3.0]" />
-    <PackageDownload Include="vpk" Version="[0.0.462-gf8acc97]" />
+    <PackageDownload Include="vpk" Version="[0.0.556]" />
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="Nuke.Common"/>
-    <Using Include="Nuke.Common.IO"/>
-    <Using Include="Nuke.Common.ProjectModel"/>
-    <Using Include="Nuke.Common.Tools.Coverlet"/>
-    <Using Include="Nuke.Common.Tools.DotNet"/>
-    <Using Include="Nuke.Common.Tools.MinVer"/>
-    <Using Include="Nuke.Common.Tools.ReportGenerator"/>
+    <Using Include="Nuke.Common" />
+    <Using Include="Nuke.Common.IO" />
+    <Using Include="Nuke.Common.ProjectModel" />
+    <Using Include="Nuke.Common.Tools.Coverlet" />
+    <Using Include="Nuke.Common.Tools.DotNet" />
+    <Using Include="Nuke.Common.Tools.MinVer" />
+    <Using Include="Nuke.Common.Tools.ReportGenerator" />
     <Using Include="Serilog" />
     <Using Include="System.Diagnostics" />
     <Using Include="Nuke.Common.Tools.DotNet.DotNetTasks" Static="True" />

@@ -134,8 +134,7 @@ partial class Build : NukeBuild
         .TriggeredBy(Publish)
         .Requires(() => Configuration == "Release")
         .Produces([
-            ReleaseDirectory / Runtime / "tasktitan-win-Setup.exe",
-            ReleaseDirectory / Runtime / "tasktitan-win-Portable.zip",
+            ReleaseDirectory / Runtime,
         ])
         .Executes(() =>
         {

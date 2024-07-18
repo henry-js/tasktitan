@@ -38,13 +38,8 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj', '**/Directory.Packages.props') }}
       - name: 'Run: Publish'
         run: ./build.cmd Publish
-      - name: 'Publish: tasktitan-win-Setup.exe'
+      - name: 'Publish: win-x64'
         uses: actions/upload-artifact@v3
         with:
-          name: tasktitan-win-Setup.exe
-          path: release/win-x64/tasktitan-win-Setup.exe
-      - name: 'Publish: tasktitan-win-Portable.zip'
-        uses: actions/upload-artifact@v3
-        with:
-          name: tasktitan-win-Portable.zip
-          path: release/win-x64/tasktitan-win-Portable.zip
+          name: win-x64
+          path: release/win-x64
