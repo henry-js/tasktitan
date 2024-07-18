@@ -6,22 +6,26 @@ public static class Constants
 {
     public const string TasksDbConnectionString = "TasksDb";
 
-    public static class TasksTable
+    public static class Tasks
     {
+        public static class Views
+        {
+            public const string TasksWithRowId = "tasks_with_rowId";
+
+        }
         public const string Name = "tasks";
         public const string RowId = "RowId";
         public const string TasksQuery = $"""
 SELECT * FROM {Name}
 """;
-        public const string TasksWithRowId = "tasks_with_rowId"
-        ; public const string CreateViewTasksWithRowId = $"""
-CREATE VIEW {TasksWithRowId} as
+        public const string CreateViewTasksWithRowId = $"""
+CREATE VIEW {Views.TasksWithRowId} as
 SELECT
     *,
     row_number() OVER ( ORDER BY {nameof(TaskItem.Entry)}) RowId
 FROM tasks
 """;
-        public const string DropViewTasksWithRowId = $"DROP VIEW {TasksWithRowId}";
+        public const string DropViewTasksWithRowId = $"DROP VIEW {Views.TasksWithRowId}";
         public static readonly string CreateTaskModifiedTrigger = $"""
 CREATE TRIGGER tasks_on_update
 AFTER UPDATE ON tasks
@@ -31,7 +35,6 @@ BEGIN
         {TaskItemAttribute.Modified} = CURRENT_TIMESTAMP
     WHERE {TaskItemAttribute.Id} = NEW.{TaskItemAttribute.Id};
 END;
-
 """;
 
         public static readonly string DropTaskModifiedTrigger = "DROP TRIGGER IF EXISTS tasks_on_update";

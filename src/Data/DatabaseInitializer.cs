@@ -1,5 +1,4 @@
 using DbUp;
-using DbUp.Helpers;
 
 namespace TaskTitan.Data;
 
@@ -24,13 +23,18 @@ public class DatabaseInitializer
         if (upgrader.IsUpgradeRequired())
         {
             var result = upgrader.PerformUpgrade();
+            if (result.Successful)
+            {
+                Console.WriteLine("Database is up to date!");
+            }
+            else
+            {
+                Console.WriteLine("Update database failed!");
+            }
         }
-        var idempotentUpgrader = DeployChanges.To
-            .SQLiteDatabase(_connectionString)
-            .WithScriptsEmbeddedInAssembly(typeof(DatabaseInitializer).Assembly, s => s.Contains("idempotent"))
-            .JournalTo(new NullJournal())
-            .Build();
-
-        idempotentUpgrader.PerformUpgrade();
+        else
+        {
+            Console.WriteLine("No database upgrade required!");
+        }
     }
 }

@@ -1,42 +1,61 @@
-namespace TaskTitan.Core.OperationResults;
+// namespace TaskTitan.Core.OperationResults;
 
-public record Result
-{
-    internal Result(bool success, Error error)
-    {
-        if ((success && error != Error.None) || (!success && error == Error.None))
-            throw new ArgumentException("Invalid error", nameof(error));
-        IsSuccess = success;
-        Error = error;
-    }
+// public abstract record Result
+// {
+//     public bool IsSuccess { get; }
+//     public Error Error { get; }
 
-    public bool IsSuccess { get; }
-    public bool IsFailure => !IsSuccess;
-    public Error Error { get; }
+//     protected Result(bool isSuccess, Error error)
+//     {
+//         IsSuccess = isSuccess;
+//         Error = error;
+//     }
 
-    public static Result Success() => new(true, Error.None);
-    public static Result Failure(Error error) => new(false, error);
-}
+//     public static Result Success() => new SuccessResult();
+//     public static Result<T> Success<T>(T value) => new Result<T>.SuccessResult(value);
+//     public static Result Failure(Error error) => new FailureResult(error);
 
-public sealed record Error(int Code, string Description)
-{
-    public static readonly Error None = new(0, string.Empty);
-}
+//     public Result<T> ToGeneric<T>() => IsSuccess ? Result<T>.Success(default!) : Result<T>.Failure(Error);
 
-public record Result<T> : Result
-{
-    protected internal Result(bool success, Error error, T value) : base(success, error)
-    {
-        Value = value;
-    }
+//     private record SuccessResult : Result
+//     {
+//         public SuccessResult() : base(true, Error.None) { }
+//     }
 
-    protected internal Result(bool succes, Error error) : base(succes, error)
-    {
-        Value = default;
-    }
+//     private record FailureResult : Result
+//     {
+//         public FailureResult(Error error) : base(false, error) { }
+//     }
+// }
 
-    public T? Value { get; }
+// public record Result<T> : Result
+// {
+//     private readonly T _value;
 
-    public static Result<T> Success(T value) => new Result<T>(true, Error.None, value);
-    new public static Result<T> Failure(Error error) => new Result<T>(false, error);
-}
+//     private Result(bool isSuccess, T value, Error error) : base(isSuccess, error)
+//     {
+//         _value = value;
+//     }
+
+//     public T Value => IsSuccess ? _value : throw new InvalidOperationException("Cannot access Value on a failure result.");
+
+//     public static Result<T> Success(T value) => new SuccessResult(value);
+//     public new static Result<T> Failure(Error error) => new Result<T>(false, default, error);
+
+//     public static Result<T> FromResult(Result result) => result.ToGeneric<T>();
+
+//     internal record SuccessResult : Result<T>
+//     {
+//         public SuccessResult(T value) : base(true, value, Error.None) { }
+//     }
+
+//     public static implicit operator Result<T>(Result r)
+//     {
+
+//     }
+// }
+
+// public sealed record Error(int Code, string Description)
+// {
+//     public static readonly Error None = new(0, string.Empty);
+// }

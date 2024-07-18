@@ -1,6 +1,3 @@
-using Microsoft.Data.Sqlite;
-
-using SqlKata.Compilers;
 using SqlKata.Execution;
 
 using TaskTitan.Data.Repositories;
@@ -44,7 +41,8 @@ public class TaskItemServiceTests : IDisposable
         var result = await sut.Add(request);
 
         // Assert
-        result.Should().Be(1);
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().Be(1);
     }
 
     [Fact]
@@ -64,7 +62,12 @@ public class TaskItemServiceTests : IDisposable
         await sut.Delete(newTask);
 
         // Then
-        var deletedTask = (await sut.GetTasks([])).SingleOrDefault(t => t.Id == id);
+        var result = await sut.GetTasks([]);
+
+        result.IsSuccess.Should().BeTrue();
+
+        var deletedTask = result.Value.SingleOrDefault(t => t.Id == id);
+
         deletedTask.Should().NotBeNull();
     }
 
@@ -79,9 +82,11 @@ public class TaskItemServiceTests : IDisposable
         ITaskItemService sut = new TaskItemService(repository, _parser, _serviceLogger);
 
         // Act
-        var tasks = await sut.GetTasks([]);
+        var result = await sut.GetTasks([]);
 
         // Assert
+        result.IsSuccess.Should().BeTrue();
+        var tasks = result.Value;
         tasks.Should().HaveCount(2);
         tasks.Should().AllSatisfy(t => t.RowId.Should().NotBe(0), "The database should correctly assign row number");
     }
@@ -90,7 +95,6 @@ public class TaskItemServiceTests : IDisposable
     public async Task UpdateShouldUpdateAndReturnSuccessResult()
     {
         // Given
-        // using var dbContext = _fixture.CreateContext();
         ITaskItemRepository repository = new TaskItemRepository(_db, _repoLogger);
         var newTask = TaskItem.CreateNew("Task to update");
         var id = newTask.Id;
@@ -105,7 +109,8 @@ public class TaskItemServiceTests : IDisposable
         var result = await sut.Update(modifyRequest);
 
         // Then
-        result.Should().Be(1);
+        result.IsSuccess.Should().Be(true);
+        result.Value.Should().Be(1);
     }
 
     public void Dispose()

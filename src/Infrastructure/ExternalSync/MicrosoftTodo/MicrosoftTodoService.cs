@@ -1,9 +1,8 @@
+using FluentResults;
+
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using Microsoft.Graph.Models.ODataErrors;
-
-using TaskTitan.Core.OperationResults;
-using TaskTitan.Infrastructure.Dtos;
 
 namespace TaskTitan.Infrastructure.ExternalSync.MicrosoftTodo;
 
@@ -35,10 +34,10 @@ public class MicrosoftTodoService : IExternalTaskService
         if (result is null || result.Id is null)
         {
             _logger.LogError("Failed to create list");
-            return Result<string>.Failure(new Error(404, "Microsoft Graph failed to create tasklist"));
+            return Result.Fail(new Error("Microsoft Graph failed to create tasklist"));
         }
         else
-            return Result<string>.Success(result.Id);
+            return Result.Ok(result.Id);
     }
 
     public async Task<Result> ExportTaskAsync(string listId, TaskItem task)
@@ -68,17 +67,17 @@ public class MicrosoftTodoService : IExternalTaskService
         catch (ODataError ex)
         {
             _logger.LogError(ex, "Failed to export tasktitan task to Microsoft To Do");
-            return Result.Failure(new Error(501, ex.Message));
+            return Result.Fail(new Error(ex.Message));
             throw;
         }
 
         if (result is null)
         {
             _logger.LogWarning("Export task failed");
-            return Result.Failure(new Error(404, "Failed to export tasktitan task to Microsoft To Do"));
+            return Result.Fail(new Error("Failed to export tasktitan task to Microsoft To Do"));
         }
 
-        return Result.Success();
+        return Result.Ok();
     }
 
     public async Task<IEnumerable<TodoTaskList>> GetAsync()
@@ -117,17 +116,14 @@ public class MicrosoftTodoService : IExternalTaskService
     {
         // TODO: Convert to ExternalTaskDtos before returning
         var todos = await _client.Me.Todo.Lists[id].Tasks.GetAsync();
-        if (todos is not null)
-            return Result<IEnumerable<TodoTask>>.Success(todos?.Value!);
-        else
-        {
-            return Result<IEnumerable<TodoTask>>.Failure(new Error(500, $"Could not find todo list with id {id}"));
-        }
+        return todos is not null
+            ? Result.Ok(todos?.Value!.AsEnumerable() ?? [])
+            : Result.Fail(new Error($"Could not find todo list with id {id}"));
     }
 
     public async Task<List<TaskItem>> GetTasksToExportAsync(bool all = false)
     {
-        var tasks = (await _repository.GetAllAsync());
+        var tasks = await _repository.GetAllAsync();
         return all ? tasks.ToList() : tasks.Where(t => t.Status != TaskItemState.Pending || t.Status != TaskItemState.Deleted).ToList();
     }
 }

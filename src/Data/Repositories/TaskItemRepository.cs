@@ -1,7 +1,7 @@
 using Dapper;
+using Microsoft.Extensions.Logging;
 using static TaskTitan.Data.Constants;
 using TaskTitan.Data.DapperSqliteTypeHandlers;
-using Microsoft.Extensions.Logging;
 using TaskTitan.Core.Enums;
 using SqlKata.Execution;
 using TaskTitan.Core.Expressions;
@@ -60,7 +60,7 @@ public class TaskItemRepository : ITaskItemRepository
 
     public async Task<int> DeleteByFilter(IEnumerable<Expression> filterExpressions)
     {
-        var query = _db.Query(TasksTable.TasksWithRowId).Select();
+        var query = _db.Query(Tasks.Views.TasksWithRowId).Select();
         foreach (var exp in filterExpressions)
         {
             query = exp switch
@@ -79,13 +79,13 @@ public class TaskItemRepository : ITaskItemRepository
 
     public async Task<IEnumerable<TaskItem>> GetAllAsync()
     {
-        var tasks = await _db.Query(TasksTable.TasksWithRowId).GetAsync<TaskItem>();
+        var tasks = await _db.Query(Tasks.Views.TasksWithRowId).GetAsync<TaskItem>();
         return tasks;
     }
 
     public Task<IEnumerable<TaskItem>> GetByFilterAsync(IEnumerable<Expression> expressions)
     {
-        var query = _db.Query(TasksTable.TasksWithRowId).Select("*");
+        var query = _db.Query(Tasks.Views.TasksWithRowId).Select("*");
         foreach (var exp in expressions)
         {
             query = exp switch
@@ -100,7 +100,7 @@ public class TaskItemRepository : ITaskItemRepository
 
     public async Task<int> UpdateByFilter(IEnumerable<Expression> expressions, IEnumerable<KeyValuePair<string, object?>> keyValues)
     {
-        var query = _db.Query("tasks_with_rowId");
+        var query = _db.Query(Tasks.Views.TasksWithRowId);
         foreach (var exp in expressions)
         {
             query = exp switch
@@ -113,6 +113,25 @@ public class TaskItemRepository : ITaskItemRepository
         var taskIds = query.Select(TaskItemAttribute.Id).Get<string>();
 
         return await _db.Query("tasks").WhereIn("Id", taskIds).UpdateAsync(keyValues);
+    }
+
+    public async Task<IEnumerable<TaskItem>> GetTasks(IEnumerable<Expression> expressions, IEnumerable<TaskItemAttribute>? fields = null)
+    {
+        var query = _db.Query(Tasks.Views.TasksWithRowId);
+        // query.Select(fields.Select(f => (string)f));
+        foreach (var exp in expressions)
+        {
+            query = exp switch
+            {
+                IdFilterExpression idExp => query.AddIdFilter(idExp),
+                OperatorExpression opExp when opExp.Value == "Or" => query.Or(),
+                AttributeFilterExpression afExp => query.Where(afExp.attribute, afExp.Value),
+                _ => throw new NotImplementedException(),
+            };
+        }
+        var tasks = await query.GetAsync<TaskItem>();
+
+        return tasks;
     }
 }
 

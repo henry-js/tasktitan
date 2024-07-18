@@ -40,7 +40,15 @@ internal sealed class StartCommand : Command
             logger.LogInformation("Handling {Request}", nameof(TaskItemModifyRequest));
 
             await service.Update(request);
-            var tasksToStart = await service.GetTasks(Filter ?? []);
+            var result = await service.GetTasks(Filter ?? []);
+
+            if (result.IsFailed)
+            {
+                console.WriteLine("Found 0 tasks");
+                return -1;
+            }
+
+            var tasksToStart = result.Value;
             logger.LogInformation("Found {foundTasks} task(s)", tasksToStart.Count());
             foreach (var task in tasksToStart)
             {

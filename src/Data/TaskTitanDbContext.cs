@@ -17,7 +17,7 @@ public class TaskTitanDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<TaskItem>()
-            .ToTable(TasksTable.Name)
+            .ToTable(Constants.Tasks.Name)
             .HasKey(t => t.Id);
         modelBuilder.Entity<TaskItem>().Property(t => t.Id).HasColumnName(TaskItemAttribute.Id);
         modelBuilder.Entity<TaskItem>().Property(t => t.Description).HasColumnName(TaskItemAttribute.Description);

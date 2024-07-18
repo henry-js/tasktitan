@@ -15,7 +15,7 @@ public static class DependencyInjection
     public static IServiceCollection RegisterDb(this IServiceCollection services, string connectionString)
     {
         ArgumentException.ThrowIfNullOrEmpty(connectionString);
-        services.AddSingleton<DatabaseInitializer>();
+        // services.AddSingleton<DatabaseInitializer>();
         services.AddTransient<IDbConnection>(sp => new SqliteConnection(connectionString));
         services.AddTransient<ITaskItemRepository, TaskItemRepository>();
         services.AddTransient(_ =>

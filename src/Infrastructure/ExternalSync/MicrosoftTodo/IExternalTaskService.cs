@@ -1,6 +1,7 @@
+using FluentResults;
+
 using Microsoft.Graph.Models;
 
-using TaskTitan.Core.OperationResults;
 using TaskTitan.Infrastructure.Dtos;
 
 namespace TaskTitan.Infrastructure.ExternalSync.MicrosoftTodo;

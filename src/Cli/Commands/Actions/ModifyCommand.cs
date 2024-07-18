@@ -83,7 +83,9 @@ internal sealed class ModifyCommand : Command
             if (Wait is not null)
                 request.Attributes.Add(TaskItemAttribute.Wait, Wait);
 
-            int rowsUpdated = await service.Update(request);
+            var result = await service.Update(request);
+
+            int rowsUpdated = result.Value;
 
             console.WriteLine("tasks".ToQuantity(rowsUpdated) + " updated.");
             return 0;

@@ -6,9 +6,15 @@ public record TaskItemCreateRequest : ITaskRequest
 {
     public string[] Filters { get; init; } = [];
     public Action Operation { get; } = Action.Create;
-    // public Dictionary<TaskItemAttribute, string> Attributes { get; } = [];
 
     public required TaskItem Task { get; set; }
+}
+
+public record TaskItemGetRequest : ITaskRequest
+{
+    public string[] Filters { get; init; } = [];
+    public IEnumerable<FormattedTaskItemAttribute> Fields { get; init; } = [];
+    public Action Operation { get; } = Action.Fetch;
 }
 
 public record CreateTaskItemDto
@@ -21,5 +27,56 @@ public record CreateTaskItemDto
     public string? Started { get; init; }
     public string? Ended { get; init; }
     public string? Scheduled { get; init; }
+}
+public class FormattedTaskItemAttribute
+{
+    private readonly string _col;
 
+    public FormattedTaskItemAttribute(string col)
+    {
+        var split = col.Split(".");
+        FieldName = (TaskItemAttribute)split[0];
+        Format = split.Length > 1 ? Enum.Parse<FieldFormat>(split[1], true) : DefaultFormat(FieldName);
+        _col = col;
+    }
+
+    private static FieldFormat DefaultFormat(TaskItemAttribute fieldName)
+    {
+        return fieldName.Value switch
+        {
+            TaskItemConstants.Field.id => FieldFormat.None,
+            TaskItemConstants.Field.description => FieldFormat.None,
+            TaskItemConstants.Field.status => FieldFormat.Short,
+            TaskItemConstants.Field.project => FieldFormat.None,
+            TaskItemConstants.Field.due => FieldFormat.Date,
+            TaskItemConstants.Field.until => FieldFormat.Date,
+            TaskItemConstants.Field.limit => FieldFormat.None,
+            TaskItemConstants.Field.wait => FieldFormat.Date,
+            TaskItemConstants.Field.entry => FieldFormat.Age,
+            TaskItemConstants.Field.end => FieldFormat.Date,
+            TaskItemConstants.Field.start => FieldFormat.Date,
+            TaskItemConstants.Field.scheduled => FieldFormat.Date,
+            TaskItemConstants.Field.modified => FieldFormat.Date,
+            TaskItemConstants.Field.depends => FieldFormat.Date,
+            TaskItemConstants.Field.tag => FieldFormat.None,
+            _ => FieldFormat.None
+        };
+    }
+
+    public TaskItemAttribute FieldName { get; }
+    public FieldFormat Format { get; }
+}
+
+public enum FieldFormat
+{
+    None,
+    Long,
+    Short,
+    Date,
+    Age,
+    Indicator,
+    Countdown,
+    Count,
+    Parent,
+    Remaining
 }

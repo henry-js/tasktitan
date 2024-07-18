@@ -4,7 +4,7 @@ namespace TaskTitan.Cli.Commands.Actions;
 
 internal sealed class DeleteCommand : Command
 {
-    public DeleteCommand() : base("delete", "delete a task to the list")
+    public DeleteCommand() : base("delete", "delete a task from the list")
     {
         AddOptions(this);
     }
@@ -38,11 +38,23 @@ internal sealed class DeleteCommand : Command
                 Filters = Filter ?? [],
             };
 
-            var fetchedTasks = await service.GetTasks(Filter ?? []);
+            var result = await service.GetTasks(Filter ?? []);
+
+            if (result.IsFailed)
+            {
+                foreach (var error in result.Errors)
+                {
+                    console.WriteLine(error.Message);
+                }
+                return -1;
+            }
+
+            var fetchedTasks = result.Value;
             int deletedCount = 0;
             int failedCount = 0;
             int skippedCount = 0;
             bool all = false;
+
             foreach (var task in fetchedTasks)
             {
                 if (!all)
@@ -55,9 +67,9 @@ internal sealed class DeleteCommand : Command
                     }
                 }
 
-                var result = await service.Delete(task);
+                result = await service.Delete(task);
 
-                if (result.IsFailure)
+                if (result.IsFailed)
                 {
                     logger.LogError("Failed to delete task {TaskId}", task.Id);
                     failedCount++;

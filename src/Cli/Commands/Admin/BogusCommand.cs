@@ -43,7 +43,12 @@ public class BogusCommand : Command
         var faker = new Faker<TaskItem>()
         .CustomInstantiator(f => TaskItem.CreateNew(f.Hacker.Verb() + " " + f.Hacker.Noun()))
         .RuleFor(t => t.Entry, f => (TaskDate)f.Date.Recent(30))
-        .RuleFor(t => t.Due, (f, t) => f.Date.Future(1));
+        .RuleFor(t => t.Modified, (f, t) => f.Date.Soon(1, t.Entry))
+        .RuleFor(t => t.Due, (f, t) => f.Date.Future(1, DateTime.Now))
+        .RuleFor(t => t.Scheduled, (f, t) => f.Date.Future(1, DateTime.Now))
+        .RuleFor(t => t.Status, (f) => f.PickRandom<TaskItemState>(TaskItemState.Values))
+        .RuleForType<TaskDate>(typeof(TaskDate), f => f.Date.Soon(50))
+        .RuleFor(t => t.Project, f => f.Random.Word());
 
         return faker.Generate(quantity);
     }

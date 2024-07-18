@@ -1,7 +1,7 @@
+using FluentResults;
+
 using System.Data;
 
-using TaskTitan.Core.Enums;
-using TaskTitan.Core.OperationResults;
 using TaskTitan.Infrastructure.Expressions;
 
 namespace TaskTitan.Infrastructure.Services;
@@ -12,7 +12,7 @@ public class TaskItemService(ITaskItemRepository repository, IExpressionParser p
     private readonly IExpressionParser _parser = parser;
     private readonly ILogger<TaskItemService> _logger = logger;
 
-    public async Task<int> Add(ITaskRequest request)
+    public async Task<Result<int>> Add(ITaskRequest request)
     {
         if (request is not TaskItemCreateRequest createRequest) throw new Exception();
 
@@ -28,17 +28,6 @@ public class TaskItemService(ITaskItemRepository repository, IExpressionParser p
         }
     }
 
-    private void MapAttributes(TaskItem task, Dictionary<TaskItemAttribute, string> attributes)
-    {
-        foreach (var attr in attributes)
-        {
-            if (attr.Key == TaskItemAttribute.Description)
-            {
-                continue;
-            }
-        }
-    }
-
     public async Task<Result> Delete(TaskItem taskToDelete)
     {
         try
@@ -48,10 +37,10 @@ public class TaskItemService(ITaskItemRepository repository, IExpressionParser p
         catch (Exception ex)
         {
             _logger.LogError(ex, "Delete task {TaskID} failed", taskToDelete.Id);
-            return Result.Failure(new Error(1, ex.Message));
+            return Result.Fail(new Error(ex.Message));
         }
 
-        return Result.Success();
+        return Result.Ok();
     }
 
     public async Task<Result<int>> Delete(ITaskRequest request)
@@ -67,23 +56,45 @@ public class TaskItemService(ITaskItemRepository repository, IExpressionParser p
         }
         catch (Exception ex)
         {
-            return Result<int>.Failure(new Error(500, ex.Message));
+            return Result.Fail<int>(new Error(ex.Message));
         }
 
-        return Result<int>.Success(rowsUpdated);
+        return Result.Ok(rowsUpdated);
     }
 
-    public async Task<IEnumerable<TaskItem>> GetTasks(IEnumerable<string> filters)
+    public async Task<Result<IEnumerable<TaskItem>>> GetTasks(IEnumerable<string> filters)
     {
-        var expressions = filters.Any() ? filters.Select(_parser.ParseFilter) : [];
-        return await _repository.GetByFilterAsync(expressions);
+        var expressions = filters.Any() ? filters.Distinct().Select(_parser.ParseFilter) : [];
+        var tasks = await _repository.GetByFilterAsync(expressions);
+
+        return Result.Ok(tasks);
     }
 
-    public async Task<int> Update(ITaskRequest request)
+    public async Task<Result<int>> Update(ITaskRequest request)
     {
         if (request is not TaskItemModifyRequest updateRequest) throw new Exception();
         var filterExpressions = updateRequest.Filters.Select(_parser.ParseFilter);
 
         return await _repository.UpdateByFilter(filterExpressions, updateRequest.Attributes);
+    }
+
+    public async Task<Result<IEnumerable<TaskItem>>> GetTasks(ITaskRequest request)
+    {
+        if (request is not TaskItemGetRequest getRequest)
+        {
+            throw new Exception();
+        }
+        IEnumerable<TaskItem> tasks = Enumerable.Empty<TaskItem>();
+        var expressions = getRequest.Filters.Select(_parser.ParseFilter);
+        try
+        {
+            tasks = await _repository.GetTasks(expressions, getRequest.Fields.Select(f => f.FieldName).ToList());
+        }
+        catch (Exception ex)
+        {
+            return Result.Fail(new Error(ex.Message));
+        }
+
+        return Result.Ok(tasks);
     }
 }

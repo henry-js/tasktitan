@@ -55,18 +55,19 @@ internal class ExportCommand : Command
                     logger.LogInformation("Export cancelled");
                     return 0;
                 }
+
+                var result = await service.CreateNewListAsync();
+
+                if (result.IsSuccess)
+                    listId = result.Value;
                 else
                 {
-                    var result = await service.CreateNewListAsync();
-
-                    if (result.IsSuccess)
-                        listId = result.Value;
-                    else
+                    foreach (var error in result.Errors)
                     {
-                        console.WriteLine("Failed to create a list to export tasks to. Terminating program");
-                        console.WriteLine(result.Error.Description);
-                        return -1;
+                        console.WriteLine(error.Message);
                     }
+                    console.WriteLine("Failed to create a list to export tasks to. Terminating program");
+                    return -1;
                 }
             }
 
@@ -111,7 +112,10 @@ internal class ExportCommand : Command
                         else
                         {
                             console.MarkupLine("[red]Failed to export local task to cloud service[/]");
-                            console.MarkupLineInterpolated($"\t[red]Reason: {result.Error.Description}[/]");
+                            foreach (var error in result.Errors)
+                            {
+                                console.MarkupLineInterpolated($"\t[red]Reason: {error.Message}[/]");
+                            }
                             failures++;
                         }
                         await Task.Delay(1000);
