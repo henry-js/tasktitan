@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Reflection;
 
 using Humanizer;
 
@@ -33,6 +34,7 @@ internal static class TaskItemConsoleExtensions
 
         grid.AddColumns(fields.Count());
         grid.AddRow(fields.Select(f => (string)f.FieldName).ToArray());
+
         foreach (var task in tasks)
         {
             AddGridTaskItemRow(grid, task, fields);
@@ -47,19 +49,18 @@ internal static class TaskItemConsoleExtensions
     {
         var fieldsArr = fields.ToArray();
         string[] row = new string[fieldsArr.Length];
-        var props = task.GetType().GetProperties();
         for (int i = 0; i < fieldsArr.Length; i++)
         {
-            var prop = props.SingleOrDefault(p => string.Equals(fieldsArr[i].FieldName, p.Name, StringComparison.OrdinalIgnoreCase));
-            if (prop is null)
+            var field = fieldsArr[i];
+            if (field.Property is null)
             {
-                Console.WriteLine($"Field {fieldsArr[i].FieldName} could not be found on TaskItem object");
+                // Console.WriteLine($"Field {fieldsArr[i].FieldName} could not be found on TaskItem object");
                 row[i] = "";
                 continue;
             }
 
-            var propValue = prop.GetValue(task);
-            Debug.WriteLine($"Field: {fieldsArr[i].FieldName}, Name: {prop?.Name}, Value: {prop.GetValue(task)}");
+            var propValue = field.Property.GetValue(task);
+            Debug.WriteLine($"Field: {field.FieldName}, Name: {field.Property?.Name}, Value: {propValue}");
 
             row[i] = FormatPropValue(propValue, fieldsArr[i]);
         }
@@ -71,6 +72,9 @@ internal static class TaskItemConsoleExtensions
         //     row[i] = formatter is null ? propValue : FormatPropValue(propValue, formatter);
         //     Debug.WriteLine($"Name: {prop.Name}, Value: {prop.GetValue(task)}");
         // }
+
+        grid.AddRow(row);
+
         static string FormatPropValue(object? value, FormattedTaskItemAttribute formatter)
         {
             if (value is null) return "";
@@ -81,12 +85,12 @@ internal static class TaskItemConsoleExtensions
                 FieldFormat.None => value.ToString() ?? "",
                 FieldFormat.Date => ((TaskDate)value).DateOnly.ToString(),
                 FieldFormat.Indicator => value.ToString()![0].ToString(),
-                FieldFormat.Age => (((TaskDate)value) - DateTime.UtcNow).Days.ToString(),
+                // FieldFormat.Age => (((TaskDate)value) - DateTime.UtcNow).Days.ToString(),
+                FieldFormat.Age => ((TaskDate)value).Value.Humanize(),
+
                 _ => value.ToString() ?? "",
             };
         }
-
-        grid.AddRow(row);
     }
 
     internal static void DisplayTaskDetails(this IAnsiConsole console, TaskItem task)

@@ -18,6 +18,7 @@ VelopackApp.Build()
     })
 .Run();
 
+
 var userConfig = new ConfigurationBuilder()
     .AddTomlFile(ConfigHelper.UserConfigFile, true)
     .Build();

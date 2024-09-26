@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace TaskTitan.Core;
 
-public class TaskItem : INotifyPropertyChanged
+public class TaskItem
 {
     private string _description = string.Empty;
 
@@ -25,8 +25,6 @@ public class TaskItem : INotifyPropertyChanged
     public TaskDate? Start { get; set; }
     public TaskDate? End { get; set; }
     public TaskDate? Scheduled { get; set; }
-
-    public event PropertyChangedEventHandler? PropertyChanged;
 
     // [NotMapped]
     // public TaskItemMetadata? Metadata { get; set; }

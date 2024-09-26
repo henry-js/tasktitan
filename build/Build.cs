@@ -22,9 +22,9 @@ partial class Build : NukeBuild
         .Executes(() =>
         {
             MinVer = MinVerTasks.MinVer(_ => _
-                // .SetMinimumMajorMinor("1.0")
-                .SetDefaultPreReleasePhase("preview")
-                .SetTagPrefix("v")
+            // .SetMinimumMajorMinor("1.0")
+            .SetDefaultPreReleasePhase("preview")
+            .SetTagPrefix("v")
             ).Result;
             Log.Information("MinVer.Version: {0}", MinVer.Version);
             Log.Information("MinVer.MinverVersion: {0}", MinVer.MinVerVersion);
@@ -144,5 +144,4 @@ partial class Build : NukeBuild
             Log.Information("Velopack --outputDir: {0}", outputDir);
             Vpk.Invoke($"pack --packId tasktitan --packVersion {MinVer.Version} --packDir {packDir} --mainExe task.exe --packTitle tasktitan --outputDir {outputDir}");
         });
-
 }

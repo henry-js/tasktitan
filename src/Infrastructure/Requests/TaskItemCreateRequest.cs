@@ -1,3 +1,5 @@
+using System.Reflection;
+
 using TaskTitan.Core.Enums;
 
 namespace TaskTitan.Infrastructure.Services;
@@ -31,6 +33,7 @@ public record CreateTaskItemDto
 public class FormattedTaskItemAttribute
 {
     private readonly string _col;
+    private static readonly PropertyInfo[] Properties = typeof(TaskItem).GetProperties();
 
     public FormattedTaskItemAttribute(string col)
     {
@@ -38,6 +41,7 @@ public class FormattedTaskItemAttribute
         FieldName = (TaskItemAttribute)split[0];
         Format = split.Length > 1 ? Enum.Parse<FieldFormat>(split[1], true) : DefaultFormat(FieldName);
         _col = col;
+        Property = Properties.SingleOrDefault(p => string.Equals(FieldName, p.Name, StringComparison.OrdinalIgnoreCase));
     }
 
     private static FieldFormat DefaultFormat(TaskItemAttribute fieldName)
@@ -65,6 +69,7 @@ public class FormattedTaskItemAttribute
 
     public TaskItemAttribute FieldName { get; }
     public FieldFormat Format { get; }
+    public PropertyInfo? Property { get; }
 }
 
 public enum FieldFormat
