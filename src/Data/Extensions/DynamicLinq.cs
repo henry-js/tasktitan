@@ -1,5 +1,7 @@
 using System.Runtime.CompilerServices;
+
 using TaskTitan.Data.Expressions;
+
 using static TaskTitan.Data.Enums;
 
 namespace TaskTitan.Data.Extensions;
@@ -22,22 +24,22 @@ public static class DynamicLinq
 
     private static string AttributeToLinq(TaskProperty attr)
     {
-        if (attr is TaskAttribute<DateTime> t)
+        if (attr is TaskProperty<DateTime> t)
         {
             return ParseDateTimeAttribute(t);
         }
-        else if (attr is TaskAttribute<double> d)
+        else if (attr is TaskProperty<double> d)
         {
             return ParseNumberAttribute(d);
         }
-        else if (attr is TaskAttribute<string> s)
+        else if (attr is TaskProperty<string> s)
         {
             return ParseTextAttribute(s);
         }
 
         throw new Exception($"Unsupported property type {attr.GetType()}");
 
-        string ParseDateTimeAttribute(TaskAttribute<DateTime> attribute)
+        string ParseDateTimeAttribute(TaskProperty<DateTime> attribute)
         {
             return attribute.Modifier switch
             {
@@ -49,7 +51,7 @@ public static class DynamicLinq
                 _ => throw new SwitchExpressionException($"Modifier {attribute.Modifier} is not supported for Date attributes"),
             };
         }
-        string ParseTextAttribute(TaskAttribute<string> attribute)
+        string ParseTextAttribute(TaskProperty<string> attribute)
         {
             return attribute.Modifier switch
             {
@@ -62,7 +64,7 @@ public static class DynamicLinq
                 _ => throw new SwitchExpressionException($"Modifier {attribute.Modifier} is not supported for Text attributes"),
             };
         }
-        string ParseNumberAttribute(TaskAttribute<double> attribute)
+        string ParseNumberAttribute(TaskProperty<double> attribute)
         {
             return attribute.Modifier switch
             {

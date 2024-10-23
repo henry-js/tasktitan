@@ -1,6 +1,9 @@
 using System.Runtime.CompilerServices;
+
 using LiteDB;
+
 using TaskTitan.Data.Expressions;
+
 using static TaskTitan.Data.Enums;
 
 namespace TaskTitan.Data.Extensions;
@@ -29,15 +32,15 @@ public static class FilterToBson
 
     private static BsonExpression AttributeToBsonExpression(TaskProperty attr)
     {
-        if (attr is TaskAttribute<DateTime> t)
+        if (attr is TaskProperty<DateTime> t)
         {
             return ParseDateTimeAttribute(t);
         }
-        else if (attr is TaskAttribute<double> d)
+        else if (attr is TaskProperty<double> d)
         {
             return ParseNumberAttribute(d);
         }
-        else if (attr is TaskAttribute<string> s)
+        else if (attr is TaskProperty<string> s)
         {
             return ParseTextAttribute(s);
         }
@@ -48,7 +51,7 @@ public static class FilterToBson
 
         throw new Exception($"Unsupported property type {attr.GetType()}");
 
-        BsonExpression ParseDateTimeAttribute(TaskAttribute<DateTime> attribute)
+        BsonExpression ParseDateTimeAttribute(TaskProperty<DateTime> attribute)
         {
             return attribute.Modifier switch
             {
@@ -59,7 +62,7 @@ public static class FilterToBson
                 _ => throw new SwitchExpressionException($"Modifier {attribute.Modifier} is not supported for Date attributes"),
             };
         }
-        BsonExpression ParseTextAttribute(TaskAttribute<string> attribute)
+        BsonExpression ParseTextAttribute(TaskProperty<string> attribute)
         {
             return attribute.Modifier switch
             {
@@ -72,7 +75,7 @@ public static class FilterToBson
                 _ => throw new SwitchExpressionException($"Modifier {attribute.Modifier} is not supported for Text attributes"),
             };
         }
-        BsonExpression ParseNumberAttribute(TaskAttribute<double> attribute)
+        BsonExpression ParseNumberAttribute(TaskProperty<double> attribute)
         {
             return attribute.Modifier switch
             {
@@ -89,6 +92,7 @@ public static class FilterToBson
             {
                 { Name: "WAITING", Modifier: ColModifier.Exclude } => Query.EQ(nameof(TaskItem.Wait), null),
                 { Name: "WAITING", Modifier: ColModifier.Include } => Query.Not(nameof(TaskItem.Wait), null),
+                _ => throw new SwitchExpressionException($"Tag not supported, \n TaskTag: {tag?.ToString() ?? "NULL"}")
             };
         }
     }

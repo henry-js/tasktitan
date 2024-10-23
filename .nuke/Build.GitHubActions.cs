@@ -1,4 +1,4 @@
-// using Nuke.Common.CI.GitHubActions;
+using Nuke.Common.CI.GitHubActions;
 
 // [GitHubActions(
 //     "continuous",
@@ -8,13 +8,13 @@
 //     InvokedTargets = [nameof(Compile)],
 //     AutoGenerate = true,
 //     FetchDepth = 0)]
-// [GitHubActions(
-//     "test",
-//     GitHubActionsImage.WindowsLatest,
-//     On = [GitHubActionsTrigger.PullRequest],
-//     InvokedTargets = [nameof(Test)],
-//     AutoGenerate = true,
-//     FetchDepth = 0)]
+[GitHubActions(
+    "test",
+    GitHubActionsImage.WindowsLatest,
+    On = [GitHubActionsTrigger.PullRequest],
+    InvokedTargets = [nameof(Test)],
+    AutoGenerate = true,
+    FetchDepth = 0)]
 // [GitHubActions(
 //     "release",
 //     GitHubActionsImage.WindowsLatest,
@@ -23,7 +23,17 @@
 //     AutoGenerate = true,
 //     FetchDepth = 0, OnPushTags = ["v*.*"]
 // )]
-// partial class Build
-// {
 
-// }
+[GitHubActions(
+    "release",
+    GitHubActionsImage.WindowsLatest,
+    OnPushTags = ["v*"],
+    OnPushBranches = ["release"],
+    FetchDepth = 0,
+    InvokedTargets = [nameof(Publish)],
+    AutoGenerate = true
+)]
+partial class Build
+{
+
+}

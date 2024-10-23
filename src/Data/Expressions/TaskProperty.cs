@@ -1,4 +1,5 @@
 using TaskTitan.Data.Parsers;
+
 using static TaskTitan.Data.Enums;
 
 namespace TaskTitan.Data.Expressions;
@@ -39,11 +40,11 @@ public abstract record TaskProperty : Expr
         {
             case ColType.Date:
                 var dateVal = _dateParser.Parse(value);
-                return new TaskAttribute<DateTime>(split[0], dateVal, modifier);
+                return new TaskProperty<DateTime>(split[0], dateVal, modifier);
             case ColType.Text:
-                return new TaskAttribute<string>(split[0], value, modifier);
+                return new TaskProperty<string>(split[0], value, modifier);
             case ColType.Number:
-                return new TaskAttribute<double>(split[0], Convert.ToDouble(value), modifier);
+                return new TaskProperty<double>(split[0], Convert.ToDouble(value), modifier);
             default:
                 throw new Exception();
         }
@@ -52,9 +53,9 @@ public abstract record TaskProperty : Expr
     private static readonly string[] _taskItemProperties = typeof(TaskItem).GetProperties().Select(x => x.Name).ToArray();
 }
 
-public record TaskAttribute<T> : TaskProperty
+public record TaskProperty<T> : TaskProperty
 {
-    internal TaskAttribute(string field, T value, ColModifier? modifier = null) : base(field, modifier)
+    internal TaskProperty(string field, T value, ColModifier? modifier = null) : base(field, modifier)
     {
         Value = value;
     }

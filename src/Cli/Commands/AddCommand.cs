@@ -1,12 +1,7 @@
-using System.CommandLine;
-using System.CommandLine.Hosting;
 using System.CommandLine.Invocation;
 using System.Text;
 using System.Text.Json;
-using System.Windows.Input;
-using Microsoft.Extensions.Logging;
-using Spectre.Console;
-using TaskTitan.Configuration;
+
 using TaskTitan.Data;
 using TaskTitan.Data.Expressions;
 using TaskTitan.Data.Parsers;
@@ -54,23 +49,15 @@ public sealed class AddCommand : Command
 
     new public class Handler(IAnsiConsole console, LiteDbContext dbContext) : ICommandHandler
     {
-        public CommandExpression? Modification { get; set; }
+        private readonly IAnsiConsole console = console;
+        public CommandExpression Modification { get; set; } = default!;
 
         public int Invoke(InvocationContext context) => InvokeAsync(context).Result;
         public async Task<int> InvokeAsync(InvocationContext context)
         {
-            var tasks = dbContext.Tasks;
-            var task = new TaskItem("Modification.Children");
+            var taskId = dbContext.AddTask(Modification.Properties);
 
-            tasks.Insert(task);
-
-            var fetchedTask = tasks.FindById(task.Uuid);
-
-            console.WriteLine(JsonSerializer.Serialize(fetchedTask));
-
-            console.WriteLine($"Added task {tasks.Count()}");
             return await Task.FromResult(0);
         }
-
     }
 }

@@ -38,10 +38,10 @@
     "ExecutableTarget": {
       "type": "string",
       "enum": [
-        "Artifact",
         "Clean",
         "Compile",
         "Publish",
+        "Release",
         "Restore",
         "Test"
       ]

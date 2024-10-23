@@ -1,7 +1,10 @@
 ﻿using System.Collections;
 using System.Reflection.Metadata;
+
 using LiteDB;
+
 using TaskTitan.Configuration;
+using TaskTitan.Data.Expressions;
 
 namespace TaskTitan.Data;
 
@@ -47,6 +50,33 @@ public class LiteDbContext
     public static string CreateConnectionStringFrom(string dataDirectoryPath)
     {
         return $@"Filename={Path.Combine(dataDirectoryPath, FILE_NAME)}";
+    }
+
+    public int AddTask(IEnumerable<TaskProperty> properties)
+    {
+        var taskDoc = new BsonDocument();
+        taskDoc["_id"] = Guid.NewGuid();
+        foreach (var propp in properties)
+        {
+            if (propp is TaskProperty<DateTime> dateProp)
+            {
+                taskDoc[propp.PropertyName] = dateProp.Value;
+            }
+            else if (propp is TaskProperty<string> stringProp)
+            {
+                taskDoc[propp.PropertyName] = stringProp.Value;
+            }
+            else if (propp is TaskProperty<double> numProp)
+            {
+                taskDoc[propp.PropertyName] = numProp.Value;
+            }
+        }
+        taskDoc[nameof(TaskItem.Tags)] = new BsonArray(properties.Where(p => p is TaskTag).Select(t => new BsonValue(t.Name)));
+        taskDoc[nameof(TaskItem.Id)] = WorkingSet.Count();
+        db.GetCollection("tasks", BsonAutoId.Guid).Insert(taskDoc);
+
+
+        return WorkingSet.Count();
     }
 
     public IEnumerable<TaskItem> ListFromFilter(string linqFilterText, bool rebuildIds)

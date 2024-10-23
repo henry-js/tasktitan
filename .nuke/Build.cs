@@ -99,14 +99,19 @@ partial class Build : NukeBuild
         });
 
 
-    Target Artifact => _ => _
+    Target Release => _ => _
         .TriggeredBy(Publish)
-        // .Requires(() => Configuration == "Release")
-        // .Produces([
-        //     ReleaseDirectory / Runtime,
-        // ])
+        .Produces(ReleaseDirectory)
+        .Unlisted()
         .Executes(() =>
         {
+            MinVer = MinVerTasks.MinVer(_ => _
+                .SetAutoIncrement(MinVerVersionPart.Minor)
+                .SetDefaultPreReleasePhase("preview")
+                .SetTagPrefix("v")
+                ).Result;
+            Log.Information(MinVer.Version);
+
             var packDir = PublishDirectory;
             var outputDir = ReleaseDirectory;
             Log.Information("Velopack --packDir: {0}", packDir);

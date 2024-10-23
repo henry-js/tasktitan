@@ -77,6 +77,6 @@ public class PidginParserTests
 
         await Assert.That(result).IsNotNull();
 
-        await Assert.That(result.Children).HasCount().EqualTo(quantity);
+        await Assert.That(result.Properties).HasCount().EqualTo(quantity);
     }
 }

@@ -1,6 +1,8 @@
 using Pidgin;
 using Pidgin.Expression;
+
 using TaskTitan.Data.Expressions;
+
 using static Pidgin.Parser<char>;
 using static Pidgin.Parser<string>;
 using static Pidgin.Parser;
@@ -93,6 +95,6 @@ public static class ExpressionParser
             _attribute,
             _tagExpression
         ).SeparatedAtLeastOnce(Token(' '))
-        .Select(exprs => new CommandExpression(exprs, input))
+        .Select(exprs => new CommandExpression(exprs.Cast<TaskProperty>(), input))
         .ParseOrThrow(input);
 }

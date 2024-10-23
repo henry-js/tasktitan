@@ -1,15 +1,13 @@
-﻿using System.Runtime.CompilerServices;
-using TaskTitan.Cli.Commands;
+﻿using TaskTitan.Cli.Commands;
 using TaskTitan.Cli.Extensions;
 using TaskTitan.Configuration;
 using TaskTitan.Data;
-using TaskTitan.Data.Reports;
+
 using Tomlyn.Extensions.Configuration;
 
 VelopackApp.Build()
     .WithFirstRun(v =>
     {
-        Global.CreateConfigurationDirectories();
     })
     .Run();
 
@@ -32,6 +30,7 @@ var cmdLine = new CommandLineBuilder(cmd)
             {
                 services.AddSingleton(_ => AnsiConsole.Console);
                 services.AddSingleton(f => new LiteDbContext(LiteDbContext.CreateConnectionStringFrom(Global.DataDirectoryPath)));
+                services.Configure<ReportConfiguration>(context.Configuration.GetSection("Report"));
             })
             .UseSerilog((context, configuration) =>
                 configuration.ReadFrom.Configuration(context.Configuration))

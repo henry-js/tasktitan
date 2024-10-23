@@ -17,12 +17,12 @@ namespace TaskTitan.Cli.Commands;
 
 public sealed class ListCommand : Command
 {
-    public ListCommand(ReportDictionary reports = null) : base("list", "Add a task to the list")
+    public ListCommand(ReportDictionary? reports = null) : base("list", "Add a task to the list")
     {
         AddOptions(this, reports);
     }
 
-    public static void AddOptions(Command command, ReportDictionary reports)
+    public static void AddOptions(Command command, ReportDictionary? reports)
     {
         Option<FilterExpression?> option = new(
             aliases: ["-f", "--filter"],
@@ -40,7 +40,7 @@ public sealed class ListCommand : Command
         Argument<CustomReport?> report = new(
             name: "Report",
             description: "Use a report instead of filter",
-            parse: ar => reports.TryGetValue(ar.Tokens.FirstOrDefault()!.Value, out var report) ? report : null
+            parse: ar => reports?.TryGetValue(ar.Tokens.FirstOrDefault()!.Value, out var report) == true ? report : null
         )
         {
             Arity = ArgumentArity.ZeroOrOne
@@ -48,19 +48,15 @@ public sealed class ListCommand : Command
         command.AddArgument(report);
     }
 
-    new public class Handler(IAnsiConsole console, LiteDbContext db, ILogger<ListCommand> logger, IConfiguration configuration) : ICommandHandler
+    new public class Handler(IAnsiConsole console, LiteDbContext dbContext, ILogger<ListCommand> logger, IOptions<ReportConfiguration> reportOptions) : ICommandHandler
     {
-        private readonly IConfiguration configuration = configuration;
-
+        private readonly ReportConfiguration reportConfig = reportOptions.Value;
         public FilterExpression? Filter { get; set; }
         public CustomReport? Report { get; set; }
         public int Invoke(InvocationContext context) => InvokeAsync(context).Result;
 
         public async Task<int> InvokeAsync(InvocationContext context)
         {
-            var reportConfig = new ReportConfiguration();
-            configuration.GetSection("Report").Bind(reportConfig.Report);
-
             Report = Report ?? reportConfig.Report["list"];
 
             string linqFilterText = Report switch
@@ -72,7 +68,7 @@ public sealed class ListCommand : Command
             logger.LogInformation("Information logged");
             console.WriteLine("Hello from list command");
 
-            var tasks = db.ListFromFilter(linqFilterText, true);
+            var tasks = dbContext.ListFromFilter(linqFilterText, true);
 
             console.MarkupLineInterpolated($"[yellow]Fetced {tasks.Count()} tasks");
 

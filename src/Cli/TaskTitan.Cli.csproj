@@ -11,6 +11,9 @@
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <DebugType>embedded</DebugType>
     <AssemblyName>task</AssemblyName>
+    <MinVerDefaultPreReleaseIdentifiers>preview.0</MinVerDefaultPreReleaseIdentifiers>
+    <MinVerAutoIncrement>minor</MinVerAutoIncrement>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Time.Testing;
+
 using TaskTitan.Data.Expressions;
 using TaskTitan.Data.Extensions;
 using TaskTitan.Data.Parsers;
@@ -23,7 +24,7 @@ public class AttributeTests
         var pair = text.Split(':');
         var attribute = TaskProperty.Create(pair[0], pair[1], _dateParser);
 
-        var actual = attribute as TaskAttribute<DateTime>;
+        var actual = attribute as TaskProperty<DateTime>;
         await Assert.That(actual).IsNotNull();
         await Assert.That(actual?.Value).IsNotNull()
         .And
@@ -38,7 +39,7 @@ public class AttributeTests
         var pair = text.Split(':');
         var attribute = TaskProperty.Create(pair[0], pair[1], _dateParser);
 
-        var actual = attribute as TaskAttribute<DateTime>;
+        var actual = attribute as TaskProperty<DateTime>;
         await Assert.That(actual).IsNotNull();
         await Assert.That(actual?.Value).IsNotNull()
         .And
@@ -52,7 +53,7 @@ public class AttributeTests
         var pair = text.Split(':');
         var attribute = TaskProperty.Create(pair[0], pair[1], _dateParser);
 
-        var actual = attribute as TaskAttribute<DateTime>;
+        var actual = attribute as TaskProperty<DateTime>;
         await Assert.That(actual).IsNotNull();
         await Assert.That(actual?.Value).IsNotNull()
         .And
@@ -66,7 +67,7 @@ public class AttributeTests
         var pair = text.Split(':');
         var attribute = TaskProperty.Create(pair[0], pair[1], _dateParser);
 
-        var actual = attribute as TaskAttribute<string>;
+        var actual = attribute as TaskProperty<string>;
         await Assert.That(actual).IsNotNull();
         await Assert.That(actual?.Value).IsNotNull()
         .And
