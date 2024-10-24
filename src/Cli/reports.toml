@@ -1,0 +1,85 @@
+[Report.active]
+description = "Active tasks"
+filter = "status:pending and +ACTIVE"
+columns = ["id", "start", "start.age", "entry.age", "depends.indicator", "priority", "project", "tags", "recur", "wait", "scheduled.remaining", "due", "until", "description"]
+labels = ["ID", "Started", "Active", "Age", "D", "P", "Project", "Tags", "Recur", "W", "Sch", "Due", "Until", "Description"]
+[Report.all]
+description = "All tasks"
+filter = ""
+columns = ["id", "status.short", "uuid.short", "start.active", "entry.age", "end.age", "depends.indicator", "priority", "project.parent", "tags.count", "recur.indicator", "wait.remaining", "scheduled.remaining", "due", "until.remaining", "description"]
+labels = ["ID", "St", "UUID", "A", "Age", "Done", "D", "P", "Project", "Tags", "R", "Wait", "Sch", "Due", "Until", "Description"]
+[Report.blocked]
+description = "Blocked tasks"
+filter = "status:pending -WAITING +BLOCKED"
+columns = ["id", "depends", "project", "priority", "due", "start.active", "entry.age", "description"]
+labels = ["ID", "Deps", "Proj", "Pri", "Due", "Active", "Age", "Description"]
+[Report.blocking]
+description = "Blocking tasks"
+filter = "status:pending -WAITING +BLOCKING"
+columns = ["id", "uuid.short", "start.active", "depends", "project", "tags", "recur", "wait", "scheduled.remaining", "due.relative", "until.remaining", "description.count", "urgency"]
+labels = ["ID", "UUID", "A", "Deps", "Project", "Tags", "R", "W", "Sch", "Due", "Until", "Description", "Urg"]
+[Report.completed]
+description = "Completed tasks"
+filter = "status:completed"
+columns = ["id", "uuid.short", "entry", "end", "entry.age", "depends", "priority", "project", "tags", "recur.indicator", "due", "description"]
+labels = ["ID", "UUID", "Created", "Completed", "Age", "Deps", "P", "Project", "Tags", "R", "Due", "Description"]
+[Report.list]
+description = "Most details of tasks"
+filter = "status:pending -WAITING"
+columns = ["id", "start.age", "entry.age", "depends.indicator", "priority", "project", "tags", "recur.indicator", "scheduled.countdown", "due", "until.remaining", "description.count", "urgency"]
+labels = ["ID", "Active", "Age", "D", "P", "Project", "Tags", "R", "Sch", "Due", "Until", "Description", "Urg"]
+[Report.long]
+description = "All details of tasks"
+filter = "status:pending -WAITING"
+columns = ["id", "start.active", "entry", "modified.age", "depends", "priority", "project", "tags", "recur", "wait.remaining", "scheduled", "due", "until", "description"]
+labels = ["ID", "A", "Created", "Mod", "Deps", "P", "Project", "Tags", "Recur", "Wait", "Sched", "Due", "Until", "Description"]
+[Report.ls]
+description = "Few details of tasks"
+filter = "status:pending -WAITING"
+columns = ["id", "start.active", "depends.indicator", "project", "tags", "recur.indicator", "wait.remaining", "scheduled.countdown", "due.countdown", "until.countdown", "description.count"]
+labels = ["ID", "A", "D", "Project", "Tags", "R", "Wait", "S", "Due", "Until", "Description"]
+[Report.minimal]
+description = "Minimal details of tasks"
+filter = "status:pending"
+columns = ["id", "project", "tags.count", "description.count"]
+labels = ["ID", "Project", "Tags", "Description"]
+[Report.newest]
+description = "Newest tasks"
+filter = "status:pending"
+columns = ["id", "start.age", "entry", "entry.age", "modified.age", "depends.indicator", "priority", "project", "tags", "recur.indicator", "wait.remaining", "scheduled.countdown", "due", "until.age", "description"]
+labels = ["ID", "Active", "Created", "Age", "Mod", "D", "P", "Project", "Tags", "R", "Wait", "Sch", "Due", "Until", "Description"]
+[Report.next]
+description = "Most urgent tasks"
+filter = "status:pending -WAITING limit:page"
+columns = ["id", "start.age", "entry.age", "depends", "priority", "project", "tags", "recur", "scheduled.countdown", "due.relative", "until.remaining", "description", "urgency"]
+labels = ["ID", "Active", "Age", "Deps", "P", "Project", "Tag", "Recur", "S", "Due", "Until", "Description", "Urg"]
+[Report.oldest]
+description = "Oldest tasks"
+filter = "status:pending"
+columns = ["id", "start.age", "entry", "entry.age", "modified.age", "depends.indicator", "priority", "project", "tags", "recur.indicator", "wait.remaining", "scheduled.countdown", "due", "until.age", "description"]
+labels = ["ID", "Active", "Created", "Age", "Mod", "D", "P", "Project", "Tags", "R", "Wait", "Sch", "Due", "Until", "Description"]
+[Report.overdue]
+description = "Overdue tasks"
+filter = "status:pending and +OVERDUE"
+columns = ["id", "start.age", "entry.age", "depends", "priority", "project", "tags", "recur.indicator", "scheduled.countdown", "due", "until", "description", "urgency"]
+labels = ["ID", "Active", "Age", "Deps", "P", "Project", "Tag", "R", "S", "Due", "Until", "Description", "Urg"]
+[Report.ready]
+description = "Most urgent actionable tasks"
+filter = "+READY"
+columns = ["id", "start.age", "entry.age", "depends.indicator", "priority", "project", "tags", "recur.indicator", "scheduled.countdown", "due.countdown", "until.remaining", "description", "urgency"]
+labels = ["ID", "Active", "Age", "D", "P", "Project", "Tags", "R", "S", "Due", "Until", "Description", "Urg"]
+[Report.recurring]
+description = " Tasks"
+filter = "status:pending and (+PARENT or +CHILD)"
+columns = ["id", "start.age", "entry.age", "depends.indicator", "priority", "project", "tags", "recur", "scheduled.countdown", "due", "until.remaining", "description", "urgency"]
+labels = ["ID", "Active", "Age", "D", "P", "Project", "Tags", "Recur", "Sch", "Due", "Until", "Description", "Urg"]
+[Report.unblocked]
+description = " tasks"
+filter = "status:pending -WAITING -BLOCKED"
+columns = ["id", "depends", "project", "priority", "due", "start.active", "entry.age", "description"]
+labels = ["ID", "Deps", "Proj", "Pri", "Due", "Active", "Age", "Description"]
+[Report.waiting]
+description = "Waiting (hidden) tasks"
+filter = "+WAITING"
+columns = ["id", "start.active", "entry.age", "depends.indicator", "priority", "project", "tags", "recur.indicator", "wait", "wait.remaining", "scheduled", "due", "until", "description"]
+labels = ["ID", "A", "Age", "D", "P", "Project", "Tags", "R", "Wait", "Remaining", "Sched", "Due", "Until", "Description"]
