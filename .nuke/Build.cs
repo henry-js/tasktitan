@@ -36,7 +36,6 @@ partial class Build : NukeBuild
         .Executes(() =>
         {
             DotNetRestore(_ => _
-                .SetRuntime(Runtime)
                 .SetForce(true)
                 .SetProjectFile(Solution.Directory));
         });
@@ -51,6 +50,7 @@ partial class Build : NukeBuild
                         //     _
                         .EnableNoLogo()
                         .EnableNoRestore()
+                        .SetConfiguration(Configuration)
                         .SetProjectFile(Solution.Directory)
             //         .SetConfiguration(Configuration);
             //     if (v == ProjectDirectory)
