@@ -4,26 +4,14 @@ namespace TaskTitan.Data;
 
 public class TaskItem
 {
-    public TaskItem(string description)
-    {
-        Description = description;
-    }
-
-    // [BsonCtor]
-    // internal TaskItem(ObjectId _id, string description, )
-    // {
-
-    // }
-
     public int Id { get; set; }
     [BsonId]
-    public ObjectId TaskId { get; set; }
-    public string Description { get; set; }
+    public required ObjectId TaskId { get; set; }
+    public required string Description { get; set; }
     public DateTime? Due { get; set; }
     public DateTime? End { get; set; }
-    public DateTime? Entry { get; set; } = DateTime.UtcNow;
+    public DateTime Entry { get; init; }
     public DateTime? Modified { get; set; }
-    public Guid? Parent { get; set; }
     public string? Project { get; set; }
     // public Recurrence? Recur { get; set; }
     public DateTime? Scheduled { get; set; }

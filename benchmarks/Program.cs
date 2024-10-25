@@ -19,9 +19,9 @@ var reports = config.Report;
 var context = new LiteDbContext(LiteDbContext.CreateConnectionStringFrom(Global.DataDirectoryPath));
 var col = context.Tasks;
 var tasks = context.Tasks.FindAll().ToList();
-int rowId = tasks.Max(x => x.Id);
+int rowId = tasks.Count != 0 ? tasks.Max(x => x.Id) : 0;
 var sampleTasks = new Faker<TaskItem>()
-    .CustomInstantiator(f => new TaskItem(f.Hacker.Phrase()))
+    // .CustomInstantiator(f => new TaskItem(ObjectId.NewObjectId(), f.Hacker.Phrase()))
     .RuleFor(t => t.TaskId, (f, u) => ObjectId.NewObjectId())
     .RuleFor(t => t.Entry, (f, t) => f.Date.Between(new DateTime(2024, 01, 01), new DateTime(2024, 01, 08)))
     .RuleFor(t => t.Modified, (f, t) => f.Date.Recent(20))
