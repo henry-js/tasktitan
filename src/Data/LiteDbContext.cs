@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Reflection.Metadata;
-
-using LiteDB;
+﻿using LiteDB;
 
 using TaskTitan.Configuration;
 using TaskTitan.Data.Expressions;
@@ -11,32 +8,38 @@ namespace TaskTitan.Data;
 public class LiteDbContext
 {
     public const string FILE_NAME = "tasktitan.db";
+    private const string TaskCol = "tasks";
     private readonly LiteDatabase db;
+    private const string WorkingSetQuery = "SELECT $ FROM tasks WHERE Status = \"Pending\";";
     public LiteDbContext(string connectionString)
     {
-        connectionString = $@"Filename={Global.DataDirectoryPath}\tasktitan.db";
+        connectionString = $@"Filename={Global.DataDirectoryPath}\tasktitan.db;Connection=shared";
         try
         {
             var db = new LiteDatabase(connectionString);
-            if (db != null)
-                this.db = db;
-            else throw new ArgumentNullException(nameof(db));
+            this.db = db ?? throw new Exception(nameof(db));
         }
         catch (Exception ex)
         {
             throw new Exception("Can't find or create LiteDb database.", ex);
         }
 
-        db.GetCollection<TaskItem>("tasks", BsonAutoId.Guid).EnsureIndex(x => x.Id, false);
+        var tasks = db.GetCollection<TaskItem>(TaskCol, BsonAutoId.ObjectId);
+
+        tasks.EnsureIndex(x => x.Id, false);
+        tasks.EnsureIndex(x => x.Status, false);
+        // tasks.EnsureIndex(x => x.Recur, false);
 
     }
 
-    public ILiteCollection<TaskItem> Tasks => db.GetCollection<TaskItem>("tasks", BsonAutoId.Guid);
+    public ILiteCollection<TaskItem> Tasks => db.GetCollection<TaskItem>(TaskCol, BsonAutoId.ObjectId);
+
     public IEnumerable<TaskItem> WorkingSet
     {
         get
         {
-            var tasks = Tasks.Find(Query.Not("Status", TaskItemStatus.Pending.ToString()))
+            var tasks = Tasks.Find(Query.Or(
+                Query.EQ("Status", TaskItemStatus.Pending.ToString())))
                 .OrderBy(x => x.Entry)
                 .Select((task, i) => { task.Id = i + 1; return task; });
             foreach (var task in tasks)
@@ -54,29 +57,40 @@ public class LiteDbContext
 
     public int AddTask(IEnumerable<TaskProperty> properties)
     {
-        var taskDoc = new BsonDocument();
-        taskDoc["_id"] = Guid.NewGuid();
+        var id = ObjectId.NewObjectId();
+        var task = new BsonDocument();
+        task["_id"] = id;
+        task[nameof(TaskItem.Entry)] = id.CreationTime;
+
         foreach (var propp in properties)
         {
+            switch (propp.PropertyName)
+            {
+                case nameof(TaskItem.Entry):
+                case nameof(TaskItem.TaskId):
+                    continue;
+            }
             if (propp is TaskProperty<DateTime> dateProp)
             {
-                taskDoc[propp.PropertyName] = dateProp.Value;
+                task[propp.PropertyName] = dateProp.Value;
             }
             else if (propp is TaskProperty<string> stringProp)
             {
-                taskDoc[propp.PropertyName] = stringProp.Value;
+                task[propp.PropertyName] = stringProp.Value;
             }
             else if (propp is TaskProperty<double> numProp)
             {
-                taskDoc[propp.PropertyName] = numProp.Value;
+                task[propp.PropertyName] = numProp.Value;
             }
         }
-        taskDoc[nameof(TaskItem.Tags)] = new BsonArray(properties.Where(p => p is TaskTag).Select(t => new BsonValue(t.Name)));
-        taskDoc[nameof(TaskItem.Id)] = WorkingSet.Count();
-        db.GetCollection("tasks", BsonAutoId.Guid).Insert(taskDoc);
+        if (!task.ContainsKey(nameof(TaskItem.Status))) task[nameof(TaskItem.Status)] = TaskItemStatus.Pending.ToString();
+        task[nameof(TaskItem.Tags)] = new BsonArray(properties.Where(p => p is TaskTag).Select(t => new BsonValue(t.Name)));
 
-
-        return WorkingSet.Count();
+        var tasks = db.GetCollection(TaskCol);
+        int workingSetCount = tasks.Count(Query.EQ("Status", TaskItemStatus.Pending.ToString()));
+        task["Id"] = workingSetCount + 1;
+        tasks.Insert(task);
+        return task["Id"];
     }
 
     public IEnumerable<TaskItem> ListFromFilter(string linqFilterText, bool rebuildIds)
