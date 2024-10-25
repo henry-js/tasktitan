@@ -17,7 +17,7 @@ namespace TaskTitan.Cli.Commands;
 
 public sealed class ListCommand : Command
 {
-    public ListCommand(ReportDictionary? reports = null) : base("list", "Add a task to the list")
+    public ListCommand(ReportDictionary? reports = null) : base("list", "Display a report or tasks filtered")
     {
         AddOptions(this, reports);
     }
@@ -38,7 +38,7 @@ public sealed class ListCommand : Command
         command.AddOption(option);
 
         Argument<CustomReport?> report = new(
-            name: "Report",
+            name: "Report|Filters",
             description: "Use a report instead of filter",
             parse: ar => reports?.TryGetValue(ar.Tokens.FirstOrDefault()!.Value, out var report) == true ? report : null
         )

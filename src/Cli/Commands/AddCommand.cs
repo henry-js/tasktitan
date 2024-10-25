@@ -19,7 +19,7 @@ public sealed class AddCommand : Command
     {
         static CommandExpression parse(System.CommandLine.Parsing.ArgumentResult ar)
         {
-            var builder = new StringBuilder().Append("desc:'");
+            var builder = new StringBuilder().Append("description:'");
             List<string> attributes = [];
             List<string> descValues = [];
             for (int i = 0; i < ar.Tokens.Count; i++)
@@ -57,6 +57,7 @@ public sealed class AddCommand : Command
         {
             var taskId = dbContext.AddTask(Modification.Properties);
 
+            console.MarkupLineInterpolated($"[green]Created task {taskId}[/]");
             return await Task.FromResult(0);
         }
     }

@@ -1,7 +1,11 @@
 
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
+
 using Bogus;
+
+using LiteDB;
+
 using TaskTitan.Data;
 
 namespace TaskTitan.Benchmarks;
@@ -25,7 +29,7 @@ public class LiteDbBenchmark
     {
         Faker<TaskItem> Faker = new Faker<TaskItem>()
         .CustomInstantiator(f => new TaskItem(f.Rant.Random.Words()))
-        .RuleFor(t => t.Uuid, (f, u) => Guid.NewGuid())
+        .RuleFor(t => t.TaskId, (f, u) => ObjectId.NewObjectId())
         .RuleFor(t => t.Entry, (f, t) => f.Date.Recent(60))
         .RuleFor(t => t.Modified, (f, t) => f.Date.Recent(20))
         .RuleFor(t => t.Project, (f, t) => f.PickRandom(new List<string?> { "Work", "Home", "SideHustle", null }))
