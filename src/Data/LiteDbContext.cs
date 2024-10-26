@@ -1,4 +1,7 @@
-﻿using LiteDB;
+﻿using System.Collections;
+using System.Linq;
+
+using LiteDB;
 
 using TaskTitan.Configuration;
 using TaskTitan.Data.Expressions;
@@ -106,5 +109,16 @@ public class LiteDbContext
                 });
         }
         return tasks;
+    }
+
+    public IEnumerable<TaskItem> QueryTasks(BsonExpression query)
+    {
+        var tasks = Tasks.Find(query);
+
+        return tasks;
+        // foreach (var (task, index) in tasks.Index())
+        // {
+
+        // }
     }
 }

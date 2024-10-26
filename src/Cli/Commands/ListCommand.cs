@@ -1,3 +1,5 @@
+using LiteDB;
+
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -6,6 +8,7 @@ using Spectre.Console;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 
+using TaskTitan.Cli.AnsiConsole;
 using TaskTitan.Configuration;
 using TaskTitan.Data;
 using TaskTitan.Data.Expressions;
@@ -24,55 +27,52 @@ public sealed class ListCommand : Command
 
     public static void AddOptions(Command command, ReportDictionary? reports)
     {
-        Option<FilterExpression?> option = new(
-            aliases: ["-f", "--filter"],
-            description: "Filter tasks by",
-            parseArgument: ar =>
-            {
-                return ExpressionParser.ParseFilter(string.Join(' ', ar.Tokens));
-            })
-        {
-            AllowMultipleArgumentsPerToken = true,
-            Arity = ArgumentArity.ZeroOrMore,
-        };
-        command.AddOption(option);
+        // static FilterExpression? parseArgument(ArgumentResult ar) => ExpressionParser.ParseFilter(string.Join(' ', ar.Tokens));
+        // Option<FilterExpression?> option = new(
+        //     aliases: ["-f", "--filter"],
+        //     description: "Filter tasks by"
+        //     // ,parseArgument: parseArgument
+        //     )
+        // {
+        //     AllowMultipleArgumentsPerToken = true,
+        //     Arity = ArgumentArity.ZeroOrMore,
+        // };
+        // command.AddOption(option);
 
-        Argument<CustomReport?> report = new(
-            name: "Report|Filters",
-            description: "Use a report instead of filter",
-            parse: ar => reports?.TryGetValue(ar.Tokens.FirstOrDefault()!.Value, out var report) == true ? report : null
+        Argument<string[]?> report = new(
+            name: "Filter",
+            description: "Use a report instead of filter"
+        // , parse: ar => reports?.TryGetValue(ar.Tokens.FirstOrDefault()!.Value, out var report) == true ? report : null
         )
         {
-            Arity = ArgumentArity.ZeroOrOne
+            Arity = ArgumentArity.ZeroOrMore
         };
         command.AddArgument(report);
     }
 
-    new public class Handler(IAnsiConsole console, LiteDbContext dbContext, ILogger<ListCommand> logger, IOptions<ReportConfiguration> reportOptions) : ICommandHandler
+    new public class Handler(LiteDbContext dbContext, IReportWriter reportWriter, ILogger<ListCommand> logger, IOptions<ReportConfiguration> reportOptions) : ICommandHandler
     {
         private readonly ReportConfiguration reportConfig = reportOptions.Value;
-        public FilterExpression? Filter { get; set; }
-        public CustomReport? Report { get; set; }
+        public string[]? Filter { get; set; }
         public int Invoke(InvocationContext context) => InvokeAsync(context).Result;
 
         public async Task<int> InvokeAsync(InvocationContext context)
         {
-            Report = Report ?? reportConfig.Report["list"];
-
-            string linqFilterText = Report switch
+            var report = Filter switch
             {
-                not null => ExpressionParser.ParseFilter(Report.Filter).ToBsonExpression(),
-                _ => (Filter is not null) ? Filter.ToBsonExpression() : ""
+                null or { Length: 0 } => reportConfig.Report["list"],
+                { Length: 1 } => reportConfig.Report.TryGetValue(Filter[0], out var value) ? value : reportConfig.Report["list"].OverrideFilter(Filter),
+                _ => reportConfig.Report["list"].OverrideFilter(Filter)
             };
 
-            logger.LogInformation("Information logged");
-            console.WriteLine("Hello from list command");
+            logger.LogInformation("Report: {ReportName}, Filter : {ReportFilter}", report.Name, report.Filter);
 
-            var tasks = dbContext.ListFromFilter(linqFilterText, true);
+            var query = ExpressionParser.ParseFilter(report.Filter).ToBsonExpression();
 
-            console.MarkupLineInterpolated($"[yellow]Fetced {tasks.Count()} tasks");
+            logger.LogInformation("Generated query: {Query}", query);
+            var tasks = dbContext.QueryTasks(query);
 
-            return await Task.FromResult(0);
+            return await reportWriter.Display(report, tasks);
         }
     }
 }

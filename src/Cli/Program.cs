@@ -1,4 +1,5 @@
-﻿using TaskTitan.Cli.Commands;
+﻿using TaskTitan.Cli.AnsiConsole;
+using TaskTitan.Cli.Commands;
 using TaskTitan.Cli.Extensions;
 using TaskTitan.Configuration;
 using TaskTitan.Data;
@@ -30,7 +31,8 @@ var cmdLine = new CommandLineBuilder(cmd)
             {
                 services.AddSingleton(_ => AnsiConsole.Console);
                 services.AddSingleton(f => new LiteDbContext(LiteDbContext.CreateConnectionStringFrom(Global.DataDirectoryPath)));
-                services.Configure<ReportConfiguration>(context.Configuration.GetSection("Report"));
+                services.AddSingleton<IReportWriter, ReportWriter>();
+                services.Configure<ReportConfiguration>(_ => context.Configuration.GetSection("Report").Bind(_.Report));
             })
             .UseSerilog((context, configuration) =>
                 configuration.ReadFrom.Configuration(context.Configuration))

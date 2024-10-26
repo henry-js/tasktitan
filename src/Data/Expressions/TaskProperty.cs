@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 using TaskTitan.Data.Parsers;
 
 using static TaskTitan.Data.Enums;
@@ -6,6 +8,8 @@ namespace TaskTitan.Data.Expressions;
 
 public abstract record TaskProperty : Expr
 {
+    private static readonly string[] _taskItemProperties = typeof(TaskItem).GetProperties().Select(x => x.Name).ToArray();
+
     public TaskProperty(string name, ColModifier? modifier)
     {
         Name = name;
@@ -16,13 +20,19 @@ public abstract record TaskProperty : Expr
     public string PropertyName => _taskItemProperties.SingleOrDefault(p => p.Equals(Name, StringComparison.OrdinalIgnoreCase)) ?? Name;
     public ColModifier? Modifier { get; }
 
-    public static TaskProperty Create(string field, string value, DateParser _dateParser)
+    public static TaskProperty Create(string input, string value, DateParser _dateParser)
     {
-        var split = field.Split('.');
-        field = split[0];
+        var split = input.Split('.');
+        (string field, string? modifier) items = split switch
+        {
+            { Length: 1 } => (split[0], null),
+            { Length: 2 } => (split[0], split[1]),
+            _ => throw new SwitchExpressionException($"Invalid input: {input}"),
+        };
+
         var colKey = Configuration.ReportConfiguration.Columns.Keys
-            .FirstOrDefault(k => k.StartsWith(field, StringComparison.OrdinalIgnoreCase))
-            ?? field;
+            .FirstOrDefault(k => k.StartsWith(items.field, StringComparison.OrdinalIgnoreCase))
+            ?? items.field;
         if (!Configuration.ReportConfiguration.Columns.TryGetValue(colKey, out var col))
         {
             //TODO: col is UDA
@@ -49,8 +59,6 @@ public abstract record TaskProperty : Expr
                 throw new Exception();
         }
     }
-
-    private static readonly string[] _taskItemProperties = typeof(TaskItem).GetProperties().Select(x => x.Name).ToArray();
 }
 
 public record TaskProperty<T> : TaskProperty
