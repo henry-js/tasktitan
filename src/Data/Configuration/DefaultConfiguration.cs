@@ -1,7 +1,9 @@
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
+
 using TaskTitan.Data;
 using TaskTitan.Data.Reports;
+
 using static TaskTitan.Data.Enums.ColFormat;
 using static TaskTitan.Data.Enums.ColType;
 

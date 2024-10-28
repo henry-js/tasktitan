@@ -26,7 +26,7 @@ labels = ["ID", "UUID", "Created", "Completed", "Age", "Deps", "P", "Project", "
 [Report.list]
 description = "Most details of tasks"
 filter = "status:pending -WAITING"
-columns = ["id", "start.age", "entry.age", "depends.indicator", "priority", "project", "tags", "recur.indicator", "scheduled.countdown", "due", "until.remaining", "description.count", "urgency"]
+columns = ["id", "start.age", "entry.age", "depends.indicator", "priority", "project", "tags", "recur.indicator", "scheduled.countdown", "due", "until.remaining", "description", "urgency"]
 labels = ["ID", "Active", "Age", "D", "P", "Project", "Tags", "R", "Sch", "Due", "Until", "Description", "Urg"]
 [Report.long]
 description = "All details of tasks"

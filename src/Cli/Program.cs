@@ -42,5 +42,5 @@ var cmdLine = new CommandLineBuilder(cmd)
     .Build();
 
 int result = await cmdLine.InvokeAsync(args);
-
+Console.ReadLine();
 return result;

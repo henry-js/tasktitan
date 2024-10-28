@@ -1,11 +1,6 @@
-using LiteDB;
-
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-using Spectre.Console;
-
-using System.CommandLine;
 using System.CommandLine.Invocation;
 
 using TaskTitan.Cli.AnsiConsole;
@@ -69,8 +64,7 @@ public sealed class ListCommand : Command
 
             var query = ExpressionParser.ParseFilter(report.Filter).ToBsonExpression();
 
-            logger.LogInformation("Generated query: {Query}", query);
-            var tasks = dbContext.QueryTasks(query);
+            var tasks = dbContext.QueryTasks(query).ToList();
 
             return await reportWriter.Display(report, tasks);
         }
