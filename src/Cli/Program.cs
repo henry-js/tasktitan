@@ -35,6 +35,7 @@ var cmdLine = new CommandLineBuilder(cmd)
                 services.Configure<ReportConfiguration>(_ => context.Configuration.GetSection("Report").Bind(_.Report));
             })
             .UseSerilog((context, configuration) =>
+            // TODO: fix issue where this is writing to <PROCESSDIRECTORY>\logs\file.log instead of <INSTALLDIRECTORY>\logs\file.log
                 configuration.ReadFrom.Configuration(context.Configuration))
             .UseProjectCommandHandlers();
     })

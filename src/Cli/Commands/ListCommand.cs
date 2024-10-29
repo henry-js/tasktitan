@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
+using Ogu.Extensions.Logging.Timings;
+
 using System.CommandLine.Invocation;
 
 using TaskTitan.Cli.AnsiConsole;
@@ -64,7 +66,11 @@ public sealed class ListCommand : Command
 
             var query = ExpressionParser.ParseFilter(report.Filter).ToBsonExpression();
 
-            var tasks = dbContext.QueryTasks(query).ToList();
+            IEnumerable<TaskItem> tasks;
+            using (logger.TimeOperation("Fetching tasks"))
+            {
+                tasks = dbContext.QueryTasks(query).ToList();
+            }
 
             return await reportWriter.Display(report, tasks);
         }
