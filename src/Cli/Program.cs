@@ -23,8 +23,6 @@ var cmdLine = new CommandLineBuilder(cmd)
     {
         builder.ConfigureAppConfiguration(config =>
         {
-            config.AddJsonFile("appsettings.json", false)
-                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
             config.AddTomlFile("reports.toml", false)
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
             config.AddTomlFile("udas.toml", true)
@@ -41,11 +39,12 @@ var cmdLine = new CommandLineBuilder(cmd)
                     context.Configuration.GetSection("uda").Bind(_.UDAs);
                 });
             })
-            .UseSerilog((context, configuration) =>
-                SerilogConfig.LoggerConfiguration.CreateLogger())
-            .UseProjectCommandHandlers();
+            .UseSerilog(SerilogConfig.LoggerConfiguration.CreateLogger())
+            .UseProjectCommandHandlers()
+            ;
     })
     .UseDefaults()
+    .UseExceptionHandler((ex, context) => AnsiConsole.WriteException(ex, ExceptionFormats.ShortenEverything))
     .Build();
 
 int result = await cmdLine.InvokeAsync(args);

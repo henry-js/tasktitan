@@ -20,7 +20,7 @@ public static class FilterToBson
         return expr switch
         {
             BinaryFilter bf => BinaryFilterToBsonExpression(bf, depth),
-            TaskProperty attr => AttributeToBsonExpression(attr),
+            TaskAttribute attr => AttributeToBsonExpression(attr),
             _ => throw new SwitchExpressionException()
         };
     }
@@ -30,17 +30,17 @@ public static class FilterToBson
         throw new NotImplementedException();
     }
 
-    private static BsonExpression AttributeToBsonExpression(TaskProperty attr)
+    private static BsonExpression AttributeToBsonExpression(TaskAttribute attr)
     {
-        if (attr is TaskProperty<DateTime> t)
+        if (attr is TaskAttribute<DateTime> t)
         {
             return ParseDateTimeAttribute(t);
         }
-        else if (attr is TaskProperty<double> d)
+        else if (attr is TaskAttribute<double> d)
         {
             return ParseNumberAttribute(d);
         }
-        else if (attr is TaskProperty<string> s)
+        else if (attr is TaskAttribute<string> s)
         {
             return ParseTextAttribute(s);
         }
@@ -51,38 +51,38 @@ public static class FilterToBson
 
         throw new Exception($"Unsupported property type {attr.GetType()}");
 
-        BsonExpression ParseDateTimeAttribute(TaskProperty<DateTime> attribute)
+        BsonExpression ParseDateTimeAttribute(TaskAttribute<DateTime> attribute)
         {
             return attribute.Modifier switch
             {
-                ColModifier.Equals or ColModifier.Is or null => Query.EQ(attribute.PropertyName, attribute.Value),
-                ColModifier.Before => Query.LT(attribute.PropertyName, attribute.Value),
-                ColModifier.After => Query.GTE(attribute.PropertyName, attribute.Value),
-                ColModifier.Not => Query.Not(attribute.PropertyName, attribute.Value),
+                ColModifier.Equals or ColModifier.Is or null => Query.EQ(attribute.Name, attribute.Value),
+                ColModifier.Before => Query.LT(attribute.Name, attribute.Value),
+                ColModifier.After => Query.GTE(attribute.Name, attribute.Value),
+                ColModifier.Not => Query.Not(attribute.Name, attribute.Value),
                 _ => throw new SwitchExpressionException($"Modifier {attribute.Modifier} is not supported for Date attributes"),
             };
         }
-        BsonExpression ParseTextAttribute(TaskProperty<string> attribute)
+        BsonExpression ParseTextAttribute(TaskAttribute<string> attribute)
         {
             return attribute.Modifier switch
             {
-                ColModifier.Equals or ColModifier.Is or null => Query.EQ(attribute.PropertyName, attribute.Value),
-                ColModifier.Isnt => Query.Not(attribute.PropertyName, attribute.Value),
-                ColModifier.Has or ColModifier.Contains => Query.Contains(attribute.PropertyName, attribute.Value),
-                ColModifier.Hasnt => Query.Not(attribute.PropertyName, attribute.Value),
-                ColModifier.Startswith => Query.StartsWith(attribute.PropertyName, attribute.Value),
-                ColModifier.Endswith => BsonExpression.Create($"{attribute.PropertyName} LIKE {new BsonValue("%" + attribute.Value)}"),
+                ColModifier.Equals or ColModifier.Is or null => Query.EQ(attribute.Name, attribute.Value),
+                ColModifier.Isnt => Query.Not(attribute.Name, attribute.Value),
+                ColModifier.Has or ColModifier.Contains => Query.Contains(attribute.Name, attribute.Value),
+                ColModifier.Hasnt => Query.Not(attribute.Name, attribute.Value),
+                ColModifier.Startswith => Query.StartsWith(attribute.Name, attribute.Value),
+                ColModifier.Endswith => BsonExpression.Create($"{attribute.Name} LIKE {new BsonValue("%" + attribute.Value)}"),
                 _ => throw new SwitchExpressionException($"Modifier {attribute.Modifier} is not supported for Text attributes"),
             };
         }
-        BsonExpression ParseNumberAttribute(TaskProperty<double> attribute)
+        BsonExpression ParseNumberAttribute(TaskAttribute<double> attribute)
         {
             return attribute.Modifier switch
             {
-                ColModifier.Equals or ColModifier.Is or null => Query.EQ(attribute.PropertyName, attribute.Value),
-                ColModifier.Below => Query.LT(attribute.PropertyName, attribute.Value),
-                ColModifier.Above => Query.GTE(attribute.PropertyName, attribute.Value),
-                ColModifier.Not or ColModifier.Isnt => Query.Not(attribute.PropertyName, attribute.Value),
+                ColModifier.Equals or ColModifier.Is or null => Query.EQ(attribute.Name, attribute.Value),
+                ColModifier.Below => Query.LT(attribute.Name, attribute.Value),
+                ColModifier.Above => Query.GTE(attribute.Name, attribute.Value),
+                ColModifier.Not or ColModifier.Isnt => Query.Not(attribute.Name, attribute.Value),
                 _ => throw new SwitchExpressionException($"Modifier {attribute.Modifier} is not supported for Text attributes"),
             };
         }

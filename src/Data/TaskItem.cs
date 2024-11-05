@@ -30,8 +30,3 @@ public enum TaskItemStatus { Pending, Started, Done }
 public class Recurrence
 {
 }
-
-public class UserConfiguration
-{
-    public Dictionary<string, AttributeColumnConfig> ColumnConfiguration { get; set; } = [];
-}

@@ -6,6 +6,7 @@ using static TaskTitan.Data.Enums;
 using TaskTitan.Configuration;
 using System.Linq.Expressions;
 using System.Diagnostics.CodeAnalysis;
+using TaskTitan.Data.Reports;
 
 namespace TaskTitan.Cli.Tests;
 
@@ -23,7 +24,7 @@ public class PidginParserTests
         var result = ExpressionParser.ParseFilter(text);
 
 
-        TaskProperty attribute = (result.Expr as TaskProperty)!;
+        TaskAttribute attribute = (result.Expr as TaskAttribute)!;
 
         await Assert.That(attribute.Name).IsEqualTo(keyText);
         await Assert.That(attribute.Modifier).IsNull();
@@ -33,19 +34,19 @@ public class PidginParserTests
     public async Task AUserDefinedAttributeCanBeParsedWhenAddedToConfiguration()
     {
         var text = "estimate:4";
-        var udas = new Dictionary<string, UserDefinedAttributeConfig>()
+        var udas = new ConfigDictionary<UserDefinedAttributeConfig>()
         {
             ["estimate"] = new UserDefinedAttributeConfig() { Name = "estimate", Type = ColType.Number, Label = null }
         };
 
-        ExpressionParser.Udas = udas;
+        ExpressionParser.SetUdas(udas);
         var result = ExpressionParser.ParseFilter(text);
 
-        TaskProperty attribute = (result.Expr as TaskProperty)!;
+        TaskAttribute attribute = (result.Expr as TaskAttribute)!;
 
         await Assert.That(attribute).IsNotNull();
-        await Assert.That(attribute.PropertyKind).IsEqualTo(PropertyKind.UserDefinedAttribute);
-        await Assert.That((attribute as TaskProperty<double>).Value).IsEquatableOrEqualTo(4);
+        await Assert.That(attribute.AttributeKind).IsEqualTo(AttributeKind.UserDefined);
+        await Assert.That((attribute as TaskAttribute<double>).Value).IsEquatableOrEqualTo(4);
     }
     [Test]
     [Arguments("due:8w and until:7w", BinaryOperator.And)]
@@ -71,12 +72,13 @@ public class PidginParserTests
         var result = ExpressionParser.ParseFilter(tagText);
 
         await Assert.That(result.Expr).IsAssignableTo(typeof(TaskTag));
+
         var tag = result.Expr as TaskTag;
         await Assert.That(tag?.Modifier).IsEqualTo(modifier);
     }
 
     [Test]
-    [Arguments("due:tomorrow", typeof(TaskProperty))]
+    [Arguments("due:tomorrow", typeof(TaskAttribute))]
     [Arguments("+test or due:tomorrow", typeof(BinaryFilter))]
     [Arguments("due:tomorrow or project:home", typeof(BinaryFilter))]
     [Arguments("project:work and until:1w or due:monday", typeof(BinaryFilter))]

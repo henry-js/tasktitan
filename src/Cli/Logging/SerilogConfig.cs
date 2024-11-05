@@ -10,6 +10,5 @@ public static class SerilogConfig
             outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u}] {SourceContext}: {Message:lj}{NewLine}{Exception}",
             rollingInterval: RollingInterval.Day
             )
-            .WriteTo.Console()
             .Enrich.WithProperty("Application Name", "<APP NAME>");
 }

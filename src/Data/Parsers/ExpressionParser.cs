@@ -4,11 +4,12 @@ using Pidgin.Expression;
 
 using TaskTitan.Configuration;
 using TaskTitan.Data.Expressions;
-
-using static Pidgin.Parser;
+using TaskTitan.Data.Reports;
 
 using static Pidgin.Parser<char>;
 using static Pidgin.Parser<string>;
+
+using static Pidgin.Parser;
 using static TaskTitan.Data.Enums;
 
 namespace TaskTitan.Data.Parsers;
@@ -16,6 +17,7 @@ namespace TaskTitan.Data.Parsers;
 public static class ExpressionParser
 {
     private static DateParser _dateParser = new DateParser(TimeProvider.System);
+    private static ConfigDictionary<UserDefinedAttributeConfig> _udas = [];
     private static readonly Parser<char, char> _colon
         = Token(':');
     private static readonly Parser<char, char> _dash
@@ -55,7 +57,7 @@ public static class ExpressionParser
 
     internal static readonly Parser<char, Expr> _attribute
         = Map(
-            (field, _, value) => TaskPropertyFactory.Create(field, value, _dateParser, Udas),
+            (field, _, value) => TaskAttributeFactory.Create(field, value, _dateParser, _udas),
             LetterOrDigit.Or(Token('.')).AtLeastOnceString(),
             Token(':'),
             OneOf(
@@ -83,7 +85,7 @@ public static class ExpressionParser
             ]
         );
 
-    public static Dictionary<string, UserDefinedAttributeConfig> Udas { get; set; } = [];
+    public static void SetUdas(ConfigDictionary<UserDefinedAttributeConfig> udas) => _udas = udas;
 
     public static void SetTimeProvider(TimeProvider timeProvider)
         => _dateParser = (timeProvider is null)
@@ -100,6 +102,6 @@ public static class ExpressionParser
             _attribute,
             _tagExpression
         ).SeparatedAtLeastOnce(Token(' '))
-        .Select(exprs => new CommandExpression(exprs.Cast<TaskProperty>(), input))
+        .Select(exprs => new CommandExpression(exprs.Cast<TaskAttribute>(), input))
         .ParseOrThrow(input);
 }

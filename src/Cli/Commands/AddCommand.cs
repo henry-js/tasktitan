@@ -2,6 +2,9 @@ using System.CommandLine.Invocation;
 using System.Text;
 using System.Text.Json;
 
+using Microsoft.Extensions.Options;
+
+using TaskTitan.Configuration;
 using TaskTitan.Data;
 using TaskTitan.Data.Expressions;
 using TaskTitan.Data.Parsers;
@@ -17,14 +20,50 @@ public sealed class AddCommand : Command
 
     public static void AddOptions(Command command)
     {
-        static CommandExpression parse(System.CommandLine.Parsing.ArgumentResult ar)
+        // static CommandExpression parse(System.CommandLine.Parsing.ArgumentResult ar)
+        // {
+        //     var builder = new StringBuilder().Append("description:'");
+        //     List<string> attributes = [];
+        //     List<string> descValues = [];
+        //     for (int i = 0; i < ar.Tokens.Count; i++)
+        //     {
+        //         string current = ar.Tokens[i].Value;
+        //         if (current.Contains(':') || current.Contains('+'))
+        //         {
+        //             attributes.Add(current);
+        //         }
+        //         else
+        //         {
+        //             descValues.Add(current);
+        //         }
+        //     }
+        //     builder.AppendJoin(' ', descValues).Append('\'').Append(' ').AppendJoin(' ', attributes);
+        //     return ExpressionParser.ParseCommand(builder.ToString());
+        // }
+
+        var descriptionArgument = new Argument<string[]>("Modification")
+        {
+            Arity = ArgumentArity.OneOrMore,
+        };
+
+        command.Add(descriptionArgument);
+    }
+
+    new public class Handler(IAnsiConsole console, LiteDbContext dbContext, IOptions<ReportConfiguration> reportOptions) : ICommandHandler
+    {
+        private readonly ReportConfiguration reportConfig = reportOptions.Value;
+        private readonly IAnsiConsole console = console;
+        public CommandExpression Modification { get; set; } = default!;
+
+        public int Invoke(InvocationContext context) => InvokeAsync(context).Result;
+        public async Task<int> InvokeAsync(InvocationContext context)
         {
             var builder = new StringBuilder().Append("description:'");
             List<string> attributes = [];
             List<string> descValues = [];
-            for (int i = 0; i < ar.Tokens.Count; i++)
+            for (int i = 0; i < context.ParseResult.CommandResult.Tokens.Count; i++)
             {
-                string current = ar.Tokens[i].Value;
+                string current = context.ParseResult.CommandResult.Tokens[i].Value;
                 if (current.Contains(':') || current.Contains('+'))
                 {
                     attributes.Add(current);
@@ -35,26 +74,9 @@ public sealed class AddCommand : Command
                 }
             }
             builder.AppendJoin(' ', descValues).Append('\'').Append(' ').AppendJoin(' ', attributes);
-            return ExpressionParser.ParseCommand(builder.ToString());
-        }
+            ExpressionParser.SetUdas(reportConfig.UDAs);
+            Modification = ExpressionParser.ParseCommand(builder.ToString());
 
-        var descriptionArgument = new Argument<CommandExpression>("Modification",
-        parse: parse)
-        {
-            Arity = ArgumentArity.OneOrMore,
-        };
-
-        command.Add(descriptionArgument);
-    }
-
-    new public class Handler(IAnsiConsole console, LiteDbContext dbContext) : ICommandHandler
-    {
-        private readonly IAnsiConsole console = console;
-        public CommandExpression Modification { get; set; } = default!;
-
-        public int Invoke(InvocationContext context) => InvokeAsync(context).Result;
-        public async Task<int> InvokeAsync(InvocationContext context)
-        {
             var taskId = dbContext.AddTask(Modification.Properties);
 
             console.MarkupLineInterpolated($"[green]Created task {taskId}[/]");

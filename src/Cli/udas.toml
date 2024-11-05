@@ -4,3 +4,6 @@ label = "est"
 [uda.example]
 type = "number"
 label = "ex"
+[uda.priority]
+type = "number"
+label = "P"

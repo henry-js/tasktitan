@@ -59,7 +59,7 @@ public class LiteDbContext
         return $@"Filename={Path.Combine(dataDirectoryPath, FILE_NAME)}";
     }
 
-    public int AddTask(IEnumerable<TaskProperty> properties)
+    public int AddTask(IEnumerable<TaskAttribute> properties)
     {
         var id = ObjectId.NewObjectId();
         var task = new BsonDocument();
@@ -68,23 +68,23 @@ public class LiteDbContext
 
         foreach (var propp in properties)
         {
-            switch (propp.PropertyName)
+            switch (propp.Name)
             {
                 case nameof(TaskItem.Entry):
                 case nameof(TaskItem.TaskId):
                     continue;
             }
-            if (propp is TaskProperty<DateTime> dateProp)
+            if (propp is TaskAttribute<DateTime> dateProp)
             {
-                task[propp.PropertyName] = dateProp.Value;
+                task[propp.Name] = dateProp.Value;
             }
-            else if (propp is TaskProperty<string> stringProp)
+            else if (propp is TaskAttribute<string> stringProp)
             {
-                task[propp.PropertyName] = stringProp.Value;
+                task[propp.Name] = stringProp.Value;
             }
-            else if (propp is TaskProperty<double> numProp)
+            else if (propp is TaskAttribute<double> numProp)
             {
-                task[propp.PropertyName] = numProp.Value;
+                task[propp.Name] = numProp.Value;
             }
         }
         if (!task.ContainsKey(nameof(TaskItem.Status))) task[nameof(TaskItem.Status)] = TaskItemStatus.Pending.ToString();

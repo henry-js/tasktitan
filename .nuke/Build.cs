@@ -109,7 +109,7 @@ partial class Build : NukeBuild
                 .SetAutoIncrement(MinVerVersionPart.Minor)
                 .SetDefaultPreReleaseIdentifiers("preview.0")
                 .SetTagPrefix("v")
-                ).Result;
+            ).Result;
             Log.Information(MinVer.Version);
 
             var packDir = PublishDirectory;

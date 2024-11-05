@@ -17,61 +17,61 @@ public static class DynamicLinq
         return expr switch
         {
             BinaryFilter bf => BinaryFilterToLinq(bf, depth),
-            TaskProperty attr => AttributeToLinq(attr),
+            TaskAttribute attr => AttributeToLinq(attr),
             _ => throw new SwitchExpressionException($"Cannot convert expression: {expr.GetType()} to linq")
         };
     }
 
-    private static string AttributeToLinq(TaskProperty attr)
+    private static string AttributeToLinq(TaskAttribute attr)
     {
-        if (attr is TaskProperty<DateTime> t)
+        if (attr is TaskAttribute<DateTime> t)
         {
             return ParseDateTimeAttribute(t);
         }
-        else if (attr is TaskProperty<double> d)
+        else if (attr is TaskAttribute<double> d)
         {
             return ParseNumberAttribute(d);
         }
-        else if (attr is TaskProperty<string> s)
+        else if (attr is TaskAttribute<string> s)
         {
             return ParseTextAttribute(s);
         }
 
         throw new Exception($"Unsupported property type {attr.GetType()}");
 
-        string ParseDateTimeAttribute(TaskProperty<DateTime> attribute)
+        string ParseDateTimeAttribute(TaskAttribute<DateTime> attribute)
         {
             return attribute.Modifier switch
             {
-                ColModifier.Equals or null => $"{attribute.PropertyName} == {attribute.Value}",
-                ColModifier.Before => $"{attribute.PropertyName} < {attribute.Value}",
-                ColModifier.After => $"{attribute.PropertyName} >= {attribute.Value}",
-                ColModifier.Is => $"{attribute.PropertyName} == {attribute.Value}",
-                ColModifier.Not => $"{attribute.PropertyName} != {attribute.Value}",
+                ColModifier.Equals or null => $"{attribute.Name} == {attribute.Value}",
+                ColModifier.Before => $"{attribute.Name} < {attribute.Value}",
+                ColModifier.After => $"{attribute.Name} >= {attribute.Value}",
+                ColModifier.Is => $"{attribute.Name} == {attribute.Value}",
+                ColModifier.Not => $"{attribute.Name} != {attribute.Value}",
                 _ => throw new SwitchExpressionException($"Modifier {attribute.Modifier} is not supported for Date attributes"),
             };
         }
-        string ParseTextAttribute(TaskProperty<string> attribute)
+        string ParseTextAttribute(TaskAttribute<string> attribute)
         {
             return attribute.Modifier switch
             {
-                ColModifier.Equals or null => $"{attribute.PropertyName}.Equals(\"{attribute.Value}\", StringComparison.CurrentCultureIgnoreCase)",
-                ColModifier.Isnt => $"!{attribute.PropertyName}.Equals(\"{attribute.Value}\", StringComparison.CurrentCultureIgnoreCase)",
-                ColModifier.Has or ColModifier.Contains => $"{attribute.PropertyName}.Contains(\"{attribute.Value}\", StringComparison.CurrentCultureIgnoreCase)",
-                ColModifier.Hasnt => $"!{attribute.PropertyName}.Contains(\"{attribute.Value}\", StringComparison.CurrentCultureIgnoreCase)",
-                ColModifier.Startswith => $"{attribute.PropertyName}.StartsWith(\"{attribute.Value}\", StringComparison.CurrentCultureIgnoreCase)",
-                ColModifier.Endswith => $"{attribute.PropertyName}.EndsWith(\"{attribute.Value}\", StringComparison.CurrentCultureIgnoreCase)",
+                ColModifier.Equals or null => $"{attribute.Name}.Equals(\"{attribute.Value}\", StringComparison.CurrentCultureIgnoreCase)",
+                ColModifier.Isnt => $"!{attribute.Name}.Equals(\"{attribute.Value}\", StringComparison.CurrentCultureIgnoreCase)",
+                ColModifier.Has or ColModifier.Contains => $"{attribute.Name}.Contains(\"{attribute.Value}\", StringComparison.CurrentCultureIgnoreCase)",
+                ColModifier.Hasnt => $"!{attribute.Name}.Contains(\"{attribute.Value}\", StringComparison.CurrentCultureIgnoreCase)",
+                ColModifier.Startswith => $"{attribute.Name}.StartsWith(\"{attribute.Value}\", StringComparison.CurrentCultureIgnoreCase)",
+                ColModifier.Endswith => $"{attribute.Name}.EndsWith(\"{attribute.Value}\", StringComparison.CurrentCultureIgnoreCase)",
                 _ => throw new SwitchExpressionException($"Modifier {attribute.Modifier} is not supported for Text attributes"),
             };
         }
-        string ParseNumberAttribute(TaskProperty<double> attribute)
+        string ParseNumberAttribute(TaskAttribute<double> attribute)
         {
             return attribute.Modifier switch
             {
-                ColModifier.Equals or null => $"{attribute.PropertyName} == {attribute.Value}",
-                ColModifier.Below => $"{attribute.PropertyName} < {attribute.Value}",
-                ColModifier.Above => $"{attribute.PropertyName} >= {attribute.Value}",
-                ColModifier.Isnt => $"{attribute.PropertyName} != {attribute.Value}",
+                ColModifier.Equals or null => $"{attribute.Name} == {attribute.Value}",
+                ColModifier.Below => $"{attribute.Name} < {attribute.Value}",
+                ColModifier.Above => $"{attribute.Name} >= {attribute.Value}",
+                ColModifier.Isnt => $"{attribute.Name} != {attribute.Value}",
                 _ => throw new SwitchExpressionException($"Modifier {attribute.Modifier} is not supported for Text attributes"),
             };
         }
