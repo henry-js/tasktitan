@@ -5,6 +5,7 @@ using LiteDB;
 
 using TaskTitan.Configuration;
 using TaskTitan.Data.Expressions;
+using TaskTitan.Data.Extensions;
 
 namespace TaskTitan.Data;
 
@@ -111,9 +112,9 @@ public class LiteDbContext
         return tasks;
     }
 
-    public IEnumerable<TaskItem> QueryTasks(BsonExpression query)
+    public IEnumerable<TaskItem> QueryTasks(FilterExpression query)
     {
-        var tasks = Tasks.Find(query);
+        var tasks = Tasks.Find(query.ToBsonExpression());
 
         return tasks;
         // foreach (var (task, index) in tasks.Index())

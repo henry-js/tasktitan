@@ -14,9 +14,6 @@ public class ReportConfiguration
     [DataMember(Name = "Report")]
     public ConfigDictionary<CustomReport> Report { get; set; } = [];
     public ConfigDictionary<UserDefinedAttributeConfig> UDAs { get; set; } = [];
-    public ReportConfiguration()
-    {
-    }
 }
 
 public static class TaskColumns

@@ -8,8 +8,6 @@ using System.CommandLine.Invocation;
 using TaskTitan.Cli.AnsiConsole;
 using TaskTitan.Configuration;
 using TaskTitan.Data;
-using TaskTitan.Data.Expressions;
-using TaskTitan.Data.Extensions;
 using TaskTitan.Data.Parsers;
 using TaskTitan.Data.Reports;
 
@@ -51,7 +49,7 @@ public sealed class ListCommand : Command
 
             logger.LogInformation("Report: {ReportName}, Filter : {ReportFilter}", report.Name, report.Filter);
 
-            var query = ExpressionParser.ParseFilter(report.Filter).ToBsonExpression();
+            var query = ExpressionParser.ParseFilter(report.Filter);
 
             IEnumerable<TaskItem> tasks;
             using (logger.TimeOperation("Fetching tasks"))

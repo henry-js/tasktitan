@@ -1,6 +1,7 @@
 ﻿using TaskTitan.Cli.AnsiConsole;
 using TaskTitan.Cli.Commands;
 using TaskTitan.Cli.Extensions;
+using TaskTitan.Cli.Logging;
 using TaskTitan.Configuration;
 using TaskTitan.Data;
 
@@ -28,7 +29,6 @@ var cmdLine = new CommandLineBuilder(cmd)
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
             config.AddTomlFile("udas.toml", true)
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
-
         })
             .ConfigureServices((context, services) =>
             {
@@ -42,8 +42,7 @@ var cmdLine = new CommandLineBuilder(cmd)
                 });
             })
             .UseSerilog((context, configuration) =>
-            // TODO: fix issue where this is writing to <PROCESSDIRECTORY>\logs\file.log instead of <INSTALLDIRECTORY>\logs\file.log
-                configuration.ReadFrom.Configuration(context.Configuration))
+                SerilogConfig.LoggerConfiguration.CreateLogger())
             .UseProjectCommandHandlers();
     })
     .UseDefaults()
