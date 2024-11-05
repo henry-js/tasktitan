@@ -19,27 +19,14 @@ public sealed class ListCommand : Command
 {
     public ListCommand(ReportDictionary? reports = null) : base("list", "Display a report or tasks filtered")
     {
-        AddOptions(this, reports);
+        AddOptions(this);
     }
 
-    public static void AddOptions(Command command, ReportDictionary? reports)
+    public static void AddOptions(Command command)
     {
-        // static FilterExpression? parseArgument(ArgumentResult ar) => ExpressionParser.ParseFilter(string.Join(' ', ar.Tokens));
-        // Option<FilterExpression?> option = new(
-        //     aliases: ["-f", "--filter"],
-        //     description: "Filter tasks by"
-        //     // ,parseArgument: parseArgument
-        //     )
-        // {
-        //     AllowMultipleArgumentsPerToken = true,
-        //     Arity = ArgumentArity.ZeroOrMore,
-        // };
-        // command.AddOption(option);
-
         Argument<string[]?> report = new(
             name: "Filter",
             description: "Use a report instead of filter"
-        // , parse: ar => reports?.TryGetValue(ar.Tokens.FirstOrDefault()!.Value, out var report) == true ? report : null
         )
         {
             Arity = ArgumentArity.ZeroOrMore

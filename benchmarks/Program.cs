@@ -36,13 +36,13 @@ var generatedTasks = sampleTasks.Generate(1000);
 
 col.InsertBulk(generatedTasks);
 
-var dateParser = new DateParser(TimeProvider.System);
-var attribute1 = TaskProperty.Create("due.after", "tomorrow", dateParser);
-var attribute2 = TaskProperty.Create("project.contains", "work", dateParser);
-var expr = new FilterExpression(new BinaryFilter(attribute1, BinaryOperator.Or, attribute2));
+// var dateParser = new DateParser(TimeProvider.System);
+// var attribute1 = TaskPropertyFactory.Create("due.after", "tomorrow", dateParser);
+// var attribute2 = TaskPropertyFactory.Create("project.contains", "work", dateParser);
+// var expr = new FilterExpression(new BinaryFilter(attribute1, BinaryOperator.Or, attribute2));
 
-var filtered = col.Find(expr.ToBsonExpression());
+// var filtered = col.Find(expr.ToBsonExpression());
 
-// var workingSet = context.WorkingSet;
+// // var workingSet = context.WorkingSet;
 
-Console.WriteLine(filtered.Count());
+// Console.WriteLine(filtered.Count());

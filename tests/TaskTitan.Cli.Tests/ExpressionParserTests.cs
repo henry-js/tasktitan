@@ -3,6 +3,9 @@ using TaskTitan.Data.Parsers;
 using TaskTitan.Data.Expressions;
 using System.Text.Json;
 using static TaskTitan.Data.Enums;
+using TaskTitan.Configuration;
+using System.Linq.Expressions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TaskTitan.Cli.Tests;
 
@@ -26,6 +29,24 @@ public class PidginParserTests
         await Assert.That(attribute.Modifier).IsNull();
     }
 
+    [Test]
+    public async Task AUserDefinedAttributeCanBeParsedWhenAddedToConfiguration()
+    {
+        var text = "estimate:4";
+        var udas = new Dictionary<string, UserDefinedAttributeConfig>()
+        {
+            ["estimate"] = new UserDefinedAttributeConfig() { Name = "estimate", Type = ColType.Number, Label = null }
+        };
+
+        ExpressionParser.Udas = udas;
+        var result = ExpressionParser.ParseFilter(text);
+
+        TaskProperty attribute = (result.Expr as TaskProperty)!;
+
+        await Assert.That(attribute).IsNotNull();
+        await Assert.That(attribute.PropertyKind).IsEqualTo(PropertyKind.UserDefinedAttribute);
+        await Assert.That((attribute as TaskProperty<double>).Value).IsEquatableOrEqualTo(4);
+    }
     [Test]
     [Arguments("due:8w and until:7w", BinaryOperator.And)]
     [Arguments("due:9w until:8w", BinaryOperator.And)]

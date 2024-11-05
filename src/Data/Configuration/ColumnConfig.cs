@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+
 using static TaskTitan.Data.Enums;
 
 namespace TaskTitan.Data;
@@ -15,24 +16,10 @@ public class AttributeColumnConfig
     public ColType ColType { get; set; }
     public IReadOnlyList<ColFormat>? AllowedFormats { get; }
 
-    public AttributeColumnConfig(string name, bool isModifiable, ColFormat format, ColType type, List<ColFormat>? allowedFormats = null)
+    public AttributeColumnConfig(string name, bool isModifiable, ColType type)
     {
         Name = name;
         IsModifiable = isModifiable;
-        Format = format;
         ColType = type;
-        AllowedFormats = allowedFormats ?? AttributeColumnFormats.AllowedFormats[type];
-
-    }
-
-    public void SetFormat(ColFormat format)
-    {
-        if (!AttributeColumnFormats.AllowedFormats.TryGetValue(ColType, out List<ColFormat>? allowed))
-            throw new ArgumentException($"Unknown column type '{ColType}'");
-
-        if (allowed.Contains(format))
-        {
-            Format = format;
-        }
     }
 }

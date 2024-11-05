@@ -1,13 +1,11 @@
 using System.Text.Json.Serialization;
 
-using TaskTitan.Data.Expressions;
-
 namespace TaskTitan.Data.Reports;
 
-public class CustomReport //: IReport
+public class CustomReport : IConfig
 {
     [JsonIgnore]
-    public string Name { get; internal set; }
+    public string Name { get; set; }
     public required string Description { get; set; }
     public string Filter { get; set; } = string.Empty;
     public string[] Columns { get; set; } = [];
@@ -17,7 +15,6 @@ public class CustomReport //: IReport
     {
         throw new NotImplementedException();
     }
-
 
     public CustomReport OverrideFilter(params string[] filter)
     {

@@ -1,11 +1,14 @@
+
 using Pidgin;
 using Pidgin.Expression;
 
+using TaskTitan.Configuration;
 using TaskTitan.Data.Expressions;
+
+using static Pidgin.Parser;
 
 using static Pidgin.Parser<char>;
 using static Pidgin.Parser<string>;
-using static Pidgin.Parser;
 using static TaskTitan.Data.Enums;
 
 namespace TaskTitan.Data.Parsers;
@@ -52,7 +55,7 @@ public static class ExpressionParser
 
     internal static readonly Parser<char, Expr> _attribute
         = Map(
-            (field, _, value) => TaskProperty.Create(field, value, _dateParser),
+            (field, _, value) => TaskPropertyFactory.Create(field, value, _dateParser, Udas),
             LetterOrDigit.Or(Token('.')).AtLeastOnceString(),
             Token(':'),
             OneOf(
@@ -79,6 +82,8 @@ public static class ExpressionParser
                 Operator.InfixL(_and),
             ]
         );
+
+    public static Dictionary<string, UserDefinedAttributeConfig> Udas { get; set; } = [];
 
     public static void SetTimeProvider(TimeProvider timeProvider)
         => _dateParser = (timeProvider is null)

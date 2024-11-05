@@ -12,30 +12,32 @@ namespace TaskTitan.Configuration;
 public class ReportConfiguration
 {
     [DataMember(Name = "Report")]
-    public ReportDictionary Report { get; set; } = [];
+    public ConfigDictionary<CustomReport> Report { get; set; } = [];
+    public ConfigDictionary<UserDefinedAttributeConfig> UDAs { get; set; } = [];
     public ReportConfiguration()
     {
     }
+}
 
-    [IgnoreDataMember]
-    public static Dictionary<string, AttributeColumnConfig> Columns => new(){
-
-        {"depends", new AttributeColumnConfig("depends",true, List,Text,  [Standard,Indicator,List] )},
-        {"description", new AttributeColumnConfig("description",true, Standard,Text,  [Combined,Desc,Oneline,Truncated, Count, TruncatedCount] )},
-        {"due", new AttributeColumnConfig("due",true, Formatted,Date)},
-        {"end", new AttributeColumnConfig("end",true, Formatted,Date )},
-        {"entry", new AttributeColumnConfig("entry",true, Formatted,Date )},
-        {"estimate", new AttributeColumnConfig("estimate",true, Standard,Text,  [Standard,Indicator] )},
-        {"modified", new AttributeColumnConfig("modified",true, Formatted,Date )},
-        {"parent", new AttributeColumnConfig("parent",false, Long,Text ,[Long, Short])},
-        {"project", new AttributeColumnConfig("project",false, Full,Text, [ Full, Parent, Indented ] )},
-        {"recur", new AttributeColumnConfig("recur",false, Full,Text, [ Duration, Indicator ] )},
-        {"scheduled", new AttributeColumnConfig("scheduled",true, Formatted,Date )},
-        {"start", new AttributeColumnConfig("start",true, Formatted,Date )},
-        {"status", new AttributeColumnConfig("status",true, Long, Text,[Long, Short] )},
-        {"tags", new AttributeColumnConfig("tags",true, List, Text,[List,Indicator, Count] )},
-        {"until", new AttributeColumnConfig("until",true, Formatted,Date )},
-        {"uuid", new AttributeColumnConfig("uuid",false, Long,Text, [Long, Short] )},
-        {"wait", new AttributeColumnConfig("wait",true, Standard,Date )},
+public static class TaskColumns
+{
+    public static readonly Dictionary<string, AttributeColumnConfig> Columns = new(StringComparer.OrdinalIgnoreCase)
+    {
+        [nameof(TaskItem.Description)] = new AttributeColumnConfig(nameof(TaskItem.Description), true, Text),
+        [nameof(TaskItem.Due)] = new AttributeColumnConfig(nameof(TaskItem.Due), true, Date),
+        [nameof(TaskItem.End)] = new AttributeColumnConfig(nameof(TaskItem.End), true, Date),
+        [nameof(TaskItem.Entry)] = new AttributeColumnConfig(nameof(TaskItem.Entry), true, Date),
+        // [nameof(TaskItem.Estimate)] = new AttributeColumnConfig(nameof(TaskItem.Estimate), true, Text),
+        [nameof(TaskItem.Modified)] = new AttributeColumnConfig(nameof(TaskItem.Modified), true, Date),
+        // [nameof(TaskItem.Parent)] = new AttributeColumnConfig(nameof(TaskItem.Parent), false, Text),
+        [nameof(TaskItem.Project)] = new AttributeColumnConfig(nameof(TaskItem.Project), false, Text),
+        // [nameof(TaskItem.Recur)] = new AttributeColumnConfig(nameof(TaskItem.Recur), false, Text),
+        [nameof(TaskItem.Scheduled)] = new AttributeColumnConfig(nameof(TaskItem.Scheduled), true, Date),
+        [nameof(TaskItem.Start)] = new AttributeColumnConfig(nameof(TaskItem.Start), true, Date),
+        [nameof(TaskItem.Status)] = new AttributeColumnConfig(nameof(TaskItem.Status), true, Text),
+        [nameof(TaskItem.Tags)] = new AttributeColumnConfig(nameof(TaskItem.Tags), true, Text),
+        [nameof(TaskItem.Until)] = new AttributeColumnConfig(nameof(TaskItem.Until), true, Date),
+        [nameof(TaskItem.Wait)] = new AttributeColumnConfig(nameof(TaskItem.Wait), true, Date),
+        [nameof(TaskItem.TaskId)] = new AttributeColumnConfig(nameof(TaskItem.TaskId), false, Text),
     };
 }

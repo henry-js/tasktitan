@@ -26,13 +26,20 @@ var cmdLine = new CommandLineBuilder(cmd)
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
             config.AddTomlFile("reports.toml", false)
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
+            config.AddTomlFile("udas.toml", true)
+                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
+
         })
             .ConfigureServices((context, services) =>
             {
                 services.AddSingleton(_ => AnsiConsole.Console);
                 services.AddSingleton(f => new LiteDbContext(LiteDbContext.CreateConnectionStringFrom(Global.DataDirectoryPath)));
                 services.AddSingleton<IReportWriter, ReportWriter>();
-                services.Configure<ReportConfiguration>(_ => context.Configuration.GetSection("Report").Bind(_.Report));
+                services.Configure<ReportConfiguration>(_ =>
+                {
+                    context.Configuration.GetSection("Report").Bind(_.Report);
+                    context.Configuration.GetSection("uda").Bind(_.UDAs);
+                });
             })
             .UseSerilog((context, configuration) =>
             // TODO: fix issue where this is writing to <PROCESSDIRECTORY>\logs\file.log instead of <INSTALLDIRECTORY>\logs\file.log
