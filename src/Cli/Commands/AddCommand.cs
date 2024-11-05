@@ -1,7 +1,7 @@
 using System.CommandLine.Invocation;
 using System.Text;
-using System.Text.Json;
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using TaskTitan.Configuration;
@@ -20,27 +20,6 @@ public sealed class AddCommand : Command
 
     public static void AddOptions(Command command)
     {
-        // static CommandExpression parse(System.CommandLine.Parsing.ArgumentResult ar)
-        // {
-        //     var builder = new StringBuilder().Append("description:'");
-        //     List<string> attributes = [];
-        //     List<string> descValues = [];
-        //     for (int i = 0; i < ar.Tokens.Count; i++)
-        //     {
-        //         string current = ar.Tokens[i].Value;
-        //         if (current.Contains(':') || current.Contains('+'))
-        //         {
-        //             attributes.Add(current);
-        //         }
-        //         else
-        //         {
-        //             descValues.Add(current);
-        //         }
-        //     }
-        //     builder.AppendJoin(' ', descValues).Append('\'').Append(' ').AppendJoin(' ', attributes);
-        //     return ExpressionParser.ParseCommand(builder.ToString());
-        // }
-
         var descriptionArgument = new Argument<string[]>("Modification")
         {
             Arity = ArgumentArity.OneOrMore,
@@ -49,7 +28,7 @@ public sealed class AddCommand : Command
         command.Add(descriptionArgument);
     }
 
-    new public class Handler(IAnsiConsole console, LiteDbContext dbContext, IOptions<ReportConfiguration> reportOptions) : ICommandHandler
+    new public class Handler(IAnsiConsole console, LiteDbContext dbContext, IOptions<ReportConfiguration> reportOptions, ILogger<AddCommand> logger) : ICommandHandler
     {
         private readonly ReportConfiguration reportConfig = reportOptions.Value;
         private readonly IAnsiConsole console = console;
@@ -58,6 +37,7 @@ public sealed class AddCommand : Command
         public int Invoke(InvocationContext context) => InvokeAsync(context).Result;
         public async Task<int> InvokeAsync(InvocationContext context)
         {
+            logger.LogInformation("Adding task");
             var builder = new StringBuilder().Append("description:'");
             List<string> attributes = [];
             List<string> descValues = [];
@@ -74,10 +54,16 @@ public sealed class AddCommand : Command
                 }
             }
             builder.AppendJoin(' ', descValues).Append('\'').Append(' ').AppendJoin(' ', attributes);
+            logger.LogInformation("Parsed raw input");
             ExpressionParser.SetUdas(reportConfig.UDAs);
+
+            logger.LogInformation("Parsing command");
             Modification = ExpressionParser.ParseCommand(builder.ToString());
+            logger.LogInformation("Command parsed");
 
             var taskId = dbContext.AddTask(Modification.Properties);
+
+            logger.LogInformation("Created task with id {id}", taskId);
 
             console.MarkupLineInterpolated($"[green]Created task {taskId}[/]");
             return await Task.FromResult(0);

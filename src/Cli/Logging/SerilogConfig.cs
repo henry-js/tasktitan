@@ -1,3 +1,5 @@
+using Serilog;
+
 using TaskTitan.Configuration;
 
 namespace TaskTitan.Cli.Logging;

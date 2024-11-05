@@ -1,4 +1,6 @@
-﻿using TaskTitan.Cli.AnsiConsole;
+﻿using Serilog;
+
+using TaskTitan.Cli.AnsiConsole;
 using TaskTitan.Cli.Commands;
 using TaskTitan.Cli.Extensions;
 using TaskTitan.Cli.Logging;
@@ -44,7 +46,7 @@ var cmdLine = new CommandLineBuilder(cmd)
             ;
     })
     .UseDefaults()
-    .UseExceptionHandler((ex, context) => AnsiConsole.WriteException(ex, ExceptionFormats.ShortenEverything))
+    .UseExceptionHandler((ex, context) => AnsiConsole.WriteException(ex, ExceptionFormats.ShortenEverything | ExceptionFormats.NoStackTrace))
     .Build();
 
 int result = await cmdLine.InvokeAsync(args);

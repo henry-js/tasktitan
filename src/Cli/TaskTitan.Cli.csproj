@@ -53,7 +53,6 @@
     <Using Include="Microsoft.Extensions.Configuration" />
     <Using Include="Microsoft.Extensions.DependencyInjection" />
     <Using Include="Microsoft.Extensions.Hosting" />
-    <Using Include="Serilog" />
     <Using Include="Spectre.Console" />
     <Using Include="System.CommandLine" />
     <Using Include="System.CommandLine.Builder" />
