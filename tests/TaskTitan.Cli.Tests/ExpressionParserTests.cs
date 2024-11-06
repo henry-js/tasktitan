@@ -2,11 +2,12 @@ using TUnit.Assertions.Extensions.Generic;
 using TaskTitan.Data.Parsers;
 using TaskTitan.Data.Expressions;
 using System.Text.Json;
-using static TaskTitan.Data.Enums;
-using TaskTitan.Configuration;
 using System.Linq.Expressions;
 using System.Diagnostics.CodeAnalysis;
-using TaskTitan.Data.Reports;
+using TaskTitan.Core;
+using TaskTitan.Core.Enums;
+using TaskTitan.Core.Configuration;
+
 
 namespace TaskTitan.Cli.Tests;
 
@@ -34,9 +35,9 @@ public class PidginParserTests
     public async Task AUserDefinedAttributeCanBeParsedWhenAddedToConfiguration()
     {
         var text = "estimate:4";
-        var udas = new ConfigDictionary<UserDefinedAttributeConfig>()
+        var udas = new ConfigDictionary<AttributeDefinition>()
         {
-            ["estimate"] = new UserDefinedAttributeConfig() { Name = "estimate", Type = ColType.Number, Label = null }
+            ["estimate"] = new AttributeDefinition() { Name = "estimate", Type = ColType.Number, Label = null }
         };
 
         ExpressionParser.SetUdas(udas);

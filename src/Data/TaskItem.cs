@@ -1,6 +1,6 @@
 using LiteDB;
 
-namespace TaskTitan.Data;
+namespace TaskTitan.Core;
 
 public class TaskItem
 {

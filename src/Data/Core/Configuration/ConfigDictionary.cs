@@ -1,16 +1,13 @@
 using System.Collections;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.Serialization;
 
-using TaskTitan.Data.Reports;
+namespace TaskTitan.Core.Configuration;
 
-namespace TaskTitan.Data.Reports;
-
-public class ReportDictionary : IDictionary<string, ReportDefinition>
+public class ConfigDictionary<T> : IDictionary<string, T>
+where T : IConfig
 {
-    private readonly Dictionary<string, ReportDefinition> _backingDict = [];
-    public ReportDefinition this[string key]
+    private readonly Dictionary<string, T> _backingDict = [];
+    public T this[string key]
     {
         get => _backingDict[key]; set
         {
@@ -20,17 +17,17 @@ public class ReportDictionary : IDictionary<string, ReportDefinition>
     }
 
     public ICollection<string> Keys => _backingDict.Keys;
-    public ICollection<ReportDefinition> Values => _backingDict.Values;
+    public ICollection<T> Values => _backingDict.Values;
     public int Count => _backingDict.Count;
     public bool IsReadOnly { get; } = false;
 
-    public void Add(string key, ReportDefinition value)
+    public void Add(string key, T value)
     {
         _backingDict.Add(key, value);
         SetReportName(key, value);
     }
 
-    public void Add(KeyValuePair<string, ReportDefinition> item)
+    public void Add(KeyValuePair<string, T> item)
     {
         _backingDict.Add(item.Key, item.Value);
         SetReportName(item.Key, item.Value);
@@ -38,16 +35,16 @@ public class ReportDictionary : IDictionary<string, ReportDefinition>
 
     public void Clear() => _backingDict.Clear();
 
-    public bool Contains(KeyValuePair<string, ReportDefinition> item) => _backingDict.Contains(item);
+    public bool Contains(KeyValuePair<string, T> item) => _backingDict.Contains(item);
 
     public bool ContainsKey(string key) => _backingDict.ContainsKey(key);
 
-    public void CopyTo(KeyValuePair<string, ReportDefinition>[] array, int arrayIndex)
+    public void CopyTo(KeyValuePair<string, T>[] array, int arrayIndex)
     {
         throw new NotImplementedException();
     }
 
-    public IEnumerator<KeyValuePair<string, ReportDefinition>> GetEnumerator()
+    public IEnumerator<KeyValuePair<string, T>> GetEnumerator()
     {
         return _backingDict.GetEnumerator();
     }
@@ -57,19 +54,19 @@ public class ReportDictionary : IDictionary<string, ReportDefinition>
         return _backingDict.Remove(key);
     }
 
-    public bool Remove(KeyValuePair<string, ReportDefinition> item)
+    public bool Remove(KeyValuePair<string, T> item)
     {
         return _backingDict.Remove(item.Key, out var value);
     }
 
-    public bool TryGetValue(string key, [MaybeNullWhen(false)] out ReportDefinition value)
+    public bool TryGetValue(string key, [MaybeNullWhen(false)] out T value)
     {
         return _backingDict.TryGetValue(key, out value);
     }
 
     IEnumerator IEnumerable.GetEnumerator() => _backingDict.GetEnumerator();
 
-    private static void SetReportName(string key, ReportDefinition value)
+    private static void SetReportName(string key, T value)
     {
         value.Name = key;
     }

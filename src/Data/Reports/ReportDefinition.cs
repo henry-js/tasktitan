@@ -1,8 +1,10 @@
 using System.Text.Json.Serialization;
 
+using TaskTitan.Core.Configuration;
+
 namespace TaskTitan.Data.Reports;
 
-public class CustomReport : IConfig
+public class ReportDefinition : IConfig
 {
     [JsonIgnore]
     public string Name { get; set; }
@@ -11,12 +13,12 @@ public class CustomReport : IConfig
     public string[] Columns { get; set; } = [];
     public string[] Labels { get; set; } = [];
 
-    public static CustomReport FromFilter(string v)
+    public static ReportDefinition FromFilter(string v)
     {
         throw new NotImplementedException();
     }
 
-    public CustomReport OverrideFilter(params string[] filter)
+    public ReportDefinition OverrideFilter(params string[] filter)
     {
         Filter = string.Join(' ', filter);
 
@@ -25,10 +27,5 @@ public class CustomReport : IConfig
 
     // TODO: Add support for sorting
 }
-
-// public interface IReport
-// {
-
-// }
 
 public enum ReportType { Modifiable, Static, Custom }

@@ -6,7 +6,8 @@ using Ogu.Extensions.Logging.Timings;
 using System.CommandLine.Invocation;
 
 using TaskTitan.Cli.AnsiConsole;
-using TaskTitan.Configuration;
+using TaskTitan.Core;
+using TaskTitan.Core.Configuration;
 using TaskTitan.Data;
 using TaskTitan.Data.Parsers;
 using TaskTitan.Data.Reports;
@@ -32,9 +33,9 @@ public sealed class ListCommand : Command
         command.AddArgument(report);
     }
 
-    new public class Handler(LiteDbContext dbContext, IReportWriter reportWriter, ILogger<ListCommand> logger, IOptions<ReportConfiguration> reportOptions) : ICommandHandler
+    new public class Handler(LiteDbContext dbContext, IReportWriter reportWriter, ILogger<ListCommand> logger, IOptions<TaskTitanConfig> reportOptions) : ICommandHandler
     {
-        private readonly ReportConfiguration reportConfig = reportOptions.Value;
+        private readonly TaskTitanConfig reportConfig = reportOptions.Value;
         public string[]? Filter { get; set; }
         public int Invoke(InvocationContext context) => InvokeAsync(context).Result;
 

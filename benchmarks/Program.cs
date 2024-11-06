@@ -3,16 +3,13 @@ using Bogus.DataSets;
 
 using LiteDB;
 
-using TaskTitan.Configuration;
+using TaskTitan.Core;
+using TaskTitan.Core.Configuration;
 using TaskTitan.Data;
-using TaskTitan.Data.Expressions;
-using TaskTitan.Data.Extensions;
-using TaskTitan.Data.Parsers;
-using TaskTitan.Data.Reports;
 
 using Tomlyn;
 
-var config = new ReportConfiguration();
+var config = new TaskTitanConfig();
 var reports = config.Report;
 
 

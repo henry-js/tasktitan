@@ -1,23 +1,21 @@
-
 using Pidgin;
 using Pidgin.Expression;
 
-using TaskTitan.Configuration;
-using TaskTitan.Data.Expressions;
-using TaskTitan.Data.Reports;
+using TaskTitan.Core;
+using TaskTitan.Core.Configuration;
+using TaskTitan.Core.Enums;
+
+using static Pidgin.Parser;
 
 using static Pidgin.Parser<char>;
 using static Pidgin.Parser<string>;
-
-using static Pidgin.Parser;
-using static TaskTitan.Data.Enums;
 
 namespace TaskTitan.Data.Parsers;
 
 public static class ExpressionParser
 {
     private static DateParser _dateParser = new DateParser(TimeProvider.System);
-    private static ConfigDictionary<UserDefinedAttributeConfig> _udas = [];
+    private static ConfigDictionary<AttributeDefinition> _udas = [];
     private static readonly Parser<char, char> _colon
         = Token(':');
     private static readonly Parser<char, char> _dash
@@ -85,7 +83,7 @@ public static class ExpressionParser
             ]
         );
 
-    public static void SetUdas(ConfigDictionary<UserDefinedAttributeConfig> udas) => _udas = udas;
+    public static void SetUdas(ConfigDictionary<AttributeDefinition> udas) => _udas = udas;
 
     public static void SetTimeProvider(TimeProvider timeProvider)
         => _dateParser = (timeProvider is null)

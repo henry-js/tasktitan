@@ -1,6 +1,6 @@
 using Serilog;
 
-using TaskTitan.Configuration;
+using TaskTitan.Core.Configuration;
 
 namespace TaskTitan.Cli.Logging;
 

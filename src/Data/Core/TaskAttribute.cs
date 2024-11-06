@@ -1,6 +1,6 @@
-using static TaskTitan.Data.Enums;
+using TaskTitan.Core.Enums;
 
-namespace TaskTitan.Data.Expressions;
+namespace TaskTitan.Core;
 
 public abstract record TaskAttribute : Expr
 {

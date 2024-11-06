@@ -4,7 +4,8 @@ using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-using TaskTitan.Configuration;
+using TaskTitan.Core;
+using TaskTitan.Core.Configuration;
 using TaskTitan.Data;
 using TaskTitan.Data.Expressions;
 using TaskTitan.Data.Parsers;
@@ -28,16 +29,15 @@ public sealed class AddCommand : Command
         command.Add(descriptionArgument);
     }
 
-    new public class Handler(IAnsiConsole console, LiteDbContext dbContext, IOptions<ReportConfiguration> reportOptions, ILogger<AddCommand> logger) : ICommandHandler
+    new public class Handler(IAnsiConsole console, LiteDbContext dbContext, IOptions<TaskTitanConfig> reportOptions, ILogger<AddCommand> logger) : ICommandHandler
     {
-        private readonly ReportConfiguration reportConfig = reportOptions.Value;
+        private readonly TaskTitanConfig reportConfig = reportOptions.Value;
         private readonly IAnsiConsole console = console;
         public CommandExpression Modification { get; set; } = default!;
 
         public int Invoke(InvocationContext context) => InvokeAsync(context).Result;
         public async Task<int> InvokeAsync(InvocationContext context)
         {
-            logger.LogInformation("Adding task");
             var builder = new StringBuilder().Append("description:'");
             List<string> attributes = [];
             List<string> descValues = [];
@@ -55,12 +55,13 @@ public sealed class AddCommand : Command
             }
             builder.AppendJoin(' ', descValues).Append('\'').Append(' ').AppendJoin(' ', attributes);
             logger.LogInformation("Parsed raw input");
-            ExpressionParser.SetUdas(reportConfig.UDAs);
+
+            ExpressionParser.SetUdas(reportConfig.Uda);
 
             logger.LogInformation("Parsing command");
             Modification = ExpressionParser.ParseCommand(builder.ToString());
-            logger.LogInformation("Command parsed");
 
+            logger.LogInformation("Adding task");
             var taskId = dbContext.AddTask(Modification.Properties);
 
             logger.LogInformation("Created task with id {id}", taskId);

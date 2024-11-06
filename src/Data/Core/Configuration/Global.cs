@@ -2,7 +2,7 @@ using Microsoft.Extensions.Configuration;
 using static System.Environment;
 using TaskTitan.Data.Reports;
 
-namespace TaskTitan.Configuration;
+namespace TaskTitan.Core.Configuration;
 
 public static class Global
 {

@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Linq;
+﻿using LiteDB;
 
-using LiteDB;
-
-using TaskTitan.Configuration;
+using TaskTitan.Core;
+using TaskTitan.Core.Configuration;
 using TaskTitan.Data.Expressions;
 using TaskTitan.Data.Extensions;
 

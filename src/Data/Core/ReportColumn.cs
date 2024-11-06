@@ -1,9 +1,10 @@
 using System.Text.Json.Serialization;
 
-using static TaskTitan.Data.Enums;
-using static TaskTitan.Data.Enums.ColType;
+using TaskTitan.Core.Enums;
 
-namespace TaskTitan.Data;
+using static TaskTitan.Core.Enums.ColType;
+
+namespace TaskTitan.Core;
 
 public class ReportColumn
 {

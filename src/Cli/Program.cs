@@ -4,15 +4,13 @@ using TaskTitan.Cli.AnsiConsole;
 using TaskTitan.Cli.Commands;
 using TaskTitan.Cli.Extensions;
 using TaskTitan.Cli.Logging;
-using TaskTitan.Configuration;
+using TaskTitan.Core.Configuration;
 using TaskTitan.Data;
 
 using Tomlyn.Extensions.Configuration;
 
 VelopackApp.Build()
-    .WithFirstRun(v =>
-    {
-    })
+    .WithFirstRun(v => { })
     .Run();
 
 var cmd = new RootCommand();
@@ -35,10 +33,10 @@ var cmdLine = new CommandLineBuilder(cmd)
                 services.AddSingleton(_ => AnsiConsole.Console);
                 services.AddSingleton(f => new LiteDbContext(LiteDbContext.CreateConnectionStringFrom(Global.DataDirectoryPath)));
                 services.AddSingleton<IReportWriter, ReportWriter>();
-                services.Configure<ReportConfiguration>(_ =>
+                services.Configure<TaskTitanConfig>(_ =>
                 {
                     context.Configuration.GetSection("Report").Bind(_.Report);
-                    context.Configuration.GetSection("uda").Bind(_.UDAs);
+                    context.Configuration.GetSection("uda").Bind(_.Uda);
                 });
             })
             .UseSerilog(SerilogConfig.LoggerConfiguration.CreateLogger())

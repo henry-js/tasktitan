@@ -2,9 +2,8 @@ using System.Runtime.CompilerServices;
 
 using LiteDB;
 
-using TaskTitan.Data.Expressions;
-
-using static TaskTitan.Data.Enums;
+using TaskTitan.Core;
+using TaskTitan.Core.Enums;
 
 namespace TaskTitan.Data.Extensions;
 

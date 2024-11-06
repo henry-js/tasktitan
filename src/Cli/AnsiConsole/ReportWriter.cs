@@ -5,10 +5,9 @@ using Microsoft.Extensions.Logging;
 
 using Ogu.Extensions.Logging.Timings;
 
-using TaskTitan.Data;
+using TaskTitan.Core;
+using TaskTitan.Core.Enums;
 using TaskTitan.Data.Reports;
-
-using static TaskTitan.Data.Enums;
 
 namespace TaskTitan.Cli.AnsiConsole;
 
@@ -17,7 +16,7 @@ public class ReportWriter(ILogger<ReportWriter> logger) : IReportWriter
     private readonly IEnumerable<PropertyInfo> _typeProperties = typeof(TaskItem).GetProperties();
     private readonly ILogger<ReportWriter> _logger = logger;
 
-    public Task<int> Display(CustomReport report, IEnumerable<TaskItem> tasks)
+    public Task<int> Display(ReportDefinition report, IEnumerable<TaskItem> tasks)
     {
         using (_logger.TimeOperation("Generating {reportName} report", report.Name))
             if (report.Columns.Length != report.Labels.Length) throw new Exception("Mismatched column and label counts");
@@ -116,5 +115,5 @@ public class ReportWriter(ILogger<ReportWriter> logger) : IReportWriter
 
 public interface IReportWriter
 {
-    Task<int> Display(CustomReport report, IEnumerable<TaskItem> tasks);
+    Task<int> Display(ReportDefinition report, IEnumerable<TaskItem> tasks);
 }

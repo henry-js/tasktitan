@@ -1,11 +1,11 @@
-using static TaskTitan.Data.Enums;
-using static TaskTitan.Data.Enums.ColType;
-using static TaskTitan.Data.Enums.ColFormat;
+using static TaskTitan.Core.Enums.ColType;
+using static TaskTitan.Core.Enums.ColFormat;
+using TaskTitan.Core.Enums;
 
 
-namespace TaskTitan.Data;
+namespace TaskTitan.Core;
 
-public static class AttributeColumnFormats
+public static class ReportColumnFormats
 {
     public static readonly Dictionary<ColType, List<ColFormat>> AllowedFormats = new()
     {

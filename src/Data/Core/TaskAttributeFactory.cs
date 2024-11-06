@@ -1,15 +1,15 @@
-using TaskTitan.Configuration;
+using TaskTitan.Core.Configuration;
+using TaskTitan.Core.Enums;
+using TaskTitan.Data.Expressions;
 using TaskTitan.Data.Parsers;
 using TaskTitan.Data.Reports;
 
-using static TaskTitan.Data.Enums;
-
-namespace TaskTitan.Data.Expressions;
+namespace TaskTitan.Core;
 
 // Factory class for creating TaskProperties
 public static class TaskAttributeFactory
 {
-    public static TaskAttribute Create(string input, string value, DateParser dateParser, ConfigDictionary<UserDefinedAttributeConfig> udas)
+    public static TaskAttribute Create(string input, string value, DateParser dateParser, ConfigDictionary<AttributeDefinition> udas)
     {
         udas ??= [];
 
@@ -63,7 +63,7 @@ public static class TaskAttributeFactory
             _ => throw new ArgumentException($"Unsupported column type: {colType}")
         };
     }
-    private static TaskAttribute CreateAttribute(UserDefinedAttributeConfig uda, string value, ColModifier? modifier, DateParser dateParser)
+    private static TaskAttribute CreateAttribute(AttributeDefinition uda, string value, ColModifier? modifier, DateParser dateParser)
     {
         return uda.Type switch
         {
