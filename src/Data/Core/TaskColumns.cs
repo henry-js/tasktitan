@@ -1,3 +1,4 @@
+using TaskTitan.Core;
 using TaskTitan.Core.Enums;
 
 namespace TaskTitan.Data.Expressions;
@@ -5,21 +6,21 @@ namespace TaskTitan.Data.Expressions;
 // Define available columns as a static class with constants
 public static class TaskColumns
 {
-    public const string Description = "description";
-    public const string Due = "due";
-    public const string End = "end";
-    public const string Entry = "entry";
-    public const string Modified = "modified";
-    public const string Parent = "parent";
-    public const string Project = "project";
-    public const string Scheduled = "scheduled";
-    public const string Start = "start";
-    public const string Status = "status";
-    public const string Tags = "tags";
-    public const string Until = "until";
-    public const string Urgency = "urgency";
-    public const string Wait = "wait";
-    public const string Uuid = "uuid";
+    public static readonly string Description = nameof(TaskItem.Description).ToLower();
+    public static readonly string Due = nameof(TaskItem.Due).ToLower();
+    public static readonly string End = nameof(TaskItem.End).ToLower();
+    public static readonly string Entry = nameof(TaskItem.Entry).ToLower();
+    public static readonly string Modified = nameof(TaskItem.Modified).ToLower();
+    // public static readonly string Parent = nameof(TaskItem.Parent).ToLower();
+    public static readonly string Project = nameof(TaskItem.Project).ToLower();
+    public static readonly string Scheduled = nameof(TaskItem.Scheduled).ToLower();
+    public static readonly string Start = nameof(TaskItem.Start).ToLower();
+    public static readonly string Status = nameof(TaskItem.Status).ToLower();
+    public static readonly string Tags = nameof(TaskItem.Tags).ToLower();
+    public static readonly string Until = nameof(TaskItem.Until).ToLower();
+    public static readonly string Urgency = nameof(TaskItem.Urgency).ToLower();
+    public static readonly string Wait = nameof(TaskItem.Wait).ToLower();
+    public static readonly string TaskId = nameof(TaskItem.TaskId).ToLower();
 
     // Create a lookup for column types
     public static readonly IReadOnlyDictionary<string, ColType> ColumnTypes = new Dictionary<string, ColType>(StringComparer.OrdinalIgnoreCase)
@@ -29,7 +30,7 @@ public static class TaskColumns
         [End] = ColType.Date,
         [Entry] = ColType.Date,
         [Modified] = ColType.Date,
-        [Parent] = ColType.Text,
+        // [Parent] = ColType.Text,
         [Project] = ColType.Text,
         [Scheduled] = ColType.Date,
         [Start] = ColType.Date,
@@ -38,7 +39,7 @@ public static class TaskColumns
         [Until] = ColType.Date,
         [Urgency] = ColType.Number,
         [Wait] = ColType.Date,
-        [Uuid] = ColType.Text
+        [TaskId] = ColType.Text
     };
 
     public static bool IsValidColumn(string columnName) =>

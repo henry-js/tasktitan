@@ -9,12 +9,13 @@ using TaskTitan.Data;
 
 using Tomlyn.Extensions.Configuration;
 
+Log.Logger = SerilogConfig.LoggerConfiguration.CreateBootstrapLogger();
+Log.Information("Application started");
 VelopackApp.Build()
     .WithFirstRun(v => { })
     .Run();
 
 var cmd = new RootCommand();
-// cmd.AddGlobalOption(CliGlobalOptions.FilterOption);
 cmd.AddCommand(new AddCommand());
 cmd.AddCommand(new ListCommand());
 
@@ -31,21 +32,29 @@ var cmdLine = new CommandLineBuilder(cmd)
             .ConfigureServices((context, services) =>
             {
                 services.AddSingleton(_ => AnsiConsole.Console);
-                services.AddSingleton(f => new LiteDbContext(LiteDbContext.CreateConnectionStringFrom(Global.DataDirectoryPath)));
+                services.AddSingleton<LiteDbContext>();
                 services.AddSingleton<IReportWriter, ReportWriter>();
                 services.Configure<TaskTitanConfig>(_ =>
                 {
-                    context.Configuration.GetSection("Report").Bind(_.Report);
+                    context.Configuration.GetSection("report").Bind(_.Report);
                     context.Configuration.GetSection("uda").Bind(_.Uda);
                 });
+                services.Configure<LiteDbOptions>(opts =>
+                    opts.DatabaseDirectory = Global.DataDirectoryPath
+                );
             })
-            .UseSerilog(SerilogConfig.LoggerConfiguration.CreateLogger())
-            .UseProjectCommandHandlers()
-            ;
+                .UseSerilog(Log.Logger)
+                .UseProjectCommandHandlers()
+                ;
     })
     .UseDefaults()
-    .UseExceptionHandler((ex, context) => AnsiConsole.WriteException(ex, ExceptionFormats.ShortenEverything | ExceptionFormats.NoStackTrace))
+    .UseExceptionHandler((ex, context) =>
+    {
+        Log.Fatal(ex, "Fatal error encountered");
+        AnsiConsole.MarkupLineInterpolated($"[default on red]{ex.Message}[/]");
+    })
     .Build();
 
+Log.Information("Invoking commandline");
 int result = await cmdLine.InvokeAsync(args);
 return result;

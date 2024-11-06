@@ -1,19 +1,21 @@
 ﻿using Bogus;
-using Bogus.DataSets;
 
 using LiteDB;
+
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 
 using TaskTitan.Core;
 using TaskTitan.Core.Configuration;
 using TaskTitan.Data;
 
-using Tomlyn;
-
 var config = new TaskTitanConfig();
 var reports = config.Report;
+var ldbOptions = new LiteDbOptions();
+Console.WriteLine(ldbOptions.ConnectionString);
 
-
-var context = new LiteDbContext(LiteDbContext.CreateConnectionStringFrom(Global.DataDirectoryPath));
+var opts = Options.Create(ldbOptions);
+var context = new LiteDbContext(opts, new NullLogger<LiteDbContext>());
 var col = context.Tasks;
 var tasks = context.Tasks.FindAll().ToList();
 int rowId = tasks.Count != 0 ? tasks.Max(x => x.Id) : 0;
@@ -31,7 +33,9 @@ var sampleTasks = new Faker<TaskItem>()
 
 var generatedTasks = sampleTasks.Generate(1000);
 
-col.InsertBulk(generatedTasks);
+var count = col.InsertBulk(generatedTasks);
+
+Console.WriteLine($"Inserted {count} tasks");
 
 // var dateParser = new DateParser(TimeProvider.System);
 // var attribute1 = TaskPropertyFactory.Create("due.after", "tomorrow", dateParser);

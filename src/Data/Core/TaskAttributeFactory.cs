@@ -35,24 +35,24 @@ public static class TaskAttributeFactory
         return CreateAttribute(field, value, colType.Value, modifier, dateParser);
     }
 
-    private static (string field, ColModifier? modifier) ParseInput(string input)
+    private static (string field, ColModifier modifier) ParseInput(string input)
     {
         var split = input.Split('.');
         return split.Length switch
         {
-            1 => (split[0], null),
+            1 => (split[0], default),
             2 => (split[0], ParseModifier(split[1])),
             _ => throw new ArgumentException($"Invalid input format: {input}")
         };
     }
 
-    private static ColModifier? ParseModifier(string modifierStr)
+    private static ColModifier ParseModifier(string modifierStr)
     {
         return Enum.GetValues<ColModifier>()
             .FirstOrDefault(m => m.ToString().Contains(modifierStr, StringComparison.OrdinalIgnoreCase));
     }
 
-    private static TaskAttribute CreateAttribute(string field, string value, ColType colType, ColModifier? modifier, DateParser dateParser)
+    private static TaskAttribute CreateAttribute(string field, string value, ColType colType, ColModifier modifier, DateParser dateParser)
     {
         if (field == TaskColumns.Description && string.IsNullOrWhiteSpace(value)) throw new ArgumentException("A task must have a description.");
         return colType switch
@@ -63,7 +63,7 @@ public static class TaskAttributeFactory
             _ => throw new ArgumentException($"Unsupported column type: {colType}")
         };
     }
-    private static TaskAttribute CreateAttribute(AttributeDefinition uda, string value, ColModifier? modifier, DateParser dateParser)
+    private static TaskAttribute CreateAttribute(AttributeDefinition uda, string value, ColModifier modifier, DateParser dateParser)
     {
         return uda.Type switch
         {

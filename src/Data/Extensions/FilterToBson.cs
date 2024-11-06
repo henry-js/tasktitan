@@ -54,7 +54,8 @@ public static class FilterToBson
         {
             return attribute.Modifier switch
             {
-                ColModifier.Equals or ColModifier.Is or null => Query.EQ(attribute.Name, attribute.Value),
+                ColModifier.NoModifier => Query.EQ(attribute.Name, attribute.Value.Date),
+                ColModifier.Equals or ColModifier.Is => Query.EQ(attribute.Name, attribute.Value),
                 ColModifier.Before => Query.LT(attribute.Name, attribute.Value),
                 ColModifier.After => Query.GTE(attribute.Name, attribute.Value),
                 ColModifier.Not => Query.Not(attribute.Name, attribute.Value),
@@ -65,7 +66,8 @@ public static class FilterToBson
         {
             return attribute.Modifier switch
             {
-                ColModifier.Equals or ColModifier.Is or null => Query.EQ(attribute.Name, attribute.Value),
+                ColModifier.NoModifier => Query.EQ(attribute.Name, attribute.Value),
+                ColModifier.Equals or ColModifier.Is => Query.EQ(attribute.Name, attribute.Value),
                 ColModifier.Isnt => Query.Not(attribute.Name, attribute.Value),
                 ColModifier.Has or ColModifier.Contains => Query.Contains(attribute.Name, attribute.Value),
                 ColModifier.Hasnt => Query.Not(attribute.Name, attribute.Value),
@@ -78,7 +80,8 @@ public static class FilterToBson
         {
             return attribute.Modifier switch
             {
-                ColModifier.Equals or ColModifier.Is or null => Query.EQ(attribute.Name, attribute.Value),
+                ColModifier.NoModifier => Query.EQ(attribute.Name, attribute.Value),
+                ColModifier.Equals or ColModifier.Is => Query.EQ(attribute.Name, attribute.Value),
                 ColModifier.Below => Query.LT(attribute.Name, attribute.Value),
                 ColModifier.Above => Query.GTE(attribute.Name, attribute.Value),
                 ColModifier.Not or ColModifier.Isnt => Query.Not(attribute.Name, attribute.Value),

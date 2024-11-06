@@ -41,10 +41,11 @@ public enum ColFormat
 
 public enum ColModifier
 {
+    NoModifier,
+    None,
     Not,
     Before, Below,
     After, Above,
-    None,
     Any,
     Is, Equals,
     Isnt,

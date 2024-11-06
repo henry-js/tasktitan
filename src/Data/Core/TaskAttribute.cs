@@ -4,20 +4,20 @@ namespace TaskTitan.Core;
 
 public abstract record TaskAttribute : Expr
 {
-    public TaskAttribute(string name, ColModifier? modifier)
+    public TaskAttribute(string name, ColModifier modifier)
     {
         Name = name; // Since validation is done at factory level, we can simplify this
         Modifier = modifier;
     }
 
     public string Name { get; }
-    public ColModifier? Modifier { get; }
+    public ColModifier Modifier { get; }
     public AttributeKind AttributeKind { get; protected init; }
 }
 
 public record TaskAttribute<T> : TaskAttribute
 {
-    internal TaskAttribute(string field, T value, AttributeKind attributeKind, ColModifier? modifier = null) : base(field, modifier)
+    internal TaskAttribute(string field, T value, AttributeKind attributeKind, ColModifier modifier = ColModifier.NoModifier) : base(field, modifier)
     {
         if (modifier != null && (modifier == ColModifier.Include || modifier == ColModifier.Exclude))
             throw new InvalidOperationException($"Modifier: {modifier} is only allowed in Tags");

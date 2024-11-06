@@ -59,7 +59,7 @@ public sealed class AddCommand : Command
             ExpressionParser.SetUdas(reportConfig.Uda);
 
             logger.LogInformation("Parsing command");
-            Modification = ExpressionParser.ParseCommand(builder.ToString());
+            Modification = ExpressionParser.ParseCommand(builder.ToString().Trim());
 
             logger.LogInformation("Adding task");
             var taskId = dbContext.AddTask(Modification.Properties);

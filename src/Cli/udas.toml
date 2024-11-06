@@ -5,5 +5,5 @@ label = "est"
 type = "number"
 label = "ex"
 [uda.priority]
-type = "number"
+type = "text"
 label = "P"
