@@ -23,23 +23,9 @@ public class TaskItem
     public DateTime? Until { get; set; }
     public double Urgency { get; set; }
     public DateTime? Wait { get; set; }
-    public Dictionary<string, UdaValue>? UserDefinedAttributes { get; set; }
+    public Dictionary<string, TaskAttribute>? Udas { get; set; }
 }
 
-public class UdaValue
-{
-    public string? Text { get; set; }
-    public double? Number { get; set; }
-    public DateTime? Date { get; set; }
-    public UdaValue(string text) => Text = text;
-    public UdaValue(double number) => Number = number;
-    public UdaValue(DateTime date) => Date = date;
-
-    // Allows implicit conversions for easy assignment
-    public static implicit operator UdaValue(string text) => new(text);
-    public static implicit operator UdaValue(double number) => new(number);
-    public static implicit operator UdaValue(DateTime date) => new(date);
-}
 
 public enum TaskItemStatus { Pending, Started, Done }
 

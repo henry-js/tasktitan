@@ -100,6 +100,6 @@ public static class ExpressionParser
             _attribute,
             _tagExpression
         ).SeparatedAtLeastOnce(Token(' '))
-        .Select(exprs => new CommandExpression(exprs.Cast<TaskAttribute>(), input))
+        .Select(exprs => new CommandExpression(exprs.Cast<TaskAttribute>().ToDictionary(attr => attr.Name), input))
         .ParseOrThrow(input);
 }

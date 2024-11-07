@@ -27,5 +27,3 @@ public class ReportDefinition : IConfig
 
     // TODO: Add support for sorting
 }
-
-public enum ReportType { Modifiable, Static, Custom }

@@ -62,7 +62,8 @@ public sealed class AddCommand : Command
             Modification = ExpressionParser.ParseCommand(builder.ToString().Trim());
 
             logger.LogInformation("Adding task");
-            var taskId = dbContext.AddTask(Modification.Properties);
+            // var taskId = dbContext.AddTask(Modification.Properties);
+            var taskId = dbContext.AddTask(Modification.Dict);
 
             logger.LogInformation("Created task with id {id}", taskId);
 

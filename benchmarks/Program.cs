@@ -15,7 +15,7 @@ var ldbOptions = new LiteDbOptions();
 Console.WriteLine(ldbOptions.ConnectionString);
 
 var opts = Options.Create(ldbOptions);
-var context = new LiteDbContext(opts, new NullLogger<LiteDbContext>());
+var context = new LiteDbContext(opts, Options.Create(new TaskTitanConfig()), new NullLogger<LiteDbContext>());
 var col = context.Tasks;
 var tasks = context.Tasks.FindAll().ToList();
 int rowId = tasks.Count != 0 ? tasks.Max(x => x.Id) : 0;
