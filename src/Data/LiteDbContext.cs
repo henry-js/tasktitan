@@ -13,14 +13,15 @@ namespace TaskTitan.Data;
 public class LiteDbContext
 {
     private const StringComparison _ignoreCase = StringComparison.InvariantCultureIgnoreCase;
-    // public const string FILE_NAME = "tasktitan.db";
     private const string TaskCol = "tasks";
     private readonly LiteDatabase db;
-    private const string WorkingSetQuery = "SELECT $ FROM tasks WHERE Status = \"Pending\";";
     private readonly ILogger<LiteDbContext> logger;
     private readonly LiteDbOptions _options;
     public LiteDbContext(IOptions<LiteDbOptions> options, ILogger<LiteDbContext> logger)
     {
+        BsonMapper.Global.RegisterType<Dictionary<string, UdaValue>>
+            (serialize: LiteDbMappers.ToBsonDocument,
+            deserialize: LiteDbMappers.FromBsonDocument);
         this.logger = logger;
         _options = options.Value;
         try
@@ -33,9 +34,7 @@ public class LiteDbContext
             throw new Exception("Can't find or create LiteDb database.", ex);
         }
 
-        BsonMapper.Global.RegisterType<Dictionary<string, UdaValue>>
-        (serialize: (dict) => new BsonDocument(),
-        deserialize: (bson) => []);
+
 
         var tasks = db.GetCollection<TaskItem>(TaskCol, BsonAutoId.ObjectId);
 
@@ -92,6 +91,10 @@ public class LiteDbContext
             }
         }
         if (!task.ContainsKey(TaskColumns.Status)) task[TaskColumns.Status] = TaskItemStatus.Pending.ToString();
+        // task["UserDefinedAttributes"] = BsonMapper.Global.ToDocument(typeof(Dictionary<string, UdaValue>), )
+
+        task["UserDefinedAttributes"] = properties.Where(p => p.AttributeKind == AttributeKind.UserDefined)
+            .ToDictionary(t => t.Name);
 
         var tasks = db.GetCollection(TaskCol, BsonAutoId.ObjectId);
         int workingSetCount = tasks.Count(Query.EQ("Status", TaskItemStatus.Pending.ToString()));
@@ -138,5 +141,22 @@ public class LiteDbContext
         // {
 
         // }
+    }
+}
+
+public static class LiteDbMappers
+{
+    internal static Dictionary<string, UdaValue> FromBsonDocument(BsonValue value)
+    {
+        throw new NotImplementedException();
+    }
+
+    internal static BsonValue ToBsonDocument(Dictionary<string, UdaValue> dictionary)
+    {
+        var bsonDict = dictionary.ToDictionary(
+                kvp => kvp.Key,
+                kvp => new BsonValue(kvp.Value)
+            );
+        return new BsonDocument(bsonDict);
     }
 }
