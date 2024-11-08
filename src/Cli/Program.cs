@@ -1,7 +1,7 @@
 ﻿using Serilog;
 
-using TaskTitan.Cli.AnsiConsole;
 using TaskTitan.Cli.Commands;
+using TaskTitan.Cli.Display;
 using TaskTitan.Cli.Extensions;
 using TaskTitan.Cli.Logging;
 using TaskTitan.Core.Configuration;
@@ -22,13 +22,16 @@ cmd.AddCommand(new ListCommand());
 var cmdLine = new CommandLineBuilder(cmd)
     .UseHost(_ => Host.CreateDefaultBuilder(args), builder =>
     {
-        builder.ConfigureAppConfiguration(config =>
-        {
-            config.AddTomlFile("reports.toml", false)
-                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
-            config.AddTomlFile("udas.toml", true)
-                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
-        })
+        builder.UseConsoleLifetime()
+            .UseSerilog(Log.Logger)
+            .UseProjectCommandHandlers()
+            .ConfigureAppConfiguration(config =>
+            {
+                config.AddTomlFile("reports.toml", false)
+                    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
+                config.AddTomlFile("udas.toml", true)
+                    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
+            })
             .ConfigureServices((context, services) =>
             {
                 services.AddSingleton(_ => AnsiConsole.Console);
@@ -42,10 +45,7 @@ var cmdLine = new CommandLineBuilder(cmd)
                 services.Configure<LiteDbOptions>(opts =>
                     opts.DatabaseDirectory = Global.DataDirectoryPath
                 );
-            })
-                .UseSerilog(Log.Logger)
-                .UseProjectCommandHandlers()
-                ;
+            });
     })
     .UseDefaults()
     .UseExceptionHandler((ex, context) =>

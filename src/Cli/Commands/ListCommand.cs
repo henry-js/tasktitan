@@ -5,7 +5,7 @@ using Ogu.Extensions.Logging.Timings;
 
 using System.CommandLine.Invocation;
 
-using TaskTitan.Cli.AnsiConsole;
+using TaskTitan.Cli.Display;
 using TaskTitan.Core;
 using TaskTitan.Core.Configuration;
 using TaskTitan.Data;
@@ -31,6 +31,8 @@ public sealed class ListCommand : Command
             Arity = ArgumentArity.ZeroOrMore
         };
         command.AddArgument(report);
+
+        command.AddOption(new Option<bool>(["-s", "--skip"]));
     }
 
     new public class Handler(LiteDbContext dbContext, IReportWriter reportWriter, ILogger<ListCommand> logger, IOptions<TaskTitanConfig> reportOptions) : ICommandHandler
@@ -38,6 +40,7 @@ public sealed class ListCommand : Command
         private readonly TaskTitanConfig reportConfig = reportOptions.Value;
         public string[]? Filter { get; set; }
         public int Invoke(InvocationContext context) => InvokeAsync(context).Result;
+        public bool Skip { get; set; } = false;
 
         public async Task<int> InvokeAsync(InvocationContext context)
         {
@@ -50,15 +53,28 @@ public sealed class ListCommand : Command
 
             logger.LogInformation("Report: {ReportName}, Filter : {ReportFilter}", report.Name, report.Filter);
 
-            var query = ExpressionParser.ParseFilter(report.Filter);
+            FilterExpression query;
+            using (logger.TimeOperation("Parsing {reportName} report filter", report.Name))
+            {
+                query = ExpressionParser.ParseFilter(report.Filter);
+            }
 
             IEnumerable<TaskItem> tasks;
+
+            if (Skip)
+            {
+                logger.LogInformation("Skipping execution");
+                return 0;
+            }
             using (logger.TimeOperation("Fetching tasks"))
             {
                 tasks = dbContext.QueryTasks(query).ToList();
             }
 
-            return await reportWriter.Display(report, tasks);
+            using (logger.TimeOperation("Generating {reportName} report", report.Name))
+            {
+                return await reportWriter.Display(report, tasks);
+            }
         }
     }
 }

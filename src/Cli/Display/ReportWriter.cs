@@ -3,13 +3,11 @@ using System.Runtime.CompilerServices;
 
 using Microsoft.Extensions.Logging;
 
-using Ogu.Extensions.Logging.Timings;
-
 using TaskTitan.Core;
 using TaskTitan.Core.Enums;
 using TaskTitan.Data.Reports;
 
-namespace TaskTitan.Cli.AnsiConsole;
+namespace TaskTitan.Cli.Display;
 
 public class ReportWriter(ILogger<ReportWriter> logger) : IReportWriter
 {
@@ -18,8 +16,7 @@ public class ReportWriter(ILogger<ReportWriter> logger) : IReportWriter
 
     public Task<int> Display(ReportDefinition report, IEnumerable<TaskItem> tasks)
     {
-        using (_logger.TimeOperation("Generating {reportName} report", report.Name))
-            if (report.Columns.Length != report.Labels.Length) throw new Exception("Mismatched column and label counts");
+        if (report.Columns.Length != report.Labels.Length) throw new Exception("Mismatched column and label counts");
 
         var grid = new Grid();
 
@@ -106,7 +103,6 @@ public class ReportWriter(ILogger<ReportWriter> logger) : IReportWriter
             }
             grid.AddRow(rowVals);
         }
-        _logger.LogInformation("Report generated");
         Spectre.Console.AnsiConsole.Write(grid);
 
         return Task.FromResult(0);
