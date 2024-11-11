@@ -19,7 +19,7 @@ public record TaskAttribute<T> : TaskAttribute
 {
     internal TaskAttribute(string field, T value, AttributeKind attributeKind, ColModifier modifier = ColModifier.NoModifier) : base(field, modifier)
     {
-        if (modifier != null && (modifier == ColModifier.Include || modifier == ColModifier.Exclude))
+        if (modifier == ColModifier.Include || modifier == ColModifier.Exclude)
             throw new InvalidOperationException($"Modifier: {modifier} is only allowed in Tags");
 
         AttributeKind = attributeKind;

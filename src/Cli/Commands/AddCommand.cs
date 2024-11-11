@@ -63,7 +63,7 @@ public sealed class AddCommand : Command
 
             logger.LogInformation("Adding task");
             // var taskId = dbContext.AddTask(Modification.Properties);
-            var taskId = dbContext.AddTask(Modification.Dict);
+            var taskId = dbContext.AddTask(Modification.Properties);
 
             logger.LogInformation("Created task with id {id}", taskId);
 

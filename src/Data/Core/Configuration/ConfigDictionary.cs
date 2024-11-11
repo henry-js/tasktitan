@@ -6,7 +6,12 @@ namespace TaskTitan.Core.Configuration;
 public class ConfigDictionary<T> : IDictionary<string, T>
 where T : IConfig
 {
-    private readonly Dictionary<string, T> _backingDict = [];
+
+    public ConfigDictionary(IEqualityComparer<string>? comparer = null)
+    {
+        _backingDict = new Dictionary<string, T>(comparer ?? StringComparer.InvariantCultureIgnoreCase);
+    }
+    private readonly Dictionary<string, T> _backingDict;
     public T this[string key]
     {
         get => _backingDict[key]; set

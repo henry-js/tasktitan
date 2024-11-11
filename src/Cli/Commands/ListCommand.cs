@@ -16,7 +16,7 @@ namespace TaskTitan.Cli.Commands;
 
 public sealed class ListCommand : Command
 {
-    public ListCommand(ReportDictionary? reports = null) : base("list", "Display a report or tasks filtered")
+    public ListCommand() : base("list", "Display a report or tasks filtered")
     {
         AddOptions(this);
     }
@@ -32,31 +32,31 @@ public sealed class ListCommand : Command
         };
         command.AddArgument(report);
 
-        command.AddOption(new Option<bool>(["-s", "--skip"]));
+        command.AddOption(new Option<bool>(["-s", "--skip"]) { IsHidden = true });
     }
 
-    new public class Handler(LiteDbContext dbContext, IReportWriter reportWriter, ILogger<ListCommand> logger, IOptions<TaskTitanConfig> reportOptions) : ICommandHandler
+    new public class Handler(LiteDbContext dbContext, IAnsiConsole console, ILogger<ListCommand> logger, IOptions<TaskTitanConfig> reportOptions) : ICommandHandler
     {
-        private readonly TaskTitanConfig reportConfig = reportOptions.Value;
+        private readonly TaskTitanConfig appConfig = reportOptions.Value;
         public string[]? Filter { get; set; }
         public int Invoke(InvocationContext context) => InvokeAsync(context).Result;
-        public bool Skip { get; set; } = false;
+        public bool Skip { get; set; }
 
         public async Task<int> InvokeAsync(InvocationContext context)
         {
-            var report = Filter switch
+            var reportDef = Filter switch
             {
-                null or { Length: 0 } => reportConfig.Report["list"],
-                { Length: 1 } => reportConfig.Report.TryGetValue(Filter[0], out var value) ? value : reportConfig.Report["list"].OverrideFilter(Filter),
-                _ => reportConfig.Report["list"].OverrideFilter(Filter)
+                null or { Length: 0 } => appConfig.Report["list"],
+                { Length: 1 } => appConfig.Report.TryGetValue(Filter[0], out var value) ? value : appConfig.Report["list"].OverrideFilter(Filter),
+                _ => appConfig.Report["list"].OverrideFilter(Filter)
             };
 
-            logger.LogInformation("Report: {ReportName}, Filter : {ReportFilter}", report.Name, report.Filter);
+            logger.LogInformation("Report: {ReportName}, Filter : {ReportFilter}", reportDef.Name, reportDef.Filter);
 
             FilterExpression query;
-            using (logger.TimeOperation("Parsing {reportName} report filter", report.Name))
+            using (logger.TimeOperation("Parsing {reportName} report filter", reportDef.Name))
             {
-                query = ExpressionParser.ParseFilter(report.Filter);
+                query = ExpressionParser.ParseFilter(reportDef.Filter);
             }
 
             IEnumerable<TaskItem> tasks;
@@ -64,16 +64,22 @@ public sealed class ListCommand : Command
             if (Skip)
             {
                 logger.LogInformation("Skipping execution");
-                return 0;
+                return await Task.FromResult(0);
             }
             using (logger.TimeOperation("Fetching tasks"))
             {
                 tasks = dbContext.QueryTasks(query).ToList();
             }
 
-            using (logger.TimeOperation("Generating {reportName} report", report.Name))
+            using (logger.TimeOperation("Generating {reportName} report", reportDef.Name))
             {
-                return await reportWriter.Display(report, tasks);
+                var report = new Report(reportDef, appConfig.Uda);
+
+                var grid = report.Build(tasks);
+
+                console.Write(grid);
+
+                return await Task.FromResult(0);
             }
         }
     }

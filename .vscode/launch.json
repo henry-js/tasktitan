@@ -17,11 +17,12 @@
                 // "+work",
                 // "priority:H",
                 // "estimate:4",
-                "list"
+                "list",
+                "active"
             ],
             "cwd": "${workspaceFolder}/src/Cli",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
-            "console": "internalConsole",
+            "console": "externalTerminal",
             "stopAtEntry": false
         },
         {
@@ -37,7 +38,7 @@
             "args": [],
             "cwd": "${workspaceFolder}/tests",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
-            "console": "internalConsole",
+            "console": "externalTerminal",
             "stopAtEntry": false
         },
         {

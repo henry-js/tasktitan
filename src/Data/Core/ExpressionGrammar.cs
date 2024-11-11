@@ -10,18 +10,17 @@ public record CommandExpression : Expr
 {
     public CommandExpression(IEnumerable<TaskAttribute> properties, string input)
     {
-        Properties = properties;
+        Properties = properties.ToDictionary(x => x.Name);
         Input = input;
     }
     public CommandExpression(Dictionary<string, TaskAttribute> dict, string input)
     {
-        Dict = dict;
+        Properties = dict;
         Input = input;
     }
 
-    public IEnumerable<TaskAttribute> Properties { get; } = [];
     public string Input { get; }
-    public Dictionary<string, TaskAttribute> Dict { get; } = [];
+    public Dictionary<string, TaskAttribute> Properties { get; } = [];
 }
 
 public record FilterExpression(Expr Expr) : Expr;

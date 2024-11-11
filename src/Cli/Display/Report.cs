@@ -1,14 +1,12 @@
-
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
 using LiteDB;
 
-using Spectre.Console;
 using Spectre.Console.Rendering;
 
 using TaskTitan.Core;
+using TaskTitan.Core.Configuration;
 using TaskTitan.Core.Enums;
 using TaskTitan.Data.Reports;
 
@@ -16,97 +14,67 @@ namespace TaskTitan.Cli.Display;
 
 public class Report
 {
-    private readonly Dictionary<string, ColFormatDefinition?> _columns = [];
-    private readonly IEnumerable<PropertyInfo> _typeProperties = typeof(TaskItem).GetProperties();
+    private readonly ReportDefinition _def;
+    private readonly string[] _labels;
+    private readonly Dictionary<string, ColumnDefinition> _columns = [];
+    private readonly ConfigDictionary<AttributeDefinition> _udas;
+    private readonly PropertyInfo[] _props = typeof(TaskItem).GetProperties();
 
-    public Report(ReportDefinition def)
+    public Report(ReportDefinition def, ConfigDictionary<AttributeDefinition> udas)
     {
-        _columns = [];
-        for (int i = 0; i < def.Columns.Length; i++)
-        {
-            string? col = def.Columns[i];
-            var split = col.Split('.');
-            KeyValuePair<string, ColFormatDefinition?> formatDef = split switch
+        _def = def;
+        _udas = udas;
+        _labels = def.Labels;
+        _columns = def.Columns.ToDictionary(k => k.Split('.')[0], e =>
             {
-                { Length: 1 } => new(split[0], null),
-                [_, "age"] => new(split[0], new(def.Labels[i], ColFormat.Age)),
-                [_, "indicator"] => new(split[0], new(def.Labels[i], ColFormat.Indicator)),
-                [_, "countdown"] => new(split[0], new(def.Labels[i], ColFormat.Countdown)),
-                [_, "remaining"] => new(split[0], new(def.Labels[i], ColFormat.Countdown)),
-                _ => throw new SwitchExpressionException($"{col}")
-            };
-            _columns.TryAdd(formatDef.Key, formatDef.Value);
-        }
+                (string colName, ColFormat colFormat) = e.Split('.') switch
+                {
+                    { Length: 1 } split => (split[0], ColFormat.Default),
+                    [_, "indicator"] split => (split[0], ColFormat.Indicator),
+                    [_, "countdown"] split => (split[0], ColFormat.Countdown),
+                    [_, "remaining"] split => (split[0], ColFormat.Remaining),
+                    [_, "active"] split => (split[0], ColFormat.Active),
+                    [_, "short"] split => (split[0], ColFormat.Short),
+                    [_, "count"] split => (split[0], ColFormat.Count),
+                    [_, _] split => (split[0], Enum.Parse<ColFormat>(split[1], true)),
+                    _ => throw new SwitchExpressionException($"{e}")
+                };
+                if (TaskTitanConfig.DefinedColumns.TryGetValue(colName, out var value))
+                    return value.SetFormat(colFormat);
+                else if (_udas.TryGetValue(colName, out var attribute))
+                    return new ColumnDefinition(attribute, true).SetFormat(colFormat);
+                else throw new Exception($"Could not parse report column {e}");
+            });
     }
 
     public Grid Build(IEnumerable<TaskItem> tasks)
     {
-        var props = typeof(TaskItem).GetProperties();
-
         var grid = new Grid();
 
         grid.AddColumns(_columns.Keys.Count);
-        grid.AddRow(_columns.Values.Select(x => x.Label).ToArray());
+        grid.AddRow(_labels);
 
         foreach (var task in tasks)
         {
-            AddRow(grid, task, props);
+            AddRow(grid, task);
         }
 
         return grid;
     }
 
-    private void AddRow(Grid grid, TaskItem task, PropertyInfo[] props)
+    private void AddRow(Grid grid, TaskItem task)
     {
         var rowCols = new List<IRenderable>();
         foreach (var col in _columns)
         {
-            var currentProp = props.FirstOrDefault(p => p.Name.StartsWith(col.Key, StringComparison.InvariantCultureIgnoreCase));
-            var stringVal = ParsePropertyValue(currentProp, task, col.Value.Format);
-            rowCols.Add(stringVal);
+            var arg = _props
+                .First(p => p.Name.StartsWith(col.Key, StringComparison.InvariantCultureIgnoreCase))
+                .GetValue(task) ?? string.Empty;
+
+            var text = col.Value.FormatFunc?.Invoke(arg);
+            rowCols.Add(text is null ? Text.Empty : new Text(text));
         }
 
-        grid.AddRow(rowCols.ToArray());
+        grid.AddRow([.. rowCols]);
     }
-
-    private Text ParsePropertyValue(PropertyInfo v, TaskItem task, ColFormat? format)
-    {
-        if (v is null) return Text.Empty;
-        var val = v.GetValue(task);
-
-        return val switch
-        {
-            null => Text.Empty,
-            string s => new Text(FormattedString(s, format)),
-            DateTime dt => new Text(FormattedDate(dt, format)),
-            double num => new Text(FormattedNumber(num, format)),
-            string[] arr => new Text(FormattedArray(arr, format)),
-            _ => throw new SwitchExpressionException($"{val}"),
-        };
-
-        string FormattedString(string s, ColFormat? format)
-        {
-            throw new NotImplementedException();
-        }
-        string FormattedDate(DateTime dt, ColFormat? format)
-        {
-            return format switch
-            {
-                null or ColFormat.Formatted => dt.ToString("yyyy-MM-dd"),
-                ColFormat.Iso => dt.ToString("yyyyMMddTHHmmssZ"),
-                ColFormat.Age => (DateTime.Now - dt).ToString("%dday %hhr %mmin")
-            };
-        }
-        string FormattedNumber(double num, ColFormat? format)
-        {
-            throw new NotImplementedException();
-        }
-        string FormattedArray(string[] num, ColFormat? format)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
 }
-
-internal record ColFormatDefinition(string Label, ColFormat? Format);

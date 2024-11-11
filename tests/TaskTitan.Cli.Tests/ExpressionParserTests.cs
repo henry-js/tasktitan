@@ -28,7 +28,7 @@ public class PidginParserTests
         TaskAttribute attribute = (result.Expr as TaskAttribute)!;
 
         await Assert.That(attribute.Name).IsEqualTo(keyText);
-        await Assert.That(attribute.Modifier).IsNull();
+        await Assert.That(attribute.Modifier).IsEqualTo(ColModifier.NoModifier);
     }
 
     [Test]
@@ -47,7 +47,7 @@ public class PidginParserTests
 
         await Assert.That(attribute).IsNotNull();
         await Assert.That(attribute.AttributeKind).IsEqualTo(AttributeKind.UserDefined);
-        await Assert.That((attribute as TaskAttribute<double>).Value).IsEquatableOrEqualTo(4);
+        await Assert.That((attribute as TaskAttribute<double>)!.Value).IsEquatableOrEqualTo(4);
     }
     [Test]
     [Arguments("due:8w and until:7w", BinaryOperator.And)]

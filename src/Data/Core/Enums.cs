@@ -11,6 +11,7 @@ public enum ColType
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum ColFormat
 {
+    Default,
     Formatted,
     Julian,
     Epoch,
@@ -36,7 +37,8 @@ public enum ColFormat
     Full,
     Parent,
     Indented,
-    Duration
+    Duration,
+    Active
 }
 
 public enum ColModifier

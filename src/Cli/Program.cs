@@ -1,7 +1,6 @@
 ﻿using Serilog;
 
 using TaskTitan.Cli.Commands;
-using TaskTitan.Cli.Display;
 using TaskTitan.Cli.Extensions;
 using TaskTitan.Cli.Logging;
 using TaskTitan.Core.Configuration;
@@ -36,7 +35,7 @@ var cmdLine = new CommandLineBuilder(cmd)
             {
                 services.AddSingleton(_ => AnsiConsole.Console);
                 services.AddSingleton<LiteDbContext>();
-                services.AddSingleton<IReportWriter, ReportWriter>();
+                // services.AddSingleton<IReportWriter, ReportWriter>();
                 services.Configure<TaskTitanConfig>(_ =>
                 {
                     context.Configuration.GetSection("report").Bind(_.Report);
@@ -51,10 +50,12 @@ var cmdLine = new CommandLineBuilder(cmd)
     .UseExceptionHandler((ex, context) =>
     {
         Log.Fatal(ex, "Fatal error encountered");
-        AnsiConsole.MarkupLineInterpolated($"[default on red]{ex.Message}[/]");
+        // AnsiConsole.MarkupLineInterpolated($"[default on red]{ex.Message}[/]");
+        AnsiConsole.WriteException(ex);
     })
     .Build();
 
 Log.Information("Invoking commandline");
 int result = await cmdLine.InvokeAsync(args);
+
 return result;

@@ -119,7 +119,8 @@ public static class LiteDbMappers
     internal static Dictionary<string, TaskAttribute> FromBsonDocument(BsonValue value)
     {
         var dict = new Dictionary<string, TaskAttribute>();
-        foreach (var item in value as BsonDocument)
+        if (value is not BsonDocument doc) throw new Exception();
+        foreach (var item in doc)
         {
             if (_udas.ContainsKey(item.Key))
             {
