@@ -7,7 +7,7 @@ namespace TaskTitan.Data.Reports;
 public class ReportDefinition : IConfig
 {
     [JsonIgnore]
-    public string Name { get; set; }
+    public string Name { get; set; } = default!;
     public required string Description { get; set; }
     public string Filter { get; set; } = string.Empty;
     public string[] Columns { get; set; } = [];

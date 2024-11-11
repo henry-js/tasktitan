@@ -65,7 +65,7 @@ public static class ExpressionParser
         ).Cast<Expr>();
     internal static readonly Parser<char, Expr> _tagExpression
         = Map(
-            (modifier, value) => new TaskTag(value, modifier),
+            (modifier, value) => Tag.TryFrom(value, modifier).Value,
             _tagOperator,
             LetterOrDigit.AtLeastOnceString()
         ).Cast<Expr>();
