@@ -1,4 +1,5 @@
-﻿using LiteDB;
+﻿
+using LiteDB;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -90,19 +91,23 @@ public class LiteDbContext
         throw new Exception($"Could not parse value: {item.Name}");
     }
 
-    public IEnumerable<TaskItem> QueryTasks(FilterExpression query)
+    public IEnumerable<TaskItem> QueryTasks(FilterExpression? query = null)
     {
-        var bson = query.ToBsonExpression();
+        if (query is null)
+        {
+            return Tasks.FindAll().OrderBy(t => t.Id).ToList();
+        }
+        var bson = query?.ToBsonExpression();
         logger.LogInformation("Generated query: {query}", bson);
-        var untyped = db.GetCollection("tasks", BsonAutoId.ObjectId).Find(bson).ToList();
 
-        var tasks = Tasks.Find(query.ToBsonExpression()).ToList();
-        logger.LogInformation("Fetched rows {rows}", untyped.Count());
+        var tasks = Tasks.Find(bson).ToList();
+        logger.LogInformation("Fetched rows {rows}", tasks.Count);
         return tasks;
-        // foreach (var (task, index) in tasks.Index())
-        // {
+    }
 
-        // }
+    public async Task NukeTaskAsync(TaskItem task)
+    {
+        await Task.Run(() => Tasks.Delete(task.TaskId));
     }
 }
 

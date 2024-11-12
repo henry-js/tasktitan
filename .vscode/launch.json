@@ -12,13 +12,14 @@
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/artifacts/bin/TaskTitan.Cli/debug_win-x64/task.dll",
             "args": [
-                "add",
-                "i am a task",
-                "+work",
-                "priority:H",
-                "estimate:4",
+                // "add",
+                // "i am a task",
+                // "+work",
+                // "priority:H",
+                // "estimate:4",
                 // "list",
                 // "active"
+                "nuke"
             ],
             "cwd": "${workspaceFolder}/src/Cli",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
