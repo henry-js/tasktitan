@@ -1,13 +1,8 @@
-using TUnit.Assertions.Extensions.Generic;
 using TaskTitan.Data.Parsers;
-using TaskTitan.Data.Expressions;
 using System.Text.Json;
-using System.Linq.Expressions;
-using System.Diagnostics.CodeAnalysis;
 using TaskTitan.Core;
 using TaskTitan.Core.Enums;
 using TaskTitan.Core.Configuration;
-
 
 namespace TaskTitan.Cli.Tests;
 
@@ -72,9 +67,9 @@ public class PidginParserTests
     {
         var result = ExpressionParser.ParseFilter(tagText);
 
-        await Assert.That(result.Expr).IsAssignableTo(typeof(TaskTag));
+        await Assert.That(result.Expr).IsAssignableTo(typeof(Tag));
 
-        var tag = result.Expr as TaskTag;
+        var tag = result.Expr as Tag;
         await Assert.That(tag?.Modifier).IsEqualTo(modifier);
     }
 
