@@ -1,8 +1,6 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-using LiteDB;
-
 using Spectre.Console.Rendering;
 
 using TaskTitan.Core;
@@ -14,16 +12,12 @@ namespace TaskTitan.Cli.Display;
 
 public class Report
 {
-    private readonly ReportDefinition _def;
     private readonly string[] _labels;
-    private readonly Dictionary<string, ColumnDefinition> _columns = [];
-    private readonly ConfigDictionary<AttributeDefinition> _udas;
+    private readonly Dictionary<string, ColumnDefinition> _columns;
     private readonly PropertyInfo[] _props = typeof(TaskItem).GetProperties();
 
     public Report(ReportDefinition def, ConfigDictionary<AttributeDefinition> udas)
     {
-        _def = def;
-        _udas = udas;
         _labels = def.Labels;
         _columns = def.Columns.ToDictionary(k => k.Split('.')[0], e =>
             {
@@ -41,7 +35,7 @@ public class Report
                 };
                 if (TaskTitanConfig.DefinedColumns.TryGetValue(colName, out var value))
                     return value.SetFormat(colFormat);
-                else if (_udas.TryGetValue(colName, out var attribute))
+                else if (udas.TryGetValue(colName, out var attribute))
                     return new ColumnDefinition(attribute, true).SetFormat(colFormat);
                 else throw new Exception($"Could not parse report column {e}");
             });
@@ -71,8 +65,8 @@ public class Report
                 .First(p => p.Name.StartsWith(col.Key, StringComparison.InvariantCultureIgnoreCase))
                 .GetValue(task) ?? string.Empty;
 
-            var text = col.Value.FormatFunc?.Invoke(arg);
-            rowCols.Add(text is null ? Text.Empty : new Text(text));
+            var text = col.Value.FormatFunc.Invoke(arg);
+            rowCols.Add(new Text(text));
         }
 
         grid.AddRow([.. rowCols]);

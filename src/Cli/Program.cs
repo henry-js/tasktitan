@@ -17,6 +17,7 @@ VelopackApp.Build()
 var cmd = new RootCommand();
 cmd.AddCommand(new AddCommand());
 cmd.AddCommand(new ListCommand());
+cmd.AddCommand(new NukeCommand());
 
 var cmdLine = new CommandLineBuilder(cmd)
     .UseHost(_ => Host.CreateDefaultBuilder(args), builder =>

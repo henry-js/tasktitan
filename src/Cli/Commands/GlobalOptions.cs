@@ -22,4 +22,11 @@ public static class CliGlobalOptions
         AllowMultipleArgumentsPerToken = true,
         Arity = ArgumentArity.ZeroOrMore,
     };
+
+    public static readonly Option<bool> HiddenOption = new(
+    aliases: ["-f", "--filter"],
+    description: "")
+    {
+        Arity = ArgumentArity.ZeroOrMore,
+    };
 }
