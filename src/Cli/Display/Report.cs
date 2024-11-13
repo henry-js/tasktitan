@@ -19,7 +19,7 @@ public class Report
     public Report(ReportDefinition def, ConfigDictionary<AttributeDefinition> udas)
     {
         _labels = def.Labels;
-        _columns = def.Columns.ToDictionary(k => k.Split('.')[0], e =>
+        _columns = def.Columns.ToDictionary(k => k, e =>
             {
                 (string colName, ColFormat colFormat) = e.Split('.') switch
                 {
@@ -62,7 +62,7 @@ public class Report
         foreach (var col in _columns)
         {
             var arg = _props
-                .First(p => p.Name.StartsWith(col.Key, StringComparison.InvariantCultureIgnoreCase))
+                .First(p => col.Key.StartsWith(p.Name, StringComparison.InvariantCultureIgnoreCase))
                 .GetValue(task) ?? string.Empty;
 
             var text = col.Value.FormatFunc.Invoke(arg);

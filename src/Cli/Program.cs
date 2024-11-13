@@ -34,6 +34,7 @@ var cmdLine = new CommandLineBuilder(cmd)
             })
             .ConfigureServices((context, services) =>
             {
+                services.AddSingleton(TimeProvider.System);
                 services.AddSingleton(_ => AnsiConsole.Console);
                 services.AddSingleton<LiteDbContext>();
                 // services.AddSingleton<IReportWriter, ReportWriter>();
@@ -59,5 +60,7 @@ var cmdLine = new CommandLineBuilder(cmd)
 Log.Information("Invoking commandline");
 int result = await cmdLine.InvokeAsync(args);
 
+#if DEBUG
 Console.ReadLine();
+#endif
 return result;
