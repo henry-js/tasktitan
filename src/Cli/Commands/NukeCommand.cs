@@ -38,7 +38,7 @@ internal sealed class NukeCommand : Command
         public async Task RunDeletionWorkflowAsync(IEnumerable<TaskItem> tasks, TaskDeletionOptions options)
         {
             console.WriteLine($"This command will delete {tasks.Count()} tasks.");
-            foreach (var task in tasks)
+            foreach ((int index, var task) in tasks.Index())
             {
                 if (await ShouldDeleteTaskAsync(task, options))
                 {
@@ -57,36 +57,41 @@ internal sealed class NukeCommand : Command
                         }
                     }
                 }
+                if (options.SkipAll)
+                {
+                    console.WriteLine($"Skipped {tasks.Count() - index} tasks");
+                    break;
+                }
             }
         }
 
         private async Task<bool> ShouldContinueAfterErrorAsync()
         {
-            return true;
+            return await Task.FromResult(true);
         }
 
         private async Task<bool> ShouldDeleteTaskAsync(TaskItem task, TaskDeletionOptions options)
         {
             if (options.ConfirmAll) return true;
-
+            if (options.SkipAll) return false;
             if (options.Interactive)
             {
-                var prompt = new TextPrompt<string>($"Delete task {task.Id} '{task.Description}'?", StringComparer.OrdinalIgnoreCase)
-                .AddChoices(["yes", "no", "all", "quit"])
-                .WithConverter(input => input);
+                string[] choices = ["yes", "no", "all", "quit"];
+                var answer = await new TextPrompt<string>($"Delete task {task.Id} '{task.Description}'? ({string.Join('/', choices)})", StringComparer.OrdinalIgnoreCase)
+                    .Validate((userInput) => choices.Any(choice => choice.StartsWith(userInput)))
+                    .ShowAsync(console, CancellationToken.None);
 
-                var answer = console.Prompt(prompt);
-                switch (answer)
+                switch (answer[0])
                 {
-                    case "quit":
+                    case 'q':
                         options.SkipAll = true;
                         return false;
-                    case "all":
+                    case 'a':
                         options.ConfirmAll = true;
                         return true;
-                    case "no":
+                    case 'n':
                         return false;
-                    case "yes":
+                    case 'y':
                         return true;
                 }
             }
@@ -96,9 +101,9 @@ internal sealed class NukeCommand : Command
     }
 }
 
-internal struct TaskDeletionOptions
+internal class TaskDeletionOptions
 {
     public bool SkipAll { get; set; }
-    public readonly bool Interactive => !SkipAll && !ConfirmAll;
+    public bool Interactive => !SkipAll && !ConfirmAll;
     public bool ConfirmAll { get; set; }
 }
