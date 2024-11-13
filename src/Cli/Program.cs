@@ -18,6 +18,7 @@ var cmd = new RootCommand();
 cmd.AddCommand(new AddCommand());
 cmd.AddCommand(new ListCommand());
 cmd.AddCommand(new NukeCommand());
+cmd.AddCommand(new StartCommand());
 
 var cmdLine = new CommandLineBuilder(cmd)
     .UseHost(_ => Host.CreateDefaultBuilder(args), builder =>

@@ -30,8 +30,8 @@ public sealed class ListCommand : Command
         {
             Arity = ArgumentArity.ZeroOrMore
         };
-        command.AddArgument(report);
 
+        command.AddArgument(report);
         command.AddOption(new Option<bool>(["-s", "--skip"]) { IsHidden = true });
     }
 

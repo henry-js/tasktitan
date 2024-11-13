@@ -17,9 +17,9 @@
                 // "+work",
                 // "priority:H",
                 // "estimate:4",
-                // "list",
-                // "active"
-                "nuke"
+                "list",
+                "active"
+                // "nuke"
             ],
             "cwd": "${workspaceFolder}/src/Cli",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
