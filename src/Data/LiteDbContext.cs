@@ -9,6 +9,7 @@ using TaskTitan.Core.Configuration;
 using TaskTitan.Core.Enums;
 using TaskTitan.Data.Expressions;
 using TaskTitan.Data.Extensions;
+using TaskTitan.Data.Parsers;
 
 namespace TaskTitan.Data;
 
@@ -18,13 +19,17 @@ public class LiteDbContext
     private readonly LiteDatabase db;
     private readonly ILogger<LiteDbContext> logger;
     private readonly LiteDbOptions _options;
-    public LiteDbContext(IOptions<LiteDbOptions> options, IOptions<TaskTitanConfig> appConfig, ILogger<LiteDbContext> logger)
+    private readonly DateParser _dateParser;
+
+
+    public LiteDbContext(IOptions<LiteDbOptions> options, IOptions<TaskTitanConfig> appConfig, TimeProvider timeProvider, ILogger<LiteDbContext> logger)
     {
         BsonMapper.Global.RegisterType
             (serialize: LiteDbMappers.ToBsonDocument,
             deserialize: LiteDbMappers.FromBsonDocument(appConfig.Value.Uda));
         this.logger = logger;
         _options = options.Value;
+        _dateParser = new DateParser(timeProvider);
         try
         {
             var db = new LiteDatabase(_options.ConnectionString);
@@ -97,7 +102,7 @@ public class LiteDbContext
         {
             return Tasks.FindAll().OrderBy(t => t.Id).ToList();
         }
-        var bson = query?.ToBsonExpression();
+        var bson = query?.ToBsonExpression(_dateParser);
         logger.LogInformation("Generated query: {query}", bson);
 
         var tasks = Tasks.Find(bson).ToList();

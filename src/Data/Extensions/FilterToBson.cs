@@ -4,13 +4,18 @@ using LiteDB;
 
 using TaskTitan.Core;
 using TaskTitan.Core.Enums;
+using TaskTitan.Data.Parsers;
+
+using static TaskTitan.Core.Tag;
 
 namespace TaskTitan.Data.Extensions;
 
 public static class FilterToBson
 {
-    public static BsonExpression ToBsonExpression(this FilterExpression filter)
+    static DateParser? _dateParser;
+    public static BsonExpression ToBsonExpression(this FilterExpression filter, DateParser dateParser)
     {
+        _dateParser = dateParser;
         return ExprToBsonExpression(filter.Expr);
     }
 
@@ -22,11 +27,6 @@ public static class FilterToBson
             TaskAttribute attr => AttributeToBsonExpression(attr),
             _ => throw new SwitchExpressionException()
         };
-    }
-
-    private static BsonExpression TagToBsonExpression(TaskTag tag)
-    {
-        throw new NotImplementedException();
     }
 
     private static BsonExpression AttributeToBsonExpression(TaskAttribute attr)
@@ -43,7 +43,7 @@ public static class FilterToBson
         {
             return ParseTextAttribute(s);
         }
-        else if (attr is TaskTag tag)
+        else if (attr is Tag tag)
         {
             return ParseTag(tag);
         }
@@ -88,14 +88,39 @@ public static class FilterToBson
                 _ => throw new SwitchExpressionException($"Modifier {attribute.Modifier} is not supported for Text attributes"),
             };
         }
-        BsonExpression ParseTag(TaskTag tag)
+        BsonExpression ParseTag(Tag tag)
         {
             return tag switch
             {
-                { Name: "WAITING", Modifier: ColModifier.Exclude } => Query.EQ(nameof(TaskItem.Wait), null),
-                { Name: "WAITING", Modifier: ColModifier.Include } => Query.Not(nameof(TaskItem.Wait), null),
+                { IsSynthetic: true } => Synthetic(tag),
                 _ => throw new SwitchExpressionException($"Tag not supported, \n TaskTag: {tag?.ToString() ?? "NULL"}")
             };
+
+            BsonExpression Synthetic(Tag tag)
+            {
+                return tag switch
+                {
+                    { Name: nameof(SyntheticTag.Waiting), Modifier: ColModifier.Include } => Query.Not(nameof(TaskItem.Wait), null),
+                    { Name: nameof(SyntheticTag.Waiting), Modifier: ColModifier.Exclude } => Query.EQ(nameof(TaskItem.Wait), null),
+                    { Name: nameof(SyntheticTag.DueToday), Modifier: ColModifier.Include } => Query.EQ(nameof(TaskItem.Wait), DateTime.UtcNow),
+                    { Name: nameof(SyntheticTag.Today), Modifier: ColModifier.Include } => Query.EQ(nameof(TaskItem.Wait), DateTime.UtcNow),
+                    { Name: nameof(SyntheticTag.Overdue), Modifier: ColModifier.Include } => Query.LT(nameof(TaskItem.Due), DateTime.UtcNow),
+                    { Name: nameof(SyntheticTag.Week), Modifier: ColModifier.Include } => Query.Between(nameof(TaskItem.Due), _dateParser?.Parse("monday"), _dateParser?.Parse("sunday")),
+                    { Name: nameof(SyntheticTag.Month), Modifier: ColModifier.Include } => Query.Between(nameof(TaskItem.Due), _dateParser?.Parse("som"), _dateParser?.Parse("eom")),
+                    { Name: nameof(SyntheticTag.Quarter), Modifier: ColModifier.Include } => Query.Between(nameof(TaskItem.Due), _dateParser?.Parse("som"), _dateParser?.Parse("eom")),
+                    { Name: nameof(SyntheticTag.Year), Modifier: ColModifier.Include } => Query.Between(nameof(TaskItem.Due), _dateParser?.Parse("som"), _dateParser?.Parse("eom")),
+                    { Name: nameof(SyntheticTag.Active), Modifier: ColModifier.Include } => Query.Not(nameof(TaskItem.Start), null),
+                    { Name: nameof(SyntheticTag.Active), Modifier: ColModifier.Exclude } => Query.EQ(nameof(TaskItem.Start), null),
+                    { Name: nameof(SyntheticTag.Scheduled), Modifier: ColModifier.Include } => Query.Not(nameof(TaskItem.Scheduled), null),
+                    { Name: nameof(SyntheticTag.Scheduled), Modifier: ColModifier.Exclude } => Query.EQ(nameof(TaskItem.Scheduled), null),
+                    { Name: nameof(SyntheticTag.Until), Modifier: ColModifier.Include } => Query.Not(nameof(TaskItem.Until), null),
+                    { Name: nameof(SyntheticTag.Until), Modifier: ColModifier.Exclude } => Query.EQ(nameof(TaskItem.Until), null),
+                    { Name: nameof(SyntheticTag.Pending), Modifier: ColModifier.Include } => Query.EQ(nameof(TaskItem.Status), nameof(TaskItemStatus.Pending)),
+                    { Name: nameof(SyntheticTag.Completed), Modifier: ColModifier.Include } => Query.EQ(nameof(TaskItem.Status), nameof(TaskItemStatus.Completed)),
+                    { Name: nameof(SyntheticTag.Deleted), Modifier: ColModifier.Include } => Query.EQ(nameof(TaskItem.Status), nameof(TaskItemStatus.Deleted)),
+                    _ => throw new SwitchExpressionException($"Tag not supported, \n TaskTag: {tag?.ToString() ?? "NULL"}")
+                };
+            }
         }
     }
 

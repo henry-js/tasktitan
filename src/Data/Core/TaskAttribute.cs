@@ -30,21 +30,12 @@ public record TaskAttribute<T> : TaskAttribute
     public T Value { get; }
 }
 
-public record TaskTag : TaskAttribute
-{
-    public TaskTag(string name, ColModifier modifier) : base(name, modifier)
-    {
-        AttributeKind = AttributeKind.Tag;
-    }
-}
-
 public enum AttributeKind { BuiltIn, UserDefined, Tag }
 
 public record Tag : TaskAttribute
 {
-
+    public string Value => _inner.ToString();
     private readonly TagInner _inner;
-
     private const string InvalidTagCharacters = "+-*/(<>^!%=~";
 
     public bool IsSynthetic => _inner is TagInner.Synthetic;
@@ -62,9 +53,9 @@ public record Tag : TaskAttribute
 
         if (value.All(char.IsUpper))
         {
-            return Enum.TryParse<SyntheticTag>(value, out var syntheticTag)
+            return Enum.TryParse<SyntheticTag>(value, true, out var syntheticTag)
                 ? (Result<Tag>)new Tag(new TagInner.Synthetic(syntheticTag), modifier)
-                : Result<Tag>.Fail("abc");
+                : Result<Tag>.Fail($"'{value}' is not a valid synthetic tag.");
         }
 
         // Validate first character
@@ -105,6 +96,15 @@ public record Tag : TaskAttribute
         Deleted,
         Blocked,
         Unblocked,
-        Blocking
+        Blocking,
+        DueToday,
+        Today,
+        Overdue,
+        Week,
+        Month,
+        Quarter,
+        Year,
+        Scheduled,
+        Until
     }
 }
