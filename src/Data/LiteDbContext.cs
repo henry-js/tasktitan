@@ -114,6 +114,11 @@ public class LiteDbContext
     {
         await Task.Run(() => Tasks.Delete(task.TaskId));
     }
+
+    public async Task<bool> DeleteTask(TaskItem item)
+    {
+        throw new NotImplementedException();
+    }
 }
 
 public static class LiteDbMappers

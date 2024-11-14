@@ -29,9 +29,7 @@ public class TaskItem
 
 public enum TaskItemStatus
 {
-    Pending, Started, Done,
-    Completed,
-    Deleted
+    Pending, Completed, Deleted
 }
 
 public class Recurrence

@@ -29,9 +29,9 @@ public sealed class AddCommand : Command
         command.Add(descriptionArgument);
     }
 
-    new public class Handler(IAnsiConsole console, LiteDbContext dbContext, IOptions<TaskTitanConfig> reportOptions, ILogger<AddCommand> logger) : ICommandHandler
+    new public class Handler(IAnsiConsole console, LiteDbContext dbContext, IOptions<TaskTitanConfig> options, ILogger<AddCommand> logger) : ICommandHandler
     {
-        private readonly TaskTitanConfig reportConfig = reportOptions.Value;
+        private readonly TaskTitanConfig appConfig = options.Value;
         private readonly IAnsiConsole console = console;
         public CommandExpression Modification { get; set; } = default!;
 
@@ -56,7 +56,7 @@ public sealed class AddCommand : Command
             builder.AppendJoin(' ', descValues).Append('\'').Append(' ').AppendJoin(' ', attributes);
             logger.LogInformation("Parsed raw input");
 
-            ExpressionParser.SetUdas(reportConfig.Uda);
+            ExpressionParser.SetUdas(appConfig.Uda);
 
             logger.LogInformation("Parsing command");
             Modification = ExpressionParser.ParseCommand(builder.ToString().Trim());
