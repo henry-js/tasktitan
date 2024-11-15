@@ -52,4 +52,7 @@ public static class TaskColumns
 
     public static ColType? GetColumnType(string columnName) =>
         ColumnTypes.TryGetValue(columnName, out var type) ? type : null;
+
+    internal static string GetColumnName(string field) =>
+        ColumnTypes.Keys.FirstOrDefault(k => k.StartsWith(field)) ?? field;
 }

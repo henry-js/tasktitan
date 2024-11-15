@@ -40,8 +40,8 @@ public static class TaskAttributeFactory
         var split = input.Split('.');
         return split.Length switch
         {
-            1 => (split[0], default),
-            2 => (split[0], ParseModifier(split[1])),
+            1 => (TaskColumns.GetColumnName(split[0]), default),
+            2 => (TaskColumns.GetColumnName(split[0]), ParseModifier(split[1])),
             _ => throw new ArgumentException($"Invalid input format: {input}")
         };
     }
@@ -71,6 +71,19 @@ public static class TaskAttributeFactory
             ColType.Text => new TaskAttribute<string>(uda.Name, value, AttributeKind.UserDefined, modifier),
             ColType.Number => new TaskAttribute<double>(uda.Name, Convert.ToDouble(value), AttributeKind.UserDefined, modifier),
             _ => throw new ArgumentException($"Unsupported column type: {uda.Name}")
+        };
+    }
+
+    public static TaskAttribute CreateBuiltIn<T>(string field, T value)
+    {
+        if (!TaskColumns.IsValidColumn(field)) throw new Exception($"{field} is not a  built in column");
+
+        return value switch
+        {
+            DateTime dt => new TaskAttribute<DateTime>(field, dt, AttributeKind.BuiltIn),
+            string s => new TaskAttribute<string>(field, s, AttributeKind.BuiltIn),
+            double num => new TaskAttribute<double>(field, num, AttributeKind.BuiltIn),
+            _ => throw new ArgumentException($"Unsupported column type: {typeof(T)}")
         };
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Serilog;
 
 using TaskTitan.Cli.Commands;
+using TaskTitan.Cli.Display;
 using TaskTitan.Cli.Extensions;
 using TaskTitan.Cli.Logging;
 using TaskTitan.Core.Configuration;
@@ -38,7 +39,7 @@ var cmdLine = new CommandLineBuilder(cmd)
                 services.AddSingleton(TimeProvider.System);
                 services.AddSingleton(_ => AnsiConsole.Console);
                 services.AddSingleton<LiteDbContext>();
-                // services.AddSingleton<IReportWriter, ReportWriter>();
+                services.AddSingleton<ITaskActionHandler, TaskActionHandler>();
                 services.Configure<TaskTitanConfig>(_ =>
                 {
                     context.Configuration.GetSection("report").Bind(_.Report);

@@ -15,7 +15,13 @@
                 "start",
                 "due.after:tomorrow",
                 "-m",
-                "due:tomorrow"
+                "due:tomorrow",
+                "-m",
+                "desc:'i am a new description'"
+                // "add",
+                // "i have a desc",
+                // "due:tomorrow",
+                // "priority:H"
             ],
             "cwd": "${workspaceFolder}/src/Cli",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console

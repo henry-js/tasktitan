@@ -2,6 +2,7 @@ using System.CommandLine.Invocation;
 
 using Microsoft.Extensions.Logging;
 
+using TaskTitan.Cli.Display;
 using TaskTitan.Core;
 using TaskTitan.Data;
 using TaskTitan.Data.Parsers;
@@ -21,7 +22,7 @@ internal sealed class NukeCommand : Command
     {
     }
 
-    new public class Handler(LiteDbContext dBContext, IAnsiConsole console, ILogger<NukeCommand> logger) : ICommandHandler
+    new public class Handler(LiteDbContext dBContext, ITaskActionHandler actionHandler, ILogger<NukeCommand> logger) : ICommandHandler
     {
         public string? Filter { get; set; }
         public int Invoke(InvocationContext context) => InvokeAsync(context).Result;
@@ -30,73 +31,15 @@ internal sealed class NukeCommand : Command
         {
             var query = Filter is not null ? ExpressionParser.ParseFilter(Filter) : null;
             var tasks = dBContext.QueryTasks(query);
-            var options = new TaskDeletionOptions();
-            await RunDeletionWorkflowAsync(tasks, options);
+            var actionHandlerOptions = new DeleteActionHandlerOptions()
+            {
+                ActionName = "delete",
+                Action = dBContext.DeleteTask
+            };
+            logger.LogInformation("Deleting {count} tasks", tasks.Count());
+
+            await actionHandler.RunActionWorkflowAsync(tasks, actionHandlerOptions);
             return 0;
-        }
-
-        public async Task RunDeletionWorkflowAsync(IEnumerable<TaskItem> tasks, TaskDeletionOptions options)
-        {
-            console.WriteLine($"This command will delete {tasks.Count()} tasks.");
-            foreach ((int index, var task) in tasks.Index())
-            {
-                if (await ShouldDeleteTaskAsync(task, options))
-                {
-                    try
-                    {
-                        console.WriteLine($"Deleting task {task.Id}");
-                        await dBContext.NukeTaskAsync(task);
-                        logger.LogInformation("Deleted task {taskId}: {taskDescription}", task.Id, task.Description);
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.LogError(ex, "Failed to delete task {taskId}", task.Id);
-                        if (!await ShouldContinueAfterErrorAsync())
-                        {
-                            break;
-                        }
-                    }
-                }
-                if (options.SkipAll)
-                {
-                    console.WriteLine($"Skipped {tasks.Count() - index} tasks");
-                    break;
-                }
-            }
-        }
-
-        private async Task<bool> ShouldContinueAfterErrorAsync()
-        {
-            return await Task.FromResult(true);
-        }
-
-        private async Task<bool> ShouldDeleteTaskAsync(TaskItem task, TaskDeletionOptions options)
-        {
-            if (options.ConfirmAll) return true;
-            if (options.SkipAll) return false;
-            if (options.Interactive)
-            {
-                string[] choices = ["yes", "no", "all", "quit"];
-                var answer = await new TextPrompt<string>($"Delete task {task.Id} '{task.Description}'? ({string.Join('/', choices)})", StringComparer.OrdinalIgnoreCase)
-                    .Validate((userInput) => choices.Any(choice => choice.StartsWith(userInput)))
-                    .ShowAsync(console, CancellationToken.None);
-
-                switch (answer[0])
-                {
-                    case 'q':
-                        options.SkipAll = true;
-                        return false;
-                    case 'a':
-                        options.ConfirmAll = true;
-                        return true;
-                    case 'n':
-                        return false;
-                    case 'y':
-                        return true;
-                }
-            }
-
-            return false;
         }
     }
 }

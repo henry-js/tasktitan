@@ -48,7 +48,7 @@ public class LiteDbContext
 
     public ILiteCollection<TaskItem> Tasks => db.GetCollection<TaskItem>(TaskCol, BsonAutoId.ObjectId);
 
-    public int AddTask(Dictionary<string, TaskAttribute> dict)
+    public int AddTask(IEnumerable<TaskAttribute> values)
     {
         var id = ObjectId.NewObjectId();
         var task = new BsonDocument
@@ -57,16 +57,16 @@ public class LiteDbContext
             [TaskColumns.Entry] = id.CreationTime
         };
 
-        var tags = dict.Values.Where(p => p.AttributeKind == AttributeKind.Tag && p.Modifier == ColModifier.Include)
+        var tags = values.Where(p => p.AttributeKind == AttributeKind.Tag && p.Modifier == ColModifier.Include)
             .Select(t => new BsonValue(t.Name))
             .ToHashSet();
         task[TaskColumns.Tags] = new BsonArray(tags);
 
-        foreach (var item in dict.Where(kvp => kvp.Value.AttributeKind == AttributeKind.BuiltIn))
+        foreach (var item in values.Where(val => val.AttributeKind == AttributeKind.BuiltIn))
         {
-            task[item.Key] = RetrieveValue(item.Value);
+            task[item.Name] = RetrieveValue(item);
         }
-        var udas = BsonMapper.Global.ToDocument(dict.Where(kvp => kvp.Value.AttributeKind == AttributeKind.UserDefined).ToDictionary());
+        var udas = BsonMapper.Global.ToDocument(values.Where(val => val.AttributeKind == AttributeKind.UserDefined).ToDictionary(k => k.Name));
 
         task[nameof(udas)] = udas;
         if (!task.ContainsKey(TaskColumns.Status)) task[TaskColumns.Status] = TaskItemStatus.Pending.ToString();
@@ -116,6 +116,16 @@ public class LiteDbContext
     }
 
     public async Task<bool> DeleteTask(TaskItem item)
+    {
+        return await Task.FromResult(true);
+    }
+
+    public async Task<bool> UpdateTask(TaskItem item)
+    {
+        return await Task.Run(() => Tasks.Update(item));
+    }
+
+    public async Task<bool> BulkUpdateTask(IEnumerable<TaskItem> tasks)
     {
         throw new NotImplementedException();
     }
