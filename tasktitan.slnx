@@ -1,0 +1,12 @@
+﻿<Solution>
+  <Folder Name="/src/">
+    <Project Path="benchmarks\TaskTitan.Benchmarks.csproj" Type="Classic C#" />
+    <Project Path="src\Cli\TaskTitan.Cli.csproj" Type="Classic C#" />
+    <Project Path="src\Data\TaskTitan.Data.csproj" Type="Classic C#" />
+  </Folder>
+  <Project Path=".nuke\_build.csproj">
+    <Configuration Solution="Debug|Any CPU" Project="Debug|Any CPU|NoBuild" />
+    <Configuration Solution="Release|Any CPU" Project="Release|Any CPU|NoBuild" />
+  </Project>
+  <Project Path="tests\TaskTitan.Tests.csproj" Type="Classic C#" />
+</Solution>

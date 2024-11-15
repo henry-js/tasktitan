@@ -1,22 +1,21 @@
 ﻿using Bogus;
-using Bogus.DataSets;
 
 using LiteDB;
 
-using TaskTitan.Configuration;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
+
+using TaskTitan.Core;
+using TaskTitan.Core.Configuration;
 using TaskTitan.Data;
-using TaskTitan.Data.Expressions;
-using TaskTitan.Data.Extensions;
-using TaskTitan.Data.Parsers;
-using TaskTitan.Data.Reports;
 
-using Tomlyn;
-
-var config = new ReportConfiguration();
+var config = new TaskTitanConfig();
 var reports = config.Report;
+var ldbOptions = new LiteDbOptions();
+Console.WriteLine(ldbOptions.ConnectionString);
 
-
-var context = new LiteDbContext(LiteDbContext.CreateConnectionStringFrom(Global.DataDirectoryPath));
+var opts = Options.Create(ldbOptions);
+var context = new LiteDbContext(opts, Options.Create(new TaskTitanConfig()), TimeProvider.System, new NullLogger<LiteDbContext>());
 var col = context.Tasks;
 var tasks = context.Tasks.FindAll().ToList();
 int rowId = tasks.Count != 0 ? tasks.Max(x => x.Id) : 0;
@@ -34,15 +33,17 @@ var sampleTasks = new Faker<TaskItem>()
 
 var generatedTasks = sampleTasks.Generate(1000);
 
-col.InsertBulk(generatedTasks);
+var count = col.InsertBulk(generatedTasks);
 
-var dateParser = new DateParser(TimeProvider.System);
-var attribute1 = TaskProperty.Create("due.after", "tomorrow", dateParser);
-var attribute2 = TaskProperty.Create("project.contains", "work", dateParser);
-var expr = new FilterExpression(new BinaryFilter(attribute1, BinaryOperator.Or, attribute2));
+Console.WriteLine($"Inserted {count} tasks");
 
-var filtered = col.Find(expr.ToBsonExpression());
+// var dateParser = new DateParser(TimeProvider.System);
+// var attribute1 = TaskPropertyFactory.Create("due.after", "tomorrow", dateParser);
+// var attribute2 = TaskPropertyFactory.Create("project.contains", "work", dateParser);
+// var expr = new FilterExpression(new BinaryFilter(attribute1, BinaryOperator.Or, attribute2));
 
-// var workingSet = context.WorkingSet;
+// var filtered = col.Find(expr.ToBsonExpression());
 
-Console.WriteLine(filtered.Count());
+// // var workingSet = context.WorkingSet;
+
+// Console.WriteLine(filtered.Count());

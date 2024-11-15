@@ -1,18 +1,21 @@
 using Pidgin;
 using Pidgin.Expression;
 
-using TaskTitan.Data.Expressions;
+using TaskTitan.Core;
+using TaskTitan.Core.Configuration;
+using TaskTitan.Core.Enums;
+
+using static Pidgin.Parser;
 
 using static Pidgin.Parser<char>;
 using static Pidgin.Parser<string>;
-using static Pidgin.Parser;
-using static TaskTitan.Data.Enums;
 
 namespace TaskTitan.Data.Parsers;
 
 public static class ExpressionParser
 {
     private static DateParser _dateParser = new DateParser(TimeProvider.System);
+    private static ConfigDictionary<AttributeDefinition> _udas = [];
     private static readonly Parser<char, char> _colon
         = Token(':');
     private static readonly Parser<char, char> _dash
@@ -52,7 +55,7 @@ public static class ExpressionParser
 
     internal static readonly Parser<char, Expr> _attribute
         = Map(
-            (field, _, value) => TaskProperty.Create(field, value, _dateParser),
+            (field, _, value) => TaskAttributeFactory.Create(field, value, _dateParser, _udas),
             LetterOrDigit.Or(Token('.')).AtLeastOnceString(),
             Token(':'),
             OneOf(
@@ -62,7 +65,7 @@ public static class ExpressionParser
         ).Cast<Expr>();
     internal static readonly Parser<char, Expr> _tagExpression
         = Map(
-            (modifier, value) => new TaskTag(value, modifier),
+            (modifier, value) => Tag.TryFrom(value, modifier).Value,
             _tagOperator,
             LetterOrDigit.AtLeastOnceString()
         ).Cast<Expr>();
@@ -80,6 +83,8 @@ public static class ExpressionParser
             ]
         );
 
+    public static void SetUdas(ConfigDictionary<AttributeDefinition> udas) => _udas = udas;
+
     public static void SetTimeProvider(TimeProvider timeProvider)
         => _dateParser = (timeProvider is null)
             ? new DateParser(TimeProvider.System)
@@ -95,6 +100,6 @@ public static class ExpressionParser
             _attribute,
             _tagExpression
         ).SeparatedAtLeastOnce(Token(' '))
-        .Select(exprs => new CommandExpression(exprs.Cast<TaskProperty>(), input))
+        .Select(exprs => new CommandExpression(exprs.Cast<TaskAttribute>().ToDictionary(attr => attr.Name), input))
         .ParseOrThrow(input);
 }

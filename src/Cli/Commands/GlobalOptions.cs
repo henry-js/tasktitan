@@ -1,28 +1,10 @@
-using System.CommandLine;
-using TaskTitan.Data.Expressions;
+using TaskTitan.Core;
 using TaskTitan.Data.Parsers;
 
 namespace TaskTitan.Cli.Commands;
 
 public static class CliGlobalOptions
 {
-    // public static readonly CliOption<CommandExpression?> ModificationOption = new("--modify", ["-m"])
-    // {
-    //     Description = "Due date etc",
-    //     CustomParser = ar => ExpressionParser.ParseCommand(string.Join(' ', ar.Tokens)),
-    //     AllowMultipleArgumentsPerToken = true,
-    //     Arity = ArgumentArity.OneOrMore
-    // };
-
-    // public static readonly CliOption<FilterExpression> FilterOption = new("--filter", ["-f"])
-    // {
-    //     Description = "Filter tasks by",
-    //     CustomParser = ar => ExpressionParser.ParseFilter(string.Join(' ', ar.Tokens)),
-    //     AllowMultipleArgumentsPerToken = true,
-    //     Arity = ArgumentArity.ZeroOrMore,
-    //     Recursive = true,
-    // };
-
     public static readonly Option<CommandExpression?> ModificationOption = new(
         aliases: ["-m", "--modify"],
         description: "Due date etc",
@@ -38,6 +20,13 @@ public static class CliGlobalOptions
         parseArgument: ar => ExpressionParser.ParseFilter(string.Join(' ', ar.Tokens)))
     {
         AllowMultipleArgumentsPerToken = true,
+        Arity = ArgumentArity.ZeroOrMore,
+    };
+
+    public static readonly Option<bool> HiddenOption = new(
+    aliases: ["-f", "--filter"],
+    description: "")
+    {
         Arity = ArgumentArity.ZeroOrMore,
     };
 }

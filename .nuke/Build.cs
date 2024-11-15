@@ -107,9 +107,9 @@ partial class Build : NukeBuild
         {
             MinVer = MinVerTasks.MinVer(_ => _
                 .SetAutoIncrement(MinVerVersionPart.Minor)
-                .SetDefaultPreReleasePhase("preview")
+                .SetDefaultPreReleaseIdentifiers("preview.0")
                 .SetTagPrefix("v")
-                ).Result;
+            ).Result;
             Log.Information(MinVer.Version);
 
             var packDir = PublishDirectory;

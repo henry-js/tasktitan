@@ -12,15 +12,20 @@
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/artifacts/bin/TaskTitan.Cli/debug_win-x64/task.dll",
             "args": [
-                "task",
-                "add",
-                "i am the description",
+                "start",
+                "due.after:tomorrow",
+                "-m",
                 "due:tomorrow",
-                "project:work"
+                "-m",
+                "desc:'i am a new description'"
+                // "add",
+                // "i have a desc",
+                // "due:tomorrow",
+                // "priority:H"
             ],
             "cwd": "${workspaceFolder}/src/Cli",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
-            "console": "internalConsole",
+            "console": "externalTerminal",
             "stopAtEntry": false
         },
         {
@@ -36,7 +41,7 @@
             "args": [],
             "cwd": "${workspaceFolder}/tests",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
-            "console": "internalConsole",
+            "console": "externalTerminal",
             "stopAtEntry": false
         },
         {
