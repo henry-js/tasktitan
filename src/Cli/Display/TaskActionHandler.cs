@@ -18,7 +18,7 @@ public class TaskActionHandler(ILogger<TaskActionHandler> logger) : ITaskActionH
         string action = options.ActionName;
 
         AnsiConsole.WriteLine($"This command will {action} {tasks.Count()} tasks.");
-        foreach ((int index, var task) in tasks.Index())
+        foreach ((int index, var task) in tasks.Select((task, index) => (index, task)))
         {
             if (await ShouldExecuteActionAsync(task, options))
             {
