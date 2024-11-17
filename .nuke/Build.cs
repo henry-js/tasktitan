@@ -1,5 +1,3 @@
-using Nuke.Common.Tooling;
-
 partial class Build : NukeBuild
 {
     public static int Main() => Execute<Build>(x => x.Compile);
@@ -33,59 +31,37 @@ partial class Build : NukeBuild
 
     Target Restore => _ => _
     .After(Clean)
-        .Executes(() =>
-        {
-            DotNetRestore(_ => _
+        .Executes(() => DotNetRestore(_ => _
                 .SetForce(true)
-                .SetProjectFile(Solution.Directory));
-        });
+                .SetProjectFile(Solution.Directory)));
 
     Target Compile => _ => _
         .DependsOn(Clean, Restore)
         .Executes(() =>
-        {
             DotNetBuild(_ => _
-                        // .CombineWith([ProjectDirectory, TestDirectory], (_, v) =>
-                        // {
-                        //     _
-                        .EnableNoLogo()
-                        .EnableNoRestore()
-                        .SetConfiguration(Configuration)
-                        .SetProjectFile(Solution.Directory)
-            //         .SetConfiguration(Configuration);
-            //     if (v == ProjectDirectory)
-            //     {
-            //         _.SetRuntime(Runtime)
-            //         .SetFramework(Framework);
-            //     }
-            //     return _;
-            // }
-            // )
-
-
-            );
-        });
+                .EnableNoLogo()
+                .EnableNoRestore()
+                .SetConfiguration(Configuration)
+                .SetProjectFile(Solution.Directory)
+            ));
 
     Target Test => _ => _
         .DependsOn(Compile)
         .Executes(() =>
-        {
             DotNetTest(_ => _
                 .EnableNoLogo()
                 .EnableNoRestore()
                 .EnableNoBuild()
                 .SetConfiguration(Configuration)
                 .SetProjectFile(TestDirectory)
-            // .SetResultsDirectory(TestResultsDirectory)
+            // .SetResultsDire@Octory(TestResultsDirectory)
             // .SetProcessArgumentConfigurator(_ => _
             //     .Add("-- --coverage --coverage-output-format cobertura --results-directory ./results"))
-            );
-        });
+            ));
 
     Target Publish => _ => _
         .DependsOn(Compile)
         .Executes(() =>
-        {
             DotNetPublish(_ => _
                 .EnableNoLogo()
                 .EnableNoRestore()
@@ -95,8 +71,7 @@ partial class Build : NukeBuild
                 .SetOutput(PublishDirectory)
             // .SetPublishSingleFile(true)
             // .SetSelfContained(false)
-            );
-        });
+            ));
 
 
     Target Release => _ => _
