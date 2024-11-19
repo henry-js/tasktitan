@@ -1,4 +1,6 @@
-﻿using Serilog;
+﻿using System.Runtime.InteropServices.Marshalling;
+
+using Serilog;
 
 using TaskTitan.Cli.Commands;
 using TaskTitan.Cli.Display;
@@ -24,6 +26,7 @@ cmd.AddCommand(new StartCommand());
 var cmdLine = new CommandLineBuilder(cmd)
     .UseHost(_ => Host.CreateDefaultBuilder(args), builder =>
     {
+        builder.UseServiceProviderFactory((context) => new Composition(context));
         builder.UseConsoleLifetime()
             .UseSerilog(Log.Logger)
             .UseProjectCommandHandlers()
@@ -58,6 +61,7 @@ var cmdLine = new CommandLineBuilder(cmd)
         AnsiConsole.WriteException(ex);
     })
     .Build();
+
 
 Log.Information("Invoking commandline");
 int result = await cmdLine.InvokeAsync(args);

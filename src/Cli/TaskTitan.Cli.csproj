@@ -24,6 +24,11 @@
     </PackageReference>
     <PackageReference Include="Ogu.Extensions.Logging.Timings" Version="1.0.1" />
     <PackageReference Include="Pidgin" Version="3.3.0" />
+    <PackageReference Include="Pure.DI" Version="2.1.38">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Pure.DI.MS" Version="2.1.36" />
     <PackageReference Include="Roslynator.Analyzers" Version="4.12.5">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
