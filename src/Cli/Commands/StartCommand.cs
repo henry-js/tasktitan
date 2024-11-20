@@ -38,7 +38,6 @@ internal sealed class StartCommand : Command
     new public class Handler(LiteDbContext dbContext, ITaskActionHandler actionHandler, IOptions<TaskTitanConfig> options, ILogger<StartCommand> logger) : ICommandHandler
     {
         private readonly TaskTitanConfig appConfig = options.Value;
-
         public string[]? Filter { get; set; }
         public string[]? Modifications { get; set; }
         public int Invoke(InvocationContext context)
@@ -48,8 +47,7 @@ internal sealed class StartCommand : Command
 
         public async Task<int> InvokeAsync(InvocationContext context)
         {
-            var start = $"start:{DateTime.UtcNow:o}";
-            Modifications = Modifications is null ? [start] : [.. Modifications, start];
+            Modifications ??= [];
             var filterExpr = Filter is null ? null : ExpressionParser.ParseFilter(string.Join(' ', Filter));
             var commandExpr = Modifications is null ? new CommandExpression([], "") : ExpressionParser.ParseCommand(string.Join(' ', Modifications));
 

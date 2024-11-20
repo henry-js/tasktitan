@@ -1,5 +1,4 @@
-﻿
-using LiteDB;
+﻿using LiteDB;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -20,7 +19,6 @@ public class LiteDbContext
     private readonly ILogger<LiteDbContext> logger;
     private readonly LiteDbOptions _options;
     private readonly DateParser _dateParser;
-
 
     public LiteDbContext(IOptions<LiteDbOptions> options, IOptions<TaskTitanConfig> appConfig, TimeProvider timeProvider, ILogger<LiteDbContext> logger)
     {
