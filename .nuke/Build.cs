@@ -91,6 +91,6 @@ partial class Build : NukeBuild
             var outputDir = ReleaseDirectory;
             Log.Information("Velopack --packDir: {0}", packDir);
             Log.Information("Velopack --outputDir: {0}", outputDir);
-            Vpk.Invoke($"pack --packId tasktitan --packVersion {MinVer.Version} --packDir {packDir} --mainExe task.exe --packTitle tasktitan --outputDir {outputDir}");
+            Vpk.Invoke($"pack --packId tasktitan --packVersion {MinVer.Version} --packDir {packDir} --mainExe task.exe --packTitle tasktitan --outputDir {outputDir} --shortcuts None");
         });
 }
