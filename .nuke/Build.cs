@@ -9,6 +9,7 @@ partial class Build : NukeBuild
     [MinVer] MinVer MinVer;
     AbsolutePath ProjectDirectory => SourceDirectory / "Cli";
     AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
+    AbsolutePath BenchmarksDirectory => RootDirectory / "benchmarks";
     AbsolutePath PublishDirectory => RootDirectory / "publish";
     AbsolutePath ReleaseDirectory => RootDirectory / "release";
     AbsolutePath SourceDirectory => RootDirectory / "src";

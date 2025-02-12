@@ -55,17 +55,17 @@ public record Tag : TaskAttribute
         {
             return Enum.TryParse<SyntheticTag>(value, true, out var syntheticTag)
                 ? (Result<Tag>)new Tag(new TagInner.Synthetic(syntheticTag), modifier)
-                : Result<Tag>.Fail($"'{value}' is not a valid synthetic tag.");
+                : Result.Failure<Tag>($"'{value}' is not a valid synthetic tag.");
         }
 
         // Validate first character
         var firstChar = value[0];
         if (char.IsWhiteSpace(firstChar) || char.IsDigit(firstChar) || InvalidTagCharacters.Contains(firstChar))
-            return Result<Tag>.Fail($"Invalid first character for tag: {firstChar}");
+            return Result.Failure<Tag>($"Invalid first character for tag: {firstChar}");
 
         // Validate remaining characters
         if (value.Skip(1).Any(c => char.IsWhiteSpace(c) || c == ':' || InvalidTagCharacters.Contains(c)))
-            return Result<Tag>.Fail($"Invalid character in tag: {value}");
+            return Result.Failure<Tag>($"Invalid character in tag: {value}");
 
         return new Tag(new TagInner.User(value), modifier);
     }

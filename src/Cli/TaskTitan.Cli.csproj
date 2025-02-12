@@ -23,16 +23,16 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Ogu.Extensions.Logging.Timings" Version="1.0.1" />
+    <PackageReference Include="Ogu.Extensions.Logging.Timings" Version="1.0.2" />
     <PackageReference Include="Pidgin" Version="3.3.0" />
-    <PackageReference Include="Roslynator.Analyzers" Version="4.12.5">
+    <PackageReference Include="Roslynator.Analyzers" Version="4.13.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Serilog" Version="4.0.1" />
+    <PackageReference Include="Serilog" Version="4.2.0" />
     <PackageReference Include="Serilog.Expressions" Version="5.0.0" />
-    <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.2" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageReference Include="SerilogTimings" Version="3.1.0" />
@@ -40,9 +40,9 @@
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
     <PackageReference Include="System.CommandLine.Hosting" Version="0.4.0-alpha.22272.1" />
     <PackageReference Include="System.CommandLine.NamingConventionBinder" Version="2.0.0-beta4.22272.1" />
-    <PackageReference Include="Tomlyn" Version="0.17.0" />
+    <PackageReference Include="Tomlyn" Version="0.18.0" />
     <PackageReference Include="Tomlyn.Extensions.Configuration" Version="1.0.6" />
-    <PackageReference Include="Velopack" Version="0.0.831-gde49887" />
+    <PackageReference Include="Velopack" Version="0.0.1126-g9740825" />
   </ItemGroup>
 
   <ItemGroup>

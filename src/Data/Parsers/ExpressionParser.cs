@@ -5,10 +5,9 @@ using TaskTitan.Core;
 using TaskTitan.Core.Configuration;
 using TaskTitan.Core.Enums;
 
-using static Pidgin.Parser;
-
 using static Pidgin.Parser<char>;
 using static Pidgin.Parser<string>;
+using static Pidgin.Parser;
 
 namespace TaskTitan.Data.Parsers;
 
@@ -65,7 +64,7 @@ public static class ExpressionParser
         ).Cast<Expr>();
     internal static readonly Parser<char, Expr> _tagExpression
         = Map(
-            (modifier, value) => Tag.TryFrom(value, modifier).Value,
+            (modifier, value) => Tag.TryFrom(value, modifier),
             _tagOperator,
             LetterOrDigit.AtLeastOnceString()
         ).Cast<Expr>();
