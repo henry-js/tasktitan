@@ -12,12 +12,14 @@
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/artifacts/bin/TaskTitan.Cli/debug_win-x64/task.dll",
             "args": [
-                "start",
-                "due.after:tomorrow",
-                "-m",
-                "due:tomorrow",
-                "-m",
-                "desc:'i am a new description'"
+                "do",
+                "hello"
+                // "start",
+                // "due.after:tomorrow",
+                // "-m",
+                // "due:tomorrow",
+                // "-m",
+                // "desc:'i am a new description'"
                 // "add",
                 // "i have a desc",
                 // "due:tomorrow",
