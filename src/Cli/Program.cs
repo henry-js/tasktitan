@@ -2,9 +2,10 @@
 
 using CsToml.Extensions.Configuration;
 
-using TaskTitan.Cli.Commands;
 using TaskTitan.Cli.ConsoleAppFrameworkCommands;
 using TaskTitan.Data.Reports;
+
+TaskTitanConfigurator.CreateDefaultReports();
 
 var app = ConsoleApp.Create()
     .ConfigureEmptyConfiguration(config => config
