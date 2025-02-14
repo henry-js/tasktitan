@@ -25,6 +25,10 @@
     <PackageReference Include="CsToml" Version="1.5.1" />
     <PackageReference Include="CsToml.Extensions" Version="1.5.1" />
     <PackageReference Include="CsToml.Extensions.Configuration" Version="1.5.1" />
+    <PackageReference Include="CsToml.Generator" Version="1.5.1">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Humanizer.Core" Version="2.14.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.2" />
     <PackageReference Include="MinVer" Version="6.0.0">
@@ -70,11 +74,11 @@
     <Using Include="System.CommandLine.Parsing" />
   </ItemGroup>
 
-  <ItemGroup>
+  <!-- <ItemGroup>
     <None Include="reports.toml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
+  </ItemGroup> -->
   <ItemGroup>
     <None Include="udas.toml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

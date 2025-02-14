@@ -1,13 +1,10 @@
 using System.Collections;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.Serialization;
-
-using TaskTitan.Data.Reports;
 
 namespace TaskTitan.Data.Reports;
 
-public class ReportDictionary : IDictionary<string, ReportDefinition>
+
+public partial class ReportDictionary : IDictionary<string, ReportDefinition>
 {
     private readonly Dictionary<string, ReportDefinition> _backingDict = [];
     public ReportDefinition this[string key]

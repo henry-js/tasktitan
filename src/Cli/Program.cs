@@ -1,11 +1,21 @@
-﻿using ConsoleAppFramework;
+﻿using System.Runtime.Versioning;
 
+using ConsoleAppFramework;
+
+using CsToml;
+using CsToml.Extensions;
 using CsToml.Extensions.Configuration;
 
+using TaskTitan.Cli.Config;
 using TaskTitan.Cli.ConsoleAppFrameworkCommands;
-using TaskTitan.Data.Reports;
 
-TaskTitanConfigurator.CreateDefaultReports();
+var config = Configuration.Default;
+var option = CsTomlSerializerOptions.Default with
+{
+    SerializeOptions = new SerializeOptions { TableStyle = TomlTableStyle.Header }
+};
+var txt = CsTomlSerializer.Serialize(config, option);
+await File.WriteAllBytesAsync("./reports.toml", txt.ByteSpan.ToArray());
 
 var app = ConsoleApp.Create()
     .ConfigureEmptyConfiguration(config => config
