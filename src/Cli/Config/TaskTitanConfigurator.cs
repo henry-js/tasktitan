@@ -1,4 +1,5 @@
 
+using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 
 using CsToml;
@@ -20,15 +21,18 @@ public partial class Configuration
         // ReportsB = TaskTitanConfigurator.CreateDefaultReports(true) as ConfigDictionary<ReportDefinition>;
         Report1 = ReportsA.First();
         Report2 = ReportsA.Skip(1).Take(1).First();
+        ReportDict = (TaskTitanConfigurator.CreateDefaultReports() as ReportDictionary);
     }
     public static Configuration Default => new();
 
-    [TomlValueOnSerialized("table")]
+    // [TomlValueOnSerialized("table")]
     public ReportDefinition[] ReportsA { get; set; }
     [TomlValueOnSerialized]
     public ReportDefinition Report1 { get; set; }
-    [TomlValueOnSerialized]
+    // [TomlValueOnSerialized]
     public ReportDefinition Report2 { get; set; }
+    [TomlValueOnSerialized]
+    public IDictionary<string, ReportDefinition> ReportDict { get; set; }
     // [TomlValueOnSerialized]
     // public IDictionary<string, ReportDefinition> ReportsB { get; set; }
 }
@@ -293,6 +297,7 @@ public static class TaskTitanConfigurator
     }
 }
 
+// [TomlSerializedObject]
 public partial class ReportDictionary : IDictionary<string, ReportDefinition>
 {
     private readonly Dictionary<string, ReportDefinition> _backingDict = [];
@@ -368,7 +373,6 @@ public interface IConfig
     [TomlValueOnSerialized] public string Name { get; set; }
 }
 
-
 [TomlSerializedObject]
 public partial class ReportDefinition : IConfig
 {
@@ -390,4 +394,34 @@ public partial class ReportDefinition : IConfig
         return this;
     }
     // TODO: Add support for sorting
+}
+
+public class ReportDictionaryFormatter : ITomlValueFormatter<IDictionary<string, ReportDefinition>>
+{
+    public IDictionary<string, ReportDefinition> Deserialize(ref TomlDocumentNode rootNode, CsTomlSerializerOptions options)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Serialize<TBufferWriter>(ref Utf8TomlDocumentWriter<TBufferWriter> writer, IDictionary<string, ReportDefinition> target, CsTomlSerializerOptions options) where TBufferWriter : System.Buffers.IBufferWriter<byte>
+    {
+        writer.BeginScope();
+        if (options.SerializeOptions.TableStyle == TomlTableStyle.Header && (writer.State == TomlValueState.Default || writer.State == TomlValueState.Table))
+        {
+            writer.WriteTableHeader("Test"u8);
+            writer.WriteNewLine();
+            // writer.BeginCurrentState(TomlValueState.Table);
+            // writer.PushKey("Report1"u8);
+            // options.Resolver.GetFormatter<IDictionary<string, ReportDefinition>>()!.Serialize(ref writer, target, options);
+            // writer.PopKey();
+            writer.EndCurrentState();
+        }
+        else
+        {
+            writer.PushKey("Test2"u8);
+            // options.Resolver.GetFormatter<IDictionary<string, ReportDefinition>>()!.Serialize(ref writer, target, options);
+            writer.PopKey();
+        }
+        writer.EndScope();
+    }
 }

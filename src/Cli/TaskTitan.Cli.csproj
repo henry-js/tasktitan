@@ -13,6 +13,7 @@
     <DebugType>embedded</DebugType>
     <AssemblyName>task</AssemblyName>
     <MinVerDefaultPreReleaseIdentifiers>preview.0</MinVerDefaultPreReleaseIdentifiers>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <MinVerAutoIncrement>minor</MinVerAutoIncrement>
     <MinVerTagPrefix>v</MinVerTagPrefix>
   </PropertyGroup>

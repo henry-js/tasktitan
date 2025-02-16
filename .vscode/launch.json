@@ -28,7 +28,7 @@
             "cwd": "${workspaceFolder}/src/Cli",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
             "console": "externalTerminal",
-            "stopAtEntry": false
+            "stopAtEntry": false,
         },
         {
             // Use IntelliSense to find out which attributes exist for C# debugging
