@@ -1,9 +1,15 @@
+using henryjs.Nuke.BuildComponents;
 
-using System.CodeDom;
-
-partial class Build : NukeBuild, ICompile, IClean
+partial class Build : NukeBuild, ICompile, IClean, ITest
 {
-    public static int Main() => Execute<Build>(x => ((ICompile)x).Compile);
+    public static int Main()
+    {
+        var result = Execute<Build>(x => (x as ICompile).Compile);
+
+        Console.ReadLine();
+
+        return result;
+    }
 
     // Target ICompile.Compile => _ => _
     //     .Inherit<ICompile>()
