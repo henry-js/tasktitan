@@ -24,9 +24,10 @@
     "ExecutableTarget": {
       "type": "string",
       "enum": [
+        "AssetRelease",
         "Clean",
         "Compile",
-        "Release",
+        "Publish",
         "Test"
       ]
     },
@@ -101,7 +102,18 @@
   "allOf": [
     {
       "properties": {
+        "Configuration": {
+          "type": "string",
+          "description": "Configuration to build - Default is 'Debug' (local) or 'Release' (server)",
+          "enum": [
+            "Debug",
+            "Release"
+          ]
+        },
         "MainName": {
+          "type": "string"
+        },
+        "PublishFolderName": {
           "type": "string"
         },
         "ReleaseFolderName": {

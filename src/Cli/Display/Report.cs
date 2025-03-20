@@ -19,6 +19,7 @@ public class Report
     public Report(ReportDefinition def, ConfigDictionary<AttributeDefinition> udas)
     {
         _labels = def.Labels;
+        _columns = [];
         // _columns = def.Columns.ToDictionary(k => k, e =>
         //     {
         //         (string colName, ColFormat colFormat) = e.Split('.') switch

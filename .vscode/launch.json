@@ -73,9 +73,11 @@
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/.nuke/bin/Debug/_build.dll",
             "args": [
-                "Compile",
+                // "LocalAssetRelease",
                 // "--mainName",
-                // "TaskTitan.Cli"
+                // "TaskTitan.Cli",
+                // "--configuration",
+                // "Release"
             ],
             "cwd": "${workspaceFolder}",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console

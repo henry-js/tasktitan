@@ -1,4 +1,6 @@
-namespace henryjs.Nuke.BuildComponents;
+using henryjs.Nuke.Extensions;
+
+namespace henryjs.Nuke.Components;
 
 public interface IHasMainProject : IHasSolution
 {
@@ -8,6 +10,8 @@ public interface IHasMainProject : IHasSolution
     [Parameter]
     string MainName => TryGetValue(() => MainName);
 
+    [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
+    Configuration Configuration => IsLocalBuild ? Configuration.Debug : Configuration.Release;
 
     /// <summary>
     /// MainProject (default: <seealso cref="MainName"/>)

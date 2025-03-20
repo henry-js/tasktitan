@@ -1,4 +1,4 @@
-namespace henryjs.Nuke.BuildComponents;
+namespace henryjs.Nuke.Components;
 
 public interface IHasSolution : INukeBuild
 {

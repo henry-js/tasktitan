@@ -1,12 +1,11 @@
-using ricaun.Nuke.Extensions;
+using henryjs.Nuke.Extensions;
 
-namespace henryjs.Nuke.BuildComponents;
+namespace henryjs.Nuke.Components;
 
-public interface ITest : ICompile, IRelease, IHasTest
+public interface ITest : ICompile, IHasTest
 {
     Target Test => _ => _
         .TriggeredBy(Compile)
-        .Before(Release)
         .Executes(() =>
         {
             var testProjects = Solution.AllProjects.Where(p => p.GetProperty("IsTestProject") != null);
@@ -26,7 +25,7 @@ public interface IHasTest
             var configurations = project.GetReleases();
             foreach (var conf in configurations)
             {
-                DotNetTasks.DotNetTest(_ => _
+                DotNetTest(_ => _
                     .SetProjectFile(project)
                     // .SetVerbosity(DotNetVerbosity.normal)
                     .SetCustomDotNetTestSettings(customDotNetTestSettings)

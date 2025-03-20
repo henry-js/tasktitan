@@ -7,6 +7,8 @@ using CsToml.Formatter.Resolver;
 using TaskTitan.Cli.Config;
 using TaskTitan.Cli.ConsoleAppFrameworkCommands;
 
+VelopackApp.Build().Run();
+
 var config = Configuration.Default;
 var option = CsTomlSerializerOptions.Default with
 {

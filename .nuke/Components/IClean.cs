@@ -1,4 +1,6 @@
-namespace henryjs.Nuke.BuildComponents;
+using henryjs.Nuke.Extensions;
+
+namespace henryjs.Nuke.Components;
 
 public interface IClean : IHasSolution
 {

@@ -21,7 +21,7 @@ public partial class Configuration
         // ReportsB = TaskTitanConfigurator.CreateDefaultReports(true) as ConfigDictionary<ReportDefinition>;
         Report1 = ReportsA.First();
         Report2 = ReportsA.Skip(1).Take(1).First();
-        ReportDict = (TaskTitanConfigurator.CreateDefaultReports() as ReportDictionary);
+        ReportDict = TaskTitanConfigurator.CreateDefaultReports() as ReportDictionary ?? [];
     }
     public static Configuration Default => new();
 

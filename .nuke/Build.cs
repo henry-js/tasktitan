@@ -1,12 +1,15 @@
-using henryjs.Nuke.BuildComponents;
+using henryjs.Nuke.Components;
 
-partial class Build : NukeBuild, ICompile, IClean, ITest
+using Nuke.Common.Tooling;
+
+partial class Build : NukeBuild, IClean, ICompile, ITest, IPublish, IAssetRelease
 {
+    IAssetReleaser IHasAssetReleaser.AssetReleaser => new VelopackAssetReleaser(Vpk);
     public static int Main()
     {
         var result = Execute<Build>(x => (x as ICompile).Compile);
 
-        Console.ReadLine();
+        // Console.ReadLine();
 
         return result;
     }
@@ -23,7 +26,7 @@ partial class Build : NukeBuild, ICompile, IClean, ITest
 //     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
 //     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
 
-//     [Solution(GenerateProjects = true)] readonly Solution Solution;
+//     [Solution] readonly Solution Solution;
 //     [MinVer] MinVer MinVer;
 //     AbsolutePath ProjectDirectory => SourceDirectory / "Cli";
 //     AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
@@ -100,9 +103,7 @@ partial class Build : NukeBuild, ICompile, IClean, ITest
 //         .Executes(() =>
 //         {
 //             MinVer = MinVerTasks.MinVer(_ => _
-//                 .SetAutoIncrement(MinVerVersionPart.Minor)
-//                 .SetDefaultPreReleaseIdentifiers("preview.0")
-//                 .SetTagPrefix("v")
+//                 .SetDefaultPreReleaseIdentifiers("preview")
 //             ).Result;
 //             Log.Information(MinVer.Version);
 
