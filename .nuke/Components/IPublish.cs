@@ -6,7 +6,7 @@ public interface IPublish : IHasPublish, ICompile
 {
     Target Publish => _ => _
         .DependsOn(Compile)
-        .Requires(() => MainName)
+        .Requires(() => Project)
         .Executes(() =>
         {
             var result = DotNetPublish(_ => _
@@ -18,7 +18,6 @@ public interface IPublish : IHasPublish, ICompile
                 .SetVerbosity(DotNetVerbosity.minimal)
                 .EnableProcessOutputLogging()
                 );
-
             Log.Information("Publish output captured: {captured}", result is not null);
         });
 }

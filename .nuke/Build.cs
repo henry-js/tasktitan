@@ -1,16 +1,15 @@
 using henryjs.Nuke.Components;
 
-using Nuke.Common.Tooling;
-
 partial class Build : NukeBuild, IClean, ICompile, ITest, IPublish, IAssetRelease
 {
+    Func<DotNetTestSettings, DotNetTestSettings> CustomDotNetTestSettings => _ => _;
+    AbsolutePath PublishDirectory => "";
     IAssetReleaser IHasAssetReleaser.AssetReleaser => new VelopackAssetReleaser(Vpk);
     public static int Main()
     {
         var result = Execute<Build>(x => (x as ICompile).Compile);
 
         // Console.ReadLine();
-
         return result;
     }
 

@@ -1,4 +1,15 @@
 {
   "$schema": "build.schema.json",
-  "Solution": "TaskTitan.sln"
+  "Solution": "TaskTitan.sln",
+  "Project": "TaskTitan.Cli",
+  "Configuration": "Debug",
+  "PublishFolderName": "publish",
+  "ReleaseFolderName": "release",
+  "Target": [
+    "Compile"
+  ],
+  "Runtimes": [
+    "win-x64",
+    "linux-x64"
+  ]
 }

@@ -110,14 +110,34 @@
             "Release"
           ]
         },
-        "MainName": {
+        "Frameworks": {
+          "type": "array",
+          "description": "Target framework - Default is 'net9.0'",
+          "items": {
+            "type": "string"
+          }
+        },
+        "Project": {
           "type": "string"
+        },
+        "Projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "PublishFolderName": {
           "type": "string"
         },
         "ReleaseFolderName": {
           "type": "string"
+        },
+        "Runtimes": {
+          "type": "array",
+          "description": "Runtimes you want to compile & test against - Default is '<empty>'",
+          "items": {
+            "type": "string"
+          }
         },
         "Solution": {
           "type": "string",
