@@ -13,14 +13,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="henryjs.nuke" Version="1.1.1" />
     <PackageReference Include="Nuke.Common" Version="9.0.4" />
-    <PackageReference Include="ricaun.Nuke" Version="1.9.2" />
-    <PackageReference Include="System.Runtime.Serialization.Formatters" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageDownload Include="minver-cli" Version="[6.0.0]" />
-    <PackageDownload Include="ReportGenerator" Version="[5.3.11]" />
     <PackageDownload Include="vpk" Version="[0.0.1053]" />
   </ItemGroup>
 
@@ -37,4 +35,5 @@
     <Using Include="Nuke.Common.Tools.DotNet.DotNetTasks" Static="True" />
     <Using Include="Nuke.Common.Tools.ReportGenerator.ReportGeneratorTasks" Static="True" />
   </ItemGroup>
+
 </Project>

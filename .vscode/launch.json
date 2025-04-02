@@ -69,10 +69,11 @@
             "name": "Nuke",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "buildNuke",
+            "preLaunchTask": "nukeBuild",
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/.nuke/bin/Debug/_build.dll",
             "args": [
+                "AssetRelease"
                 // "LocalAssetRelease",
                 // "--mainName",
                 // "TaskTitan.Cli",

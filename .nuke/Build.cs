@@ -1,115 +1,40 @@
 using henryjs.Nuke.Components;
 
-partial class Build : NukeBuild, IClean, ICompile, ITest, IPublish, IAssetRelease
+using Nuke.Common.Tooling;
+
+partial class Build : NukeBuild, IAssetRelease, IPublish
 {
-    Func<DotNetTestSettings, DotNetTestSettings> CustomDotNetTestSettings => _ => _;
-    AbsolutePath PublishDirectory => "";
-    IAssetReleaser IHasAssetReleaser.AssetReleaser => new VelopackAssetReleaser(Vpk);
+    [NuGetPackage(
+    packageId: "vpk",
+    packageExecutable: "vpk.dll",
+    Version = "0.0.1053"
+    )]
+    readonly Tool Vpk;
+    [MinVer]
+    readonly MinVer MinVer;
+    IAssetRelease Release => this;
+    Target IAssetRelease.AssetRelease => _ => _
+        .DependsOn<IPublish>(x => x.Publish)
+        .OnlyWhenDynamic(Release.MainProjectIsExecutable)
+        .Executes(() =>
+        {
+            Log.Information("Cleaning Directory: {Directory}", Release.ReleaseDirectory);
+            Release.ReleaseDirectory.CreateOrCleanDirectory();
+
+            var pkgId = Release.PackageId;
+            // var pubVer = (this as IHasMainProject).MainProject.GetPublishedVersion((this as IPublish).PublishDirectory);
+            var pubDir = Release.PublishDirectory;
+            var mainExe = Release.AssetExecutable;
+            var relDir = Release.ReleaseDirectory;
+
+            var minver = MinVerTasks.MinVer(_ => _.SetDefaultPreReleaseIdentifiers("preview")).Result;
+
+            Vpk.Invoke($"pack --packId {pkgId} --packVersion {minver.MinVerVersion} --packDir {pubDir} --mainExe {mainExe}.exe --outputDir {relDir} --shortcuts None");
+        });
     public static int Main()
     {
-        var result = Execute<Build>(x => (x as ICompile).Compile);
-
-        // Console.ReadLine();
-        return result;
+        var res = Execute<Build>(x => (x as ICompile).Compile);
+        Console.ReadLine();
+        return res;
     }
-
-    // Target ICompile.Compile => _ => _
-    //     .Inherit<ICompile>()
-    //     .Executes(() => { });
 }
-
-// partial class Build : NukeBuild
-// {
-//     public static int Main() => Execute<Build>(x => x.Compile);
-
-//     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
-//     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
-
-//     [Solution] readonly Solution Solution;
-//     [MinVer] MinVer MinVer;
-//     AbsolutePath ProjectDirectory => SourceDirectory / "Cli";
-//     AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
-//     AbsolutePath BenchmarksDirectory => RootDirectory / "benchmarks";
-//     AbsolutePath PublishDirectory => RootDirectory / "publish";
-//     AbsolutePath ReleaseDirectory => RootDirectory / "release";
-//     AbsolutePath SourceDirectory => RootDirectory / "src";
-//     AbsolutePath TestDirectory => RootDirectory / "tests";
-//     AbsolutePath TestResultsDirectory => TestDirectory / "results";
-//     IEnumerable<string> Projects => Solution.AllProjects.Select(x => x.Name);
-//     string Framework => "net8.0";
-//     string Runtime => "win-x64";
-
-//     Target Clean => _ => _
-//         .Before(Restore)
-//         .Executes(() =>
-//         {
-//             ArtifactsDirectory.CreateOrCleanDirectory();
-//             SourceDirectory.GlobDirectories("**/{obj,bin}")
-//                 .DeleteDirectories();
-//             PublishDirectory.DeleteDirectory();
-//             ReleaseDirectory.DeleteDirectory();
-//         });
-
-//     Target Restore => _ => _
-//     .After(Clean)
-//         .Executes(() => DotNetRestore(_ => _
-//                 .SetForce(true)
-//                 .SetProjectFile(Solution.Directory)));
-
-//     Target Compile => _ => _
-//         .DependsOn(Clean, Restore)
-//         .Executes(() =>
-//             DotNetBuild(_ => _
-//                 .EnableNoLogo()
-//                 .EnableNoRestore()
-//                 .SetConfiguration(Configuration)
-//                 .SetProjectFile(Solution.Directory)
-//             ));
-
-//     Target Test => _ => _
-//         .DependsOn(Compile)
-//         .Executes(() =>
-//             DotNetTest(_ => _
-//                 .EnableNoLogo()
-//                 .EnableNoRestore()
-//                 .EnableNoBuild()
-//                 .SetConfiguration(Configuration)
-//                 .SetProjectFile(TestDirectory)
-//             // .SetResultsDire@Octory(TestResultsDirectory)
-//             // .SetProcessArgumentConfigurator(_ => _
-//             //     .Add("-- --coverage --coverage-output-format cobertura --results-directory ./results"))
-//             ));
-
-//     Target Publish => _ => _
-//         .DependsOn(Compile)
-//         .Executes(() =>
-//             DotNetPublish(_ => _
-//                 .EnableNoLogo()
-//                 .EnableNoRestore()
-//                 .EnableNoBuild()
-//                 .SetConfiguration(Configuration)
-//                 .SetProject(ProjectDirectory)
-//                 .SetOutput(PublishDirectory)
-//             // .SetPublishSingleFile(true)
-//             // .SetSelfContained(false)
-//             ));
-
-
-//     Target Release => _ => _
-//         .TriggeredBy(Publish)
-//         .Produces(ReleaseDirectory)
-//         .Unlisted()
-//         .Executes(() =>
-//         {
-//             MinVer = MinVerTasks.MinVer(_ => _
-//                 .SetDefaultPreReleaseIdentifiers("preview")
-//             ).Result;
-//             Log.Information(MinVer.Version);
-
-//             var packDir = PublishDirectory;
-//             var outputDir = ReleaseDirectory;
-//             Log.Information("Velopack --packDir: {0}", packDir);
-//             Log.Information("Velopack --outputDir: {0}", outputDir);
-//             Vpk.Invoke($"pack --packId tasktitan --packVersion {MinVer.Version} --packDir {packDir} --mainExe task.exe --packTitle tasktitan --outputDir {outputDir} --shortcuts None");
-//         });
-// }

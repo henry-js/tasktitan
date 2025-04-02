@@ -15,7 +15,7 @@
             "isBuildCommand": true,
         },
         {
-            "label": "buildNuke",
+            "label": "nukeBuild",
             "command": "dotnet",
             "type": "process",
             "args": [

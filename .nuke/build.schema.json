@@ -1,6 +1,14 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "definitions": {
+    "Architecture": {
+      "type": "string",
+      "description": "",
+      "enum": [
+        "x64",
+        "x86"
+      ]
+    },
     "Host": {
       "type": "string",
       "enum": [
@@ -21,14 +29,22 @@
         "VSCode"
       ]
     },
+    "OperatingSystem": {
+      "type": "string",
+      "description": "",
+      "enum": [
+        "win",
+        "linux",
+        "osx"
+      ]
+    },
     "ExecutableTarget": {
       "type": "string",
       "enum": [
         "AssetRelease",
         "Clean",
         "Compile",
-        "Publish",
-        "Test"
+        "Publish"
       ]
     },
     "Verbosity": {
@@ -102,6 +118,21 @@
   "allOf": [
     {
       "properties": {
+        "Architectures": {
+          "type": "array",
+          "description": "List of target architectures - Default is 'x64'",
+          "items": {
+            "enum": [
+              "x64",
+              "x86"
+            ],
+            "$ref": "#/definitions/Architecture"
+          }
+        },
+        "AssetVersion": {
+          "type": "string",
+          "description": "Default is ProductVersion of published project"
+        },
         "Configuration": {
           "type": "string",
           "description": "Configuration to build - Default is 'Debug' (local) or 'Release' (server)",
@@ -110,34 +141,32 @@
             "Release"
           ]
         },
-        "Frameworks": {
+        "OperatingSystems": {
           "type": "array",
-          "description": "Target framework - Default is 'net9.0'",
+          "description": "List of target operating systems - Default is 'win'",
           "items": {
-            "type": "string"
+            "enum": [
+              "linux",
+              "osx",
+              "win"
+            ],
+            "$ref": "#/definitions/OperatingSystem"
           }
         },
-        "Project": {
+        "PackageId": {
+          "type": "string",
+          "description": "Default is <MainProject.Name>"
+        },
+        "ProjectName": {
           "type": "string"
-        },
-        "Projects": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
         },
         "PublishFolderName": {
-          "type": "string"
+          "type": "string",
+          "description": "Default is './publish', relative to solution file location"
         },
         "ReleaseFolderName": {
-          "type": "string"
-        },
-        "Runtimes": {
-          "type": "array",
-          "description": "Runtimes you want to compile & test against - Default is '<empty>'",
-          "items": {
-            "type": "string"
-          }
+          "type": "string",
+          "description": "Default is './release', relative to solution file location"
         },
         "Solution": {
           "type": "string",
