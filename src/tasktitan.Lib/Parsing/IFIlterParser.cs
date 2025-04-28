@@ -20,14 +20,14 @@ public interface IFilterParser
     // CommandExpression ParseCommand(string input);
 }
 
-public class PidginFilterParser : IFilterParser
+public class ParlotFilterParser : IFilterParser
 {
     // Dependencies can be injected
     private readonly TimeProvider _timeProvider;
     private readonly ConfigDictionary<AttributeDefinition> _udas;
 
     // Inject necessary configuration and services
-    public PidginFilterParser(IOptions<TaskTitanConfig> taskTitanOptions, TimeProvider timeProvider)
+    public ParlotFilterParser(IOptions<TaskTitanConfig> taskTitanOptions, TimeProvider timeProvider)
     {
         _timeProvider = timeProvider ?? TimeProvider.System;
 

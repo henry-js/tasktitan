@@ -2,7 +2,7 @@ using System.Globalization;
 
 using Microsoft.Extensions.Time.Testing;
 
-using TaskTitan.Data.Parsing;
+using TaskTitan.Lib.Parsing;
 
 namespace TaskTitan.Infrastructure.Tests;
 

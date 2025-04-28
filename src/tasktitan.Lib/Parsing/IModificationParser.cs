@@ -27,11 +27,13 @@ public class ParlotModificationParser : IModificationParser
     private static readonly Parser<char> lParen = Terms.Char('(');
     private static readonly Parser<char> rParen = Terms.Char(')');
     private static readonly Parser<TextSpan> quotedString = Terms.String(StringLiteralQuotes.SingleOrDouble);
-    private static readonly Parser<TextSpan> addTag = plus.Then(Literals.Identifier());
+    private static readonly Sequence<char, TextSpan> addTag = plus.And(Literals.Identifier());
 
     public IReadOnlyList<IModificationCommand> Parse(string input)
     {
         var addTag = plus.And(Literals.Identifier());
         var removeTag = minus.And(Literals.Identifier());
+
+        throw new NotImplementedException();
     }
 }

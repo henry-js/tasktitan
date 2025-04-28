@@ -1,0 +1,50 @@
+/*
+ * Grammar for TaskTitan Modification String:
+ * Defines the structure of modification clauses applied to tasks.
+ * Modifications are processed sequentially based on their appearance
+ * in the string.
+ *
+ * modification_string ::= modification_clause ( WHITESPACE modification_clause )* ;
+ *
+ * modification_clause ::= attribute_modification
+ *                      |  add_tag
+ *                      |  remove_tag ;
+ *
+ * attribute_modification ::= IDENTIFIER ":" [ value ] ; (* Setting requires value, clearing omits or uses empty value *)
+ *
+ * add_tag              ::= "+" IDENTIFIER ;
+ *
+ * remove_tag           ::= "-" IDENTIFIER ;
+ *
+ * value                ::= quoted_string
+ *                      |  unquoted_value ;
+ *
+ * quoted_string        ::= SQUOTE ( NONSQUOTE_CHAR )* SQUOTE
+ *                      |  DQUOTE ( NONDQUOTE_CHAR )* DQUOTE ;
+ *
+ * unquoted_value       ::= NONWHITESPACE_CHAR+ ; (* Consumes characters until whitespace or end of input *)
+ *                                              (* NOTE: Parser implementation needs context to distinguish end of value *)
+ *                                              (* from start of next clause, e.g., 'p:v +t' vs 'p:v+t' *)
+ *
+ * (* --- Lexical Tokens / Terminals --- *)
+ *
+ * IDENTIFIER           ::= ( LETTER | "_" | "." ) ( LETTER | DIGIT | "_" | "." )* ; (* Example: project, due, location, my_UDA, next, urgent *)
+ *                                                                                   (* Note: Allows '.' for Taskwarrior compatibility like 'due.before' if needed *)
+ *                                                                                   (* but in this context, it's usually just the name, e.g. 'due' *)
+ *
+ * WHITESPACE           ::= ( " " | "\t" )+ ; (* One or more spaces or tabs *)
+ *
+ * LETTER               ::= "a"..."z" | "A"..."Z" ;
+ * DIGIT                ::= "0"..."9" ;
+ * SQUOTE               ::= "'" ;
+ * DQUOTE               ::= '"' ;
+ * NONSQUOTE_CHAR       ::= <any character except SQUOTE> ; (* Handle escaping in implementation *)
+ * NONDQUOTE_CHAR       ::= <any character except DQUOTE> ; (* Handle escaping in implementation *)
+ * NONWHITESPACE_CHAR   ::= <any character except " " or "\t"> ; (* Or newline if applicable *)
+ *
+ * (* Operators *)
+ * (* ":" handled in attribute_modification *)
+ * (* "+" handled in add_tag *)
+ * (* "-" handled in remove_tag *)
+ *
+ */

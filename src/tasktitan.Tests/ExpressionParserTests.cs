@@ -1,9 +1,9 @@
 using System.Text.Json;
 
-using TaskTitan.Data.Parsing;
 using TaskTitan.Lib;
 using TaskTitan.Lib.Configuration;
 using TaskTitan.Lib.Enums;
+using TaskTitan.Lib.Parsing;
 
 namespace TaskTitan.Cli.Tests;
 

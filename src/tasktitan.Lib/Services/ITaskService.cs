@@ -1,4 +1,11 @@
 // Placeholder Interface Updates (Illustrative)
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+
+using TaskTitan.Lib;
+using TaskTitan.Lib.Configuration;
+using TaskTitan.Lib.Parsing;
+
 public interface ITaskService
 {
     // Add: No change needed in signature
@@ -12,8 +19,8 @@ public interface ITaskService
     Task MarkTasksDoneAsync(string filterString); // New method for bulk
 
     // Modify: Overload or modify for filter-based bulk modification
-    Task ModifyTaskAsync(string taskId, string? newProject, string? newDueDate, char? newPriority, string[]? addTags, string[]? removeTags);
-    Task ModifyTasksAsync(string filterString, string? newProject, string? newDueDate, char? newPriority, string[]? addTags, string[]? removeTags); // New method for bulk
+    Task ModifyTaskAsync(string taskId, string modifications);
+    Task ModifyTasksAsync(string filterString, string modifications); // New method for bulk
 
     // Show: No change needed
     Task ShowTaskAsync(string taskId);
@@ -42,6 +49,27 @@ public interface ITaskService
 
 public class TaskService : ITaskService
 {
+    private readonly ILogger<TaskService> _logger;
+    private readonly IFilterParser _filterParser;
+    private readonly IModificationParser _modificationParser;
+    private readonly TimeProvider _timeProvider;
+    private readonly ConfigDictionary<AttributeDefinition> _udas;
+    private readonly DateParser _dateParser;
+
+    public TaskService(
+        ILogger<TaskService> logger,
+        IFilterParser filterParser,
+        IModificationParser modificationParser,
+        IOptions<TaskTitanConfig> options,
+        TimeProvider timeProvider)
+    {
+        _logger = logger;
+        _filterParser = filterParser;
+        _modificationParser = modificationParser;
+        _timeProvider = timeProvider;
+        _udas = options.Value.Uda;
+        _dateParser = new DateParser(timeProvider ?? TimeProvider.System);
+    }
     public Task AddTaskAsync(string description, string? project, string? dueDate, char? priority, string[]? tags)
     {
         throw new NotImplementedException();
@@ -92,12 +120,19 @@ public class TaskService : ITaskService
         throw new NotImplementedException();
     }
 
-    public Task ModifyTaskAsync(string taskId, string? newProject, string? newDueDate, char? newPriority, string[]? addTags, string[]? removeTags)
+    public Task ModifyTaskAsync(string taskId, string modifications)
+    {
+        TaskItem? task = FindTask(taskId);
+
+        throw new NotImplementedException();
+    }
+
+    private TaskItem? FindTask(string taskId)
     {
         throw new NotImplementedException();
     }
 
-    public Task ModifyTasksAsync(string filterString, string? newProject, string? newDueDate, char? newPriority, string[]? addTags, string[]? removeTags)
+    public Task ModifyTasksAsync(string filterString, string modifications)
     {
         throw new NotImplementedException();
     }

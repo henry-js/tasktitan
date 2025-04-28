@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\src\Data\TaskTitan.Data.csproj" />
   </ItemGroup>
 
   <ItemGroup>

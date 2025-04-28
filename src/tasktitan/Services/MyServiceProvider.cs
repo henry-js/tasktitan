@@ -1,3 +1,5 @@
+using TaskTitan.Lib.Parsing;
+
 namespace tasktitan.Services;
 
 [ServiceProvider]
@@ -6,7 +8,11 @@ namespace tasktitan.Services;
 [Import(typeof(IOptionsModule))]
 [Transient<IConfigureOptions<CliConfig>>(Factory = nameof(BindCliConfig))]
 [Singleton(typeof(IService), typeof(ServiceImplementation))]
-[Singleton<MyCommands>]
+[Singleton<IFilterParser, ParlotFilterParser>]
+[Singleton<IModificationParser, ParlotModificationParser>]
+[Singleton<ITaskService, TaskService>]
+[Singleton<TimeProvider>(Instance = nameof(SystemTimeProvider))]
+[Singleton<TaskCommands>]
 [Singleton<IConfiguration>(Factory = nameof(CreateConfiguration))]
 
 internal partial class MyServiceProvider
@@ -29,6 +35,8 @@ internal partial class MyServiceProvider
 
     private ILogger<T> CreateLogger<T>()
         => LoggerFactory.CreateLogger<T>();
+
+    private TimeProvider SystemTimeProvider => TimeProvider.System;
 
     private static IConfigureOptions<CliConfig> BindCliConfig(IConfiguration configuration)
         => IOptionsModule
