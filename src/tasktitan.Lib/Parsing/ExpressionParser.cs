@@ -1,13 +1,12 @@
 using Pidgin;
 using Pidgin.Expression;
 
-using TaskTitan.Lib;
 using TaskTitan.Lib.Configuration;
 using TaskTitan.Lib.Enums;
 
+using static Pidgin.Parser;
 using static Pidgin.Parser<char>;
 using static Pidgin.Parser<string>;
-using static Pidgin.Parser;
 
 namespace TaskTitan.Lib.Parsing;
 
