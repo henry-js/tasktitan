@@ -1,6 +1,8 @@
 using System.Globalization;
+
 using Microsoft.Extensions.Time.Testing;
-using TaskTitan.Data.Parsers;
+
+using TaskTitan.Data.Parsing;
 
 namespace TaskTitan.Infrastructure.Tests;
 

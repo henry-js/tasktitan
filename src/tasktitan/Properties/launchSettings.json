@@ -1,0 +1,9 @@
+{
+    "profiles": {
+        "tasktitan": {
+            "commandName": "Project",
+            "commandLineArgs": "",
+            "workingDirectory": "..\\"
+        }
+    }
+}

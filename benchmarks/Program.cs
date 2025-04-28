@@ -5,9 +5,9 @@ using LiteDB;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 
-using TaskTitan.Core;
-using TaskTitan.Core.Configuration;
 using TaskTitan.Data;
+using TaskTitan.Lib;
+using TaskTitan.Lib.Configuration;
 
 var config = new TaskTitanConfig();
 var reports = config.Report;

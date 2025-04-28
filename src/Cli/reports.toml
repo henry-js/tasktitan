@@ -1,7 +1,0 @@
-ReportDict = {}
-[Report1]
-Name = "report.active"
-Description = "Active tasks"
-Filter = "status:pending and +ACTIVE"
-Columns = [ "id", "start", "start.age", "entry.age", "depends.indicator", "priority", "project", "tags", "recur", "wait", "scheduled.remaining", "due", "until", "description" ]
-Labels = [ "ID", "Started", "Active", "Age", "D", "P", "Project", "Tags", "Recur", "W", "Sch", "Due", "Until", "Description" ]
