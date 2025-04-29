@@ -75,7 +75,7 @@ public class DueDateHelperTests
         // Act
         var date = sut.Parse(dayOfWeek);
         // Assert
-        await Assert.That(date).IsNotNull();
+        await Assert.That(date).();
         await Assert.That(date!).IsEquatableOrEqualTo(expected);
     }
 }

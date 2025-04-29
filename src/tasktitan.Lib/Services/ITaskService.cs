@@ -5,11 +5,12 @@ using Microsoft.Extensions.Options;
 using TaskTitan.Lib;
 using TaskTitan.Lib.Configuration;
 using TaskTitan.Lib.Parsing;
+using TaskTitan.Lib.Tasks;
 
 public interface ITaskService
 {
     // Add: No change needed in signature
-    Task AddTaskAsync(string description, string? project, string? dueDate, char? priority, string[]? tags);
+    Task AddTaskAsync(AddTaskArgs args);
 
     // List: Now accepts standard filters AND a filter string. Needs context awareness.
     Task ListTasksAsync(string? projectFilter, string? statusFilter, char? priorityFilter, string[]? tagFilters, string[]? sortKeys, string? rawFilterString); // Added rawFilterString
@@ -70,7 +71,7 @@ public class TaskService : ITaskService
         _udas = options.Value.Uda;
         _dateParser = new DateParser(timeProvider ?? TimeProvider.System);
     }
-    public Task AddTaskAsync(string description, string? project, string? dueDate, char? priority, string[]? tags)
+    public Task AddTaskAsync(AddTaskArgs args)
     {
         throw new NotImplementedException();
     }
