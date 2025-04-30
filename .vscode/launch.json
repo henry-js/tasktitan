@@ -8,43 +8,14 @@
             "name": "TaskTitan",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
-            // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/artifacts/bin/TaskTitan.Cli/debug_win-x64/task.dll",
-            "args": [
-                "do",
-                "hello"
-                // "start",
-                // "due.after:tomorrow",
-                // "-m",
-                // "due:tomorrow",
-                // "-m",
-                // "desc:'i am a new description'"
-                // "add",
-                // "i have a desc",
-                // "due:tomorrow",
-                // "priority:H"
-            ],
-            "cwd": "${workspaceFolder}/src/Cli",
-            // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
+            "preLaunchTask": "dotnet: build",
+            "program": "${workspaceFolder}/artifacts/bin/tasktitan/debug/task.dll",
+            "launchSettingsProfile": "Debug",
+            "launchSettingsFilePath": "${workspaceFolder}/src/tasktitan/Properties/launchSettings.json",
+            "logging": {
+                "moduleLoad": false
+            },
             "console": "externalTerminal",
-            "stopAtEntry": false,
-        },
-        {
-            // Use IntelliSense to find out which attributes exist for C# debugging
-            // Use hover for the description of the existing attributes
-            // For further information visit https://github.com/dotnet/vscode-csharp/blob/main/debugger-launchjson.md
-            "name": "Test",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build",
-            // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/artifacts/bin/TaskTitan.Tests/debug/TaskTitan.Tests.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/tests",
-            // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
-            "console": "externalTerminal",
-            "stopAtEntry": false
         },
         {
             // Use IntelliSense to find out which attributes exist for C# debugging

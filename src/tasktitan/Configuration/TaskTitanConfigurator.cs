@@ -1,18 +1,7 @@
-
-using System.Collections;
 using System.Diagnostics.CodeAnalysis;
-
-using CsToml;
-using CsToml.Formatter;
-
-using TaskTitan.Data.Reports;
-using TaskTitan.Lib.Configuration;
-
-using Velopack.Sources;
 
 namespace TaskTitan.Cli.Config;
 
-[TomlSerializedObject]
 public partial class Configuration
 {
     public Configuration()
@@ -27,13 +16,11 @@ public partial class Configuration
 
     // [TomlValueOnSerialized("table")]
     public ReportDefinition[] ReportsA { get; set; }
-    [TomlValueOnSerialized]
     public ReportDefinition Report1 { get; set; }
-    // [TomlValueOnSerialized]
+    // 
     public ReportDefinition Report2 { get; set; }
-    [TomlValueOnSerialized]
     public IDictionary<string, ReportDefinition> ReportDict { get; set; }
-    // [TomlValueOnSerialized]
+    // 
     // public IDictionary<string, ReportDefinition> ReportsB { get; set; }
 }
 public static class TaskTitanConfigurator
@@ -297,7 +284,7 @@ public static class TaskTitanConfigurator
     }
 }
 
-// [TomlSerializedObject]
+// 
 public partial class ReportDictionary : IDictionary<string, ReportDefinition>
 {
     private readonly Dictionary<string, ReportDefinition> _backingDict = [];
@@ -370,17 +357,17 @@ public partial class ReportDictionary : IDictionary<string, ReportDefinition>
 }
 public interface IConfig
 {
-    [TomlValueOnSerialized] public string Name { get; set; }
+    public string Name { get; set; }
 }
 
-[TomlSerializedObject]
+
 public partial class ReportDefinition : IConfig
 {
-    [TomlValueOnSerialized] public string Name { get; set; } = default!;
-    [TomlValueOnSerialized] public required string Description { get; set; }
-    [TomlValueOnSerialized] public string Filter { get; set; } = string.Empty;
-    [TomlValueOnSerialized] public string[] Columns { get; set; } = [];
-    [TomlValueOnSerialized] public string[] Labels { get; set; } = [];
+    public string Name { get; set; } = default!;
+    public required string Description { get; set; }
+    public string Filter { get; set; } = string.Empty;
+    public string[] Columns { get; set; } = [];
+    public string[] Labels { get; set; } = [];
 
     public static ReportDefinition FromFilter(string v)
     {
@@ -394,34 +381,4 @@ public partial class ReportDefinition : IConfig
         return this;
     }
     // TODO: Add support for sorting
-}
-
-public class ReportDictionaryFormatter : ITomlValueFormatter<IDictionary<string, ReportDefinition>>
-{
-    public IDictionary<string, ReportDefinition> Deserialize(ref TomlDocumentNode rootNode, CsTomlSerializerOptions options)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void Serialize<TBufferWriter>(ref Utf8TomlDocumentWriter<TBufferWriter> writer, IDictionary<string, ReportDefinition> target, CsTomlSerializerOptions options) where TBufferWriter : System.Buffers.IBufferWriter<byte>
-    {
-        writer.BeginScope();
-        if (options.SerializeOptions.TableStyle == TomlTableStyle.Header && (writer.State == TomlValueState.Default || writer.State == TomlValueState.Table))
-        {
-            writer.WriteTableHeader("Test"u8);
-            writer.WriteNewLine();
-            // writer.BeginCurrentState(TomlValueState.Table);
-            // writer.PushKey("Report1"u8);
-            // options.Resolver.GetFormatter<IDictionary<string, ReportDefinition>>()!.Serialize(ref writer, target, options);
-            // writer.PopKey();
-            writer.EndCurrentState();
-        }
-        else
-        {
-            writer.PushKey("Test2"u8);
-            // options.Resolver.GetFormatter<IDictionary<string, ReportDefinition>>()!.Serialize(ref writer, target, options);
-            writer.PopKey();
-        }
-        writer.EndScope();
-    }
 }

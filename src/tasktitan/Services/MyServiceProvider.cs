@@ -1,3 +1,6 @@
+using LiteDB;
+
+using TaskTitan.Data;
 using TaskTitan.Lib.Parsing;
 
 namespace tasktitan.Services;
@@ -7,12 +10,13 @@ namespace tasktitan.Services;
 [Singleton(typeof(ILogger<>), Factory = nameof(CreateLogger))]
 [Import(typeof(IOptionsModule))]
 [Transient<IConfigureOptions<CliConfig>>(Factory = nameof(BindCliConfig))]
-[Singleton(typeof(IService), typeof(ServiceImplementation))]
-[Singleton<IFilterParser, ParlotFilterParser>]
-[Singleton<IModificationParser, ParlotModificationParser>]
-[Singleton<ITaskService, TaskService>]
 [Singleton<TimeProvider>(Instance = nameof(SystemTimeProvider))]
+[Singleton<ITaskService, TaskService>]
 [Singleton<TaskCommands>]
+[Singleton<IModificationParser, ParlotModificationParser>]
+[Transient<IConfigureOptions<LiteDbOptions>>(Factory = nameof(BindLightDbOptions))]
+[Singleton<LiteDatabase>(Factory = nameof(CreateLiteDb))]
+[Singleton<LiteDbContext>]
 [Singleton<IConfiguration>(Factory = nameof(CreateConfiguration))]
 
 internal partial class MyServiceProvider
@@ -41,4 +45,13 @@ internal partial class MyServiceProvider
     private static IConfigureOptions<CliConfig> BindCliConfig(IConfiguration configuration)
         => IOptionsModule
             .Configure<CliConfig>(config => configuration.Bind("Config", config));
+    private static IConfigureOptions<LiteDbOptions> BindLightDbOptions()
+    {
+        return IOptionsModule.Configure<LiteDbOptions>(options => options.DatabaseDirectory = options.DatabaseDirectory);
+    }
+    private static LiteDatabase CreateLiteDb(IOptions<LiteDbOptions> options)
+    {
+        return new LiteDatabase(options.Value.ConnectionString);
+    }
+
 }

@@ -1,3 +1,6 @@
+using TaskTitan.Core;
+using TaskTitan.Lib.Tasks;
+
 namespace tasktitan.Commands;
 
 public class TaskCommands
@@ -17,18 +20,48 @@ public class TaskCommands
     /// <param name="description">The description of the task (required).</param>
     /// <param name="project">-p, Assign task to a project.</param>
     /// <param name="due">-d, Set a due date (e.g., 'tomorrow', 'eom', '2024-12-31').</param>
-    /// <param name="priority">Set priority (H, M, L).</param>
-    /// <param name="tag">-t, Add one or more tags.</param>
+    /// <param name="tags">-t, Add one or more tags.</param>
+    /// <returns></returns>
     public async Task Add(
         [Argument] string description,
+        string status = "pending",
         string? project = null,
         string? due = null,
-        char? priority = null,
-        string[]? tag = null)
+        params string[]? tags)
     {
         _logger.LogDebug("Executing Add command");
+
+        var args = new AddTaskArgs(Description: description, Status: status, Project: project, DueDate: due, Tags: tags);
         // Simple Add command remains unchanged in structure
-        await _taskService.AddTaskAsync(description, project, due, priority, tag);
+        await _taskService.AddTaskAsync(args);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="modifications"></param>
+    /// <param name="taskId"></param>
+    /// <param name="filter"></param>
+    /// <returns></returns>
+    public async Task Modify(
+        [Argument] string modifications, // The modification string is now a required argument
+        string? taskId = null,         // Optional taskId (if not using filter)
+        string? filter = null)         // Filter option
+    {
+        ValidateIdOrFilter((string)taskId, filter, nameof(Modify)); // Keep this validation
+
+        if (taskId != null)
+        {
+            _logger.LogDebug("Executing Modify command for Task ID: {TaskId} with modifications: '{Modifications}'", taskId, modifications);
+            // Call service with raw modification string
+            await _taskService.ModifyTaskAsync((string)taskId, modifications);
+        }
+        else // filter must be non-null
+        {
+            _logger.LogDebug("Executing bulk Modify command for filter: {FilterString} with modifications: '{Modifications}'", filter, modifications);
+            // Call service with raw modification string
+            await _taskService.ModifyTasksAsync(filter!, modifications);
+        }
     }
 
     // /// <summary>
@@ -38,15 +71,13 @@ public class TaskCommands
     // /// </summary>
     // /// <param name="project">-p|--project, Filter by project.</param>
     // /// <param name="status">--status, Filter by status (default: pending).</param>
-    // /// <param name="priority">--priority, Filter by priority (H, M, L).</param>
-    // /// <param name="tag">-t|--tag, Filter by tag(s).</param>
+    // /// <param name="tags">-t|--tag, Filter by tag(s).</param>
     // /// <param name="filter">-f|--filter, Apply a complex filter string (e.g., "project:Work and (status:pending or +urgent)"). Overrides/combines with standard options based on service logic.</param>
     // /// <param name="sort">-s|--sort, Sort key(s) (e.g., 'priority-', 'due+').</param>
     // public async Task List(
     //     string? project = null,
     //     string? status = "pending",
-    //     char? priority = null,
-    //     string[]? tag = null,
+    //     string[]? tags = null,
     //     string? filter = null, // <-- New filter option
     //     string[]? sort = null)
     // {
@@ -78,35 +109,6 @@ public class TaskCommands
     //     }
     // }
 
-    // /// <summary>
-    // /// Modifies attributes of an existing task or multiple tasks based on a filter.
-    // /// Provide a single Task ID/UUID OR use --filter. Modifications are specified in the modification string.
-    // /// Example: tasktitan modify 123 "project:Work priority:H +urgent"
-    // /// Example: tasktitan modify --filter "status:pending" "due:eom -project:Old"
-    // /// </summary>
-    // /// <param name="modifications">A string containing space-separated modifications (e.g., "project:Work priority:H +urgent").</param>
-    // /// <param name="taskId">The ID or UUID of the single task to modify. Omit if using --filter.</param>
-    // /// <param name="filter">--filter, A filter string identifying multiple tasks to modify. Use instead of taskId.</param>
-    // public async Task Modify(
-    //     [Argument] string modifications, // The modification string is now a required argument
-    //     string? taskId = null,         // Optional taskId (if not using filter)
-    //     string? filter = null)         // Filter option
-    // {
-    //     ValidateIdOrFilter(taskId, filter, nameof(Modify)); // Keep this validation
-
-    //     if (taskId != null)
-    //     {
-    //         _logger.LogDebug("Executing Modify command for Task ID: {TaskId} with modifications: '{Modifications}'", taskId, modifications);
-    //         // Call service with raw modification string
-    //         await _taskService.ModifyTaskAsync(taskId, modifications);
-    //     }
-    //     else // filter must be non-null
-    //     {
-    //         _logger.LogDebug("Executing bulk Modify command for filter: {FilterString} with modifications: '{Modifications}'", filter, modifications);
-    //         // Call service with raw modification string
-    //         await _taskService.ModifyTasksAsync(filter!, modifications);
-    //     }
-    // }
 
     // /// <summary>
     // /// Shows detailed information for a specific task. Only operates on a single ID/UUID.

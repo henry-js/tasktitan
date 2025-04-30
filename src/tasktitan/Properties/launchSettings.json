@@ -1,8 +1,8 @@
 {
     "profiles": {
-        "tasktitan": {
+        "Debug": {
             "commandName": "Project",
-            "commandLineArgs": "",
+            "commandLineArgs": "modify 'asd' --task-id one --filter \"due:tomorrow project:work\"",
             "workingDirectory": "..\\"
         }
     }

@@ -3,8 +3,8 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
+using TaskTitan.Core;
 using TaskTitan.Data.Expressions;
-using TaskTitan.Data.Extensions;
 using TaskTitan.Lib;
 using TaskTitan.Lib.Configuration;
 using TaskTitan.Lib.Enums;
@@ -28,6 +28,17 @@ public class LiteDbContext
         this.logger = logger;
         _options = options.Value;
         _dateParser = new DateParser(timeProvider);
+
+        BsonMapper.Global.RegisterType<TaskUuid>(f => f.Value, f => TaskUuid.From(f.AsGuid));
+        BsonMapper.Global.RegisterType<TagName>(f => f.Value, f => TagName.From(f.AsString));
+        BsonMapper.Global.RegisterType<DueDate>(f => f.Value.DateTime, f => DueDate.From(f.AsDateTime));
+        BsonMapper.Global.RegisterType<ProjectName>(f => f.Value, f => ProjectName.From(f.AsString));
+        BsonMapper.Global.RegisterType<TaskDescription>(f => f.Value, f => TaskDescription.From(f.AsString));
+        BsonMapper.Global.RegisterType<WaitDate>(f => f.Value.DateTime, f => WaitDate.From(f.AsDateTime));
+        BsonMapper.Global.RegisterType<ScheduledDate>(f => f.Value.DateTime, f => ScheduledDate.From(f.AsDateTime));
+        BsonMapper.Global.RegisterType<EntryDate>(f => f.Value.DateTime, f => EntryDate.From(f.AsDateTime));
+        BsonMapper.Global.RegisterType<ModifiedDate>(f => f.Value.DateTime, f => ModifiedDate.From(f.AsDateTime));
+        BsonMapper.Global.RegisterType<EndDate>(f => f.Value.DateTime, f => EndDate.From(f.AsDateTime));
         try
         {
             var db = new LiteDatabase(_options.ConnectionString);
@@ -40,41 +51,42 @@ public class LiteDbContext
 
         var tasks = db.GetCollection<TaskItem>(TaskCol, BsonAutoId.ObjectId);
 
-        tasks.EnsureIndex(x => x.Id, false);
+        tasks.EnsureIndex(x => x.Uuid, true);
         tasks.EnsureIndex(x => x.Status, false);
     }
 
     public ILiteCollection<TaskItem> Tasks => db.GetCollection<TaskItem>(TaskCol, BsonAutoId.ObjectId);
 
-    public int AddTask(IEnumerable<TaskAttribute> values)
-    {
-        var id = ObjectId.NewObjectId();
-        var task = new BsonDocument
-        {
-            ["_id"] = id,
-            [TaskColumns.Entry] = id.CreationTime
-        };
+    // public int AddTask(IEnumerable<TaskAttribute> values)
+    // {
+    //     var id = ObjectId.NewObjectId();
+    //     var task = new BsonDocument
+    //     {
+    //         ["_id"] = id,
+    //         [TaskColumns.Entry] = id.CreationTime
+    //     };
 
-        var tags = values.Where(p => p.AttributeKind == AttributeKind.Tag && p.Modifier == ColModifier.Include)
-            .Select(t => new BsonValue(t.Name))
-            .ToHashSet();
-        task[TaskColumns.Tags] = new BsonArray(tags);
+    //     var tags = values.Where(p => p.AttributeKind == AttributeKind.Tag && p.Modifier == ColModifier.Include)
+    //         .Select(t => new BsonValue(t.Name))
+    //         .ToHashSet();
+    //     task[TaskColumns.Tags] = new BsonArray(tags);
 
-        foreach (var item in values.Where(val => val.AttributeKind == AttributeKind.BuiltIn))
-        {
-            task[item.Name] = RetrieveValue(item);
-        }
-        var udas = BsonMapper.Global.ToDocument(values.Where(val => val.AttributeKind == AttributeKind.UserDefined).ToDictionary(k => k.Name));
+    //     foreach (var item in values.Where(val => val.AttributeKind == AttributeKind.BuiltIn))
+    //     {
+    //         task[item.Name] = RetrieveValue(item);
+    //     }
+    //     var udas = BsonMapper.Global.ToDocument(values.Where(val => val.AttributeKind == AttributeKind.UserDefined).ToDictionary(k => k.Name));
 
-        task[nameof(udas)] = udas;
-        if (!task.ContainsKey(TaskColumns.Status)) task[TaskColumns.Status] = TaskItemStatus.Pending.ToString();
+    //     task[nameof(udas)] = udas;
+    //     if (!task.ContainsKey(TaskColumns.Status)) task[TaskColumns.Status] = TaskItemStatus.Pending.ToString();
 
-        var tasks = db.GetCollection(TaskCol, BsonAutoId.ObjectId);
-        int workingSetCount = tasks.Count(Query.EQ("Status", TaskItemStatus.Pending.ToString()));
-        task["Id"] = workingSetCount + 1;
-        tasks.Insert(task);
-        return task["Id"];
-    }
+    //     var tasks = db.GetCollection(TaskCol, BsonAutoId.ObjectId);
+    //     int workingSetCount = tasks.Count(Query.EQ("Status", TaskItemStatus.Pending.ToString()));
+    //     task["Id"] = workingSetCount + 1;
+    //     tasks.Insert(task);
+    //     return task["Id"];
+
+    // }
 
     private BsonValue RetrieveValue(TaskAttribute item)
     {
@@ -94,39 +106,39 @@ public class LiteDbContext
         throw new Exception($"Could not parse value: {item.Name}");
     }
 
-    public IEnumerable<TaskItem> QueryTasks(FilterExpression? query = null)
-    {
-        if (query is null)
-        {
-            return Tasks.FindAll().OrderBy(t => t.Id).ToList();
-        }
-        var bson = query?.ToBsonExpression(_dateParser);
-        logger.LogInformation("Generated query: {query}", bson);
+    // public IEnumerable<TaskItem> QueryTasks(FilterExpression? query = null)
+    // {
+    //     if (query is null)
+    //     {
+    //         return Tasks.FindAll().OrderBy(t => t.Id).ToList();
+    //     }
+    //     var bson = query?.ToBsonExpression(_dateParser);
+    //     logger.LogInformation("Generated query: {query}", bson);
 
-        var tasks = Tasks.Find(bson).ToList();
-        logger.LogInformation("Fetched rows {rows}", tasks.Count);
-        return tasks;
-    }
+    //     var tasks = Tasks.Find(bson).ToList();
+    //     logger.LogInformation("Fetched rows {rows}", tasks.Count);
+    //     return tasks;
+    // }
 
-    public async Task NukeTaskAsync(TaskItem task)
-    {
-        await Task.Run(() => Tasks.Delete(task.TaskId));
-    }
+    // public async Task NukeTaskAsync(TaskItem task)
+    // {
+    //     await Task.Run(() => Tasks.Delete(task.TaskId));
+    // }
 
-    public async Task<bool> DeleteTask(TaskItem item)
-    {
-        return await Task.FromResult(true);
-    }
+    // public async Task<bool> DeleteTask(TaskItem item)
+    // {
+    //     return await Task.FromResult(true);
+    // }
 
-    public async Task<bool> UpdateTask(TaskItem item)
-    {
-        return await Task.Run(() => Tasks.Update(item));
-    }
+    // public async Task<bool> UpdateTask(TaskItem item)
+    // {
+    //     return await Task.Run(() => Tasks.Update(item));
+    // }
 
-    public async Task<bool> BulkUpdateTask(IEnumerable<TaskItem> tasks)
-    {
-        throw new NotImplementedException();
-    }
+    // public async Task<bool> BulkUpdateTask(IEnumerable<TaskItem> tasks)
+    // {
+    //     throw new NotImplementedException();
+    // }
 }
 
 public static class LiteDbMappers
