@@ -2,7 +2,7 @@
     "profiles": {
         "Debug": {
             "commandName": "Project",
-            "commandLineArgs": "modify 'asd' --task-id one --filter \"due:tomorrow project:work\"",
+            "commandLineArgs": "modify 'asd' --task-id one --filter [\"due:tomorrow\",  \"project:work\"]",
             "workingDirectory": "..\\"
         }
     }
