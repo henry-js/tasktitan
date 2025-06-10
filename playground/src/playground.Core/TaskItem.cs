@@ -3,8 +3,7 @@ using Vogen;
 namespace playground.Core;
 
 [ValueObject<int>] public partial struct TaskId { }
-[ValueObject<Guid>]
-public partial class TaskUuid { }
+[ValueObject<Guid>] public partial class TaskUuid { }
 
 [ValueObject<string>]
 public partial class ProjectName
@@ -13,7 +12,12 @@ public partial class ProjectName
     private static Validation Validate(string value) =>
         string.IsNullOrWhiteSpace(value) ? Validation.Invalid("Project name cannot be empty.") : Validation.Ok;
 }
-
+[ValueObject<string>]
+public readonly partial struct TaskDescription
+{
+    private static Validation Validate(string? value) =>
+      string.IsNullOrEmpty(value) ? Validation.Invalid("Description cannot be empty.") : Validation.Ok;
+}
 [ValueObject<string>]
 public readonly partial struct TagName
 {
@@ -27,13 +31,6 @@ public readonly partial struct TagName
 [ValueObject<DateTimeOffset>] public readonly partial struct EntryDate;
 [ValueObject<DateTimeOffset>] public readonly partial struct ModifiedDate;
 [ValueObject<DateTimeOffset>] public readonly partial struct EndDate;
-
-[ValueObject<string>]
-public readonly partial struct TaskDescription
-{
-    private static Validation Validate(string? value) =>
-      string.IsNullOrEmpty(value) ? Validation.Invalid("Description cannot be empty.") : Validation.Ok;
-}
 
 public record TaskItem
 (
