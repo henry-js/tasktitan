@@ -1,0 +1,17 @@
+# https://taskfile.dev
+
+version: "3"
+
+includes:
+  ci: ./.build/dotnet.yml
+
+vars:
+  SOLUTION_FILE: tasktitan.sln
+  PROJECT_TO_PUBLISH: src/tasktitan/tasktitan.csproj
+
+tasks:
+  default:
+    desc: "Builds and tests the project"
+    cmds:
+      - task: ci:build
+      - task: ci:test
