@@ -2,7 +2,7 @@
     "profiles": {
         "playground": {
             "commandName": "Project",
-            "commandLineArgs": "",
+            "commandLineArgs": "list --from 1 --to 3",
             "workingDirectory": "..\\"
         }
     }

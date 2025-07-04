@@ -15,6 +15,7 @@ internal sealed class ExceptionFilter(ConsoleAppFilter next, ILoggerFactory fact
         {
             AnsiConsole.MarkupLineInterpolated($"[red]{ex.Message}[/]");
             logger.LogError(ex, "Program stopped");
+            Console.ReadLine();
         }
     }
 }

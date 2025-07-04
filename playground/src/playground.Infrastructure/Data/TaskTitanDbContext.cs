@@ -19,7 +19,7 @@ public class TaskTitanDbContext : DbContext
 
     public TaskTitanDbContext(string dbPath = "tasktitan.db")
     {
-        _dbPath = dbPath;
+        _dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, dbPath);
         var dir = Path.GetDirectoryName(_dbPath);
         if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
         {
