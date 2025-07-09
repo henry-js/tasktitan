@@ -1,13 +1,21 @@
-﻿using System.Diagnostics;
+﻿
+using Microsoft.Extensions.DependencyInjection;
 
-using playground;
+using playground.DependencyInjection;
+using playground.Filters;
+using playground.Infrastructure.Data;
 
 using Velopack;
 
 VelopackApp.Build().Run();
+var configuration = Extensions.CreateConfiguration();
+var services = new ServiceCollection();
+services.AddLogging(builder => builder.ConfigureSerilog());
+services.AddSingleton(configuration);
+services.AddSingleton<TaskTitanDbContext>();
+services.AddSingleton<ITaskItemRepository, SqliteTaskItemRepository>();
+ConsoleApp.ServiceProvider = services.BuildServiceProvider();
 
-MyServiceProvider sp = new();
-ConsoleApp.ServiceProvider = sp;
 var app = ConsoleApp.Create();
 app.Add<TaskCommands>();
 
@@ -15,23 +23,3 @@ app.UseFilter<ExceptionFilter>();
 app.UseFilter<LogRunningTimeFilter>();
 
 await app.RunAsync(args);
-
-
-internal class LogRunningTimeFilter(ConsoleAppFilter next) : ConsoleAppFilter(next)
-{
-    public override async Task InvokeAsync(ConsoleAppContext context, CancellationToken cancellationToken)
-    {
-        var startTime = Stopwatch.GetTimestamp();
-        ConsoleApp.Log($"Execute command at {DateTime.UtcNow.ToLocalTime()}"); // LocalTime for human readable time
-        try
-        {
-            await Next.InvokeAsync(context, cancellationToken);
-            ConsoleApp.Log($"Command execute successfully at {DateTime.UtcNow.ToLocalTime()}, Elapsed: " + (Stopwatch.GetElapsedTime(startTime)));
-        }
-        catch
-        {
-            ConsoleApp.Log($"Command execute failed at {DateTime.UtcNow.ToLocalTime()}, Elapsed: " + (Stopwatch.GetElapsedTime(startTime)));
-            throw;
-        }
-    }
-}

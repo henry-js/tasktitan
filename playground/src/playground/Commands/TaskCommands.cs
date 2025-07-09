@@ -1,6 +1,3 @@
-using System.Data.Common;
-
-using playground.Core;
 using playground.Infrastructure.Data;
 
 namespace playground.Commands;

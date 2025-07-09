@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
+using Microsoft.Extensions.Logging;
 
 using playground.Core;
 
@@ -16,29 +17,28 @@ public class TaskTitanDbContext : DbContext
     public DbSet<TaskItem> TaskItems { get; set; } = null!;
 
     private readonly string _dbPath;
+    private readonly ILogger<TaskTitanDbContext> _logger;
 
-    public TaskTitanDbContext(string dbPath = "tasktitan.db")
+    public TaskTitanDbContext(ILogger<TaskTitanDbContext> logger, string dbPath = "tasktitan.db")
     {
-        _dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, dbPath);
+        _dbPath = dbPath;
+        _logger = logger;
         var dir = Path.GetDirectoryName(_dbPath);
+        _dbPath = Path.Combine(Directory.GetCurrentDirectory(), _dbPath);
         if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
         {
             Directory.CreateDirectory(dir);
         }
     }
 
-    public TaskTitanDbContext(DbContextOptions<TaskTitanDbContext> options) : base(options)
-    {
-        _dbPath = "tasktitan_di.db";
-    }
-
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.ConfigureWarnings(w => w.Ignore([RelationalEventId.PendingModelChangesWarning]));
+        // optionsBuilder.ConfigureWarnings(w => w.Ignore([RelationalEventId.PendingModelChangesWarning]));
         if (!optionsBuilder.IsConfigured)
         {
             optionsBuilder.UseSqlite($"Data Source={_dbPath}");
         }
+        optionsBuilder.LogTo(s => _logger.LogInformation(s));
     }
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -50,7 +50,7 @@ public class TaskTitanDbContext : DbContext
                 => t.Uuid).HasValueGenerator<TaskUuidValueGenerator>());
 
         FakeData.Init(1000);
-
+        builder.Entity<TaskItem>().ToTable("tasks");
         builder.Entity<TaskItem>().HasData(FakeData.TaskItems);
     }
 
@@ -113,6 +113,8 @@ public class SqliteTaskItemRepository : ITaskItemRepository
 
     public async Task<IEnumerable<TaskItem>> GetAllAsync()
     {
+        var connectionString = _context.Database.GetDbConnection().ConnectionString;
+        Console.WriteLine($"[DEBUG] Connecting to database with: {connectionString}");
         return await _context.TaskItems.AsNoTracking().ToListAsync();
     }
 

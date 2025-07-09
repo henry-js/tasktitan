@@ -24,6 +24,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Serilog" Version="4.2.0" />
+    <PackageReference Include="Serilog.Expressions" Version="5.0.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.1" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
@@ -61,14 +62,12 @@
     <Using Include="playground.Commands" />
     <Using Include="playground.Configuration" />
     <Using Include="playground.Filters" />
-    <Using Include="playground.Services" />
     <Using Include="ConsoleAppFramework" />
     <Using Include="Spectre.Console" />
     <Using Include="Jab" />
     <Using Include="Raiqub.JabModules.MicrosoftExtensionsOptions" />
     <Using Include="Microsoft.Extensions.Configuration" />
     <Using Include="Microsoft.Extensions.Logging" />
-    <Using Include="Microsoft.Extensions.Logging.LoggerFactory" Alias="MSLogger" />
     <Using Include="Microsoft.Extensions.Options" />
     <Using Include="System.Text.Json" />
     <Using Include="System.Text.Json.Serialization" />
